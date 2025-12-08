@@ -261,6 +261,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_mandataire_for_candidat: {
+        Args: { _candidat_id: string; _user_id: string }
+        Returns: boolean
+      }
+      mandataire_has_campaign_access: {
+        Args: { _campaign_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "comptable" | "mandataire" | "candidat"
