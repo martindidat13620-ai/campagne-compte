@@ -9,7 +9,9 @@ import {
   Search,
   Filter,
   Download,
-  Eye
+  Eye,
+  Trash2,
+  Loader2
 } from 'lucide-react';
 import { Operation, ValidationStatus } from '@/types';
 import { cn } from '@/lib/utils';
@@ -37,24 +39,40 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface OperationsTableProps {
   operations: Operation[];
   showValidationActions?: boolean;
+  showDeleteAction?: boolean;
   onValidate?: (id: string) => void;
   onReject?: (id: string, comment: string) => void;
+  onDelete?: (id: string) => Promise<void>;
 }
 
 export function OperationsTable({ 
   operations, 
   showValidationActions = false,
+  showDeleteAction = false,
   onValidate,
-  onReject 
+  onReject,
+  onDelete
 }: OperationsTableProps) {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedOp, setSelectedOp] = useState<Operation | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const filteredOps = useMemo(() => {
     return operations
@@ -126,6 +144,16 @@ export function OperationsTable({
     link.click();
   };
 
+  const handleDelete = async (id: string) => {
+    if (!onDelete) return;
+    setDeletingId(id);
+    try {
+      await onDelete(id);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Filters */}
@@ -184,12 +212,13 @@ export function OperationsTable({
               <TableHead className="hidden sm:table-cell">Statut</TableHead>
               <TableHead className="w-[80px]">Pièce</TableHead>
               {showValidationActions && <TableHead className="w-[100px]">Actions</TableHead>}
+              {showDeleteAction && <TableHead className="w-[60px]"></TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredOps.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={showValidationActions ? 7 : 6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={showValidationActions ? 7 : (showDeleteAction ? 7 : 6)} className="text-center py-8 text-muted-foreground">
                   Aucune opération trouvée
                 </TableCell>
               </TableRow>
@@ -268,6 +297,43 @@ export function OperationsTable({
                           </Button>
                         </div>
                       )}
+                    </TableCell>
+                  )}
+                  {showDeleteAction && (
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button 
+                            size="icon" 
+                            variant="ghost" 
+                            className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                            disabled={deletingId === op.id}
+                          >
+                            {deletingId === op.id ? (
+                              <Loader2 size={16} className="animate-spin" />
+                            ) : (
+                              <Trash2 size={16} />
+                            )}
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Supprimer cette opération ?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Cette action est irréversible. L'opération de {op.montant.toLocaleString('fr-FR')} € sera définitivement supprimée.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={() => handleDelete(op.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Supprimer
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </TableCell>
                   )}
                 </TableRow>

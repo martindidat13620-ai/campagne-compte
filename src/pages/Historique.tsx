@@ -5,40 +5,58 @@ import { supabase } from '@/integrations/supabase/client';
 import { useMandataireData } from '@/hooks/useMandataireData';
 import { Operation } from '@/types';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function Historique() {
   const { mandataire, candidat, loading: mandataireLoading } = useMandataireData();
   const [operations, setOperations] = useState<Operation[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchOperations() {
-      if (!mandataire) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const { data, error } = await supabase
-          .from('operations')
-          .select('*')
-          .eq('mandataire_id', mandataire.id)
-          .order('date', { ascending: false });
-
-        if (error) throw error;
-
-        setOperations(data as Operation[] || []);
-      } catch (err) {
-        console.error('Erreur lors du chargement des opérations:', err);
-      } finally {
-        setLoading(false);
-      }
+  const fetchOperations = async () => {
+    if (!mandataire) {
+      setLoading(false);
+      return;
     }
 
+    try {
+      const { data, error } = await supabase
+        .from('operations')
+        .select('*')
+        .eq('mandataire_id', mandataire.id)
+        .order('date', { ascending: false });
+
+      if (error) throw error;
+
+      setOperations(data as Operation[] || []);
+    } catch (err) {
+      console.error('Erreur lors du chargement des opérations:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     if (!mandataireLoading) {
       fetchOperations();
     }
   }, [mandataire, mandataireLoading]);
+
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('operations')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      toast.success('Opération supprimée');
+      setOperations(ops => ops.filter(op => op.id !== id));
+    } catch (err: any) {
+      console.error('Erreur lors de la suppression:', err);
+      toast.error('Erreur lors de la suppression');
+    }
+  };
 
   const isLoading = mandataireLoading || loading;
 
@@ -64,7 +82,11 @@ export default function Historique() {
             </p>
           </div>
         ) : (
-          <OperationsTable operations={operations} />
+          <OperationsTable 
+            operations={operations} 
+            showDeleteAction={true}
+            onDelete={handleDelete}
+          />
         )}
       </div>
     </AppLayout>
