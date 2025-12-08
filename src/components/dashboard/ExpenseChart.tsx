@@ -7,15 +7,16 @@ interface ExpenseChartProps {
   type: 'bar' | 'pie';
 }
 
+// Expansi-inspired color palette
 const COLORS = [
-  'hsl(220, 60%, 22%)',
-  'hsl(165, 60%, 40%)',
-  'hsl(38, 92%, 50%)',
-  'hsl(280, 60%, 50%)',
-  'hsl(200, 70%, 50%)',
-  'hsl(340, 70%, 50%)',
-  'hsl(100, 60%, 45%)',
-  'hsl(30, 80%, 55%)',
+  'hsl(205, 65%, 25%)',   // Navy
+  'hsl(175, 65%, 40%)',   // Teal
+  'hsl(10, 75%, 65%)',    // Coral
+  'hsl(175, 50%, 55%)',   // Light teal
+  'hsl(205, 45%, 45%)',   // Medium navy
+  'hsl(35, 85%, 55%)',    // Warm orange
+  'hsl(205, 30%, 60%)',   // Slate blue
+  'hsl(175, 35%, 50%)',   // Muted teal
 ];
 
 export function ExpenseChart({ operations, type }: ExpenseChartProps) {
@@ -69,8 +70,8 @@ export function ExpenseChart({ operations, type }: ExpenseChartProps) {
               />
               <Bar 
                 dataKey="montant" 
-                fill="hsl(220, 60%, 22%)" 
-                radius={[4, 4, 0, 0]}
+                fill="hsl(205, 65%, 25%)" 
+                radius={[6, 6, 0, 0]}
               />
             </BarChart>
           </ResponsiveContainer>
