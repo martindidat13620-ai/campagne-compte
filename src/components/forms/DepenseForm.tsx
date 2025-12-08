@@ -82,7 +82,7 @@ export function DepenseForm() {
       description: `Dépense de ${parseFloat(formData.montant).toLocaleString('fr-FR')} € ajoutée avec succès`,
     });
 
-    navigate('/dashboard');
+    navigate('/mandataire');
   };
 
   return (
