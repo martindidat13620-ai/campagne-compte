@@ -78,10 +78,12 @@ export default function MandataireDashboard() {
             )
           `)
           .eq('id', link.candidat_id)
-          .single();
+          .maybeSingle();
 
         if (candidatError) {
           console.error('Error fetching candidat:', candidatError);
+        } else if (!candidatData) {
+          console.log('Candidat not found');
         } else if (candidatData) {
           const campaign = Array.isArray(candidatData.campaigns) 
             ? candidatData.campaigns[0] 
