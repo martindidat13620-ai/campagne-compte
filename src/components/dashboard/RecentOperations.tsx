@@ -24,7 +24,7 @@ export function RecentOperations({ operations, limit = 5, showViewAll = true }: 
             Validée
           </Badge>
         );
-      case 'refusee':
+      case 'rejetee':
         return (
           <Badge variant="outline" className="badge-rejected gap-1">
             <XCircle size={12} />
@@ -76,9 +76,9 @@ export function RecentOperations({ operations, limit = 5, showViewAll = true }: 
             >
               <div className={cn(
                 "p-2 rounded-lg",
-                op.type === 'depense' ? 'bg-destructive/10' : 'bg-success/10'
+                op.type_operation === 'depense' ? 'bg-destructive/10' : 'bg-success/10'
               )}>
-                {op.type === 'depense' ? (
+                {op.type_operation === 'depense' ? (
                   <ArrowUpRight size={18} className="text-destructive" />
                 ) : (
                   <ArrowDownLeft size={18} className="text-success" />
@@ -87,7 +87,7 @@ export function RecentOperations({ operations, limit = 5, showViewAll = true }: 
 
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-foreground truncate">
-                  {op.beneficiaire || op.donateurNom || op.categorie}
+                  {op.beneficiaire || op.donateur_nom || op.categorie}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {formatDate(op.date)} • {op.categorie}
@@ -97,12 +97,12 @@ export function RecentOperations({ operations, limit = 5, showViewAll = true }: 
               <div className="text-right">
                 <p className={cn(
                   "font-semibold",
-                  op.type === 'depense' ? 'text-destructive' : 'text-success'
+                  op.type_operation === 'depense' ? 'text-destructive' : 'text-success'
                 )}>
-                  {op.type === 'depense' ? '-' : '+'}{op.montant.toLocaleString('fr-FR')} €
+                  {op.type_operation === 'depense' ? '-' : '+'}{op.montant.toLocaleString('fr-FR')} €
                 </p>
                 <div className="mt-1">
-                  {getStatusBadge(op.statutValidation)}
+                  {getStatusBadge(op.statut_validation)}
                 </div>
               </div>
             </div>

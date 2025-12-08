@@ -198,6 +198,90 @@ export type Database = {
         }
         Relationships: []
       }
+      operations: {
+        Row: {
+          beneficiaire: string | null
+          candidat_id: string
+          categorie: string
+          commentaire: string | null
+          commentaire_comptable: string | null
+          created_at: string
+          date: string
+          donateur_adresse: string | null
+          donateur_nationalite: string | null
+          donateur_nom: string | null
+          id: string
+          justificatif_nom: string | null
+          justificatif_url: string | null
+          mandataire_id: string
+          mode_paiement: string
+          montant: number
+          numero_recu: string | null
+          statut_validation: string
+          type_operation: string
+          updated_at: string
+        }
+        Insert: {
+          beneficiaire?: string | null
+          candidat_id: string
+          categorie: string
+          commentaire?: string | null
+          commentaire_comptable?: string | null
+          created_at?: string
+          date: string
+          donateur_adresse?: string | null
+          donateur_nationalite?: string | null
+          donateur_nom?: string | null
+          id?: string
+          justificatif_nom?: string | null
+          justificatif_url?: string | null
+          mandataire_id: string
+          mode_paiement: string
+          montant: number
+          numero_recu?: string | null
+          statut_validation?: string
+          type_operation: string
+          updated_at?: string
+        }
+        Update: {
+          beneficiaire?: string | null
+          candidat_id?: string
+          categorie?: string
+          commentaire?: string | null
+          commentaire_comptable?: string | null
+          created_at?: string
+          date?: string
+          donateur_adresse?: string | null
+          donateur_nationalite?: string | null
+          donateur_nom?: string | null
+          id?: string
+          justificatif_nom?: string | null
+          justificatif_url?: string | null
+          mandataire_id?: string
+          mode_paiement?: string
+          montant?: number
+          numero_recu?: string | null
+          statut_validation?: string
+          type_operation?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operations_candidat_id_fkey"
+            columns: ["candidat_id"]
+            isOneToOne: false
+            referencedRelation: "candidats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operations_mandataire_id_fkey"
+            columns: ["mandataire_id"]
+            isOneToOne: false
+            referencedRelation: "mandataires"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string | null
