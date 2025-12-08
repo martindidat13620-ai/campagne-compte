@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Plus, Send, Building2, Users, UserCheck, Loader2, Trash2, Key, Filter } from 'lucide-react';
+import { Plus, Send, Building2, Users, UserCheck, Loader2, Trash2, Key, Filter, Pencil } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TYPES_ELECTION, Campaign, Candidat, Mandataire } from '@/types';
 
@@ -45,6 +45,9 @@ export default function ComptableGestion() {
   const [dialogOpen, setDialogOpen] = useState({ campaign: false, candidat: false, mandataire: false });
   const [inviteDialog, setInviteDialog] = useState<{ open: boolean; type: 'candidat' | 'mandataire'; record: Candidat | Mandataire | null }>({ open: false, type: 'candidat', record: null });
   const [inviteOptions, setInviteOptions] = useState({ customPassword: '', skipEmail: false });
+  const [editCandidatDialog, setEditCandidatDialog] = useState<{ open: boolean; candidat: Candidat | null }>({ open: false, candidat: null });
+  const [editPlafond, setEditPlafond] = useState<number>(0);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -354,6 +357,38 @@ export default function ComptableGestion() {
     return campaign ? `${campaign.nom} (${campaign.annee})` : 'N/A';
   };
 
+  const openEditCandidatDialog = (candidat: Candidat) => {
+    setEditCandidatDialog({ open: true, candidat });
+    setEditPlafond(candidat.plafond_depenses || 0);
+  };
+
+  const updateCandidatPlafond = async () => {
+    if (!editCandidatDialog.candidat) return;
+    
+    setUpdating(true);
+    try {
+      const { error } = await supabase
+        .from('candidats')
+        .update({ plafond_depenses: editPlafond })
+        .eq('id', editCandidatDialog.candidat.id);
+
+      if (error) {
+        toast.error('Erreur lors de la mise à jour du plafond');
+        console.error('Update error:', error);
+        return;
+      }
+
+      toast.success('Plafond mis à jour avec succès');
+      setEditCandidatDialog({ open: false, candidat: null });
+      fetchData();
+    } catch (error) {
+      console.error('Error updating plafond:', error);
+      toast.error('Erreur lors de la mise à jour');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   if (loading) {
     return (
       <AppLayout>
@@ -581,6 +616,9 @@ export default function ComptableGestion() {
                             Inviter
                           </Button>
                         )}
+                        <Button variant="outline" size="icon" onClick={() => openEditCandidatDialog(candidat)}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <Button variant="destructive" size="icon" disabled={deleting === candidat.id}>
@@ -616,6 +654,32 @@ export default function ComptableGestion() {
                 <p className="text-center text-muted-foreground py-8">Aucun candidat trouvé</p>
               )}
             </div>
+
+            {/* Dialog pour modifier le plafond */}
+            <Dialog open={editCandidatDialog.open} onOpenChange={(open) => setEditCandidatDialog({ ...editCandidatDialog, open })}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Modifier le plafond</DialogTitle>
+                  <DialogDescription>
+                    Modifier le plafond de dépenses de {editCandidatDialog.candidat?.prenom} {editCandidatDialog.candidat?.nom}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label>Plafond de dépenses (€)</Label>
+                    <Input 
+                      type="number" 
+                      value={editPlafond} 
+                      onChange={(e) => setEditPlafond(parseFloat(e.target.value) || 0)} 
+                    />
+                  </div>
+                  <Button onClick={updateCandidatPlafond} className="w-full" disabled={updating}>
+                    {updating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                    Enregistrer
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </TabsContent>
 
           {/* Mandataires Tab */}
