@@ -15,16 +15,35 @@ export default function Auth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const redirectBasedOnRole = async (userId: string) => {
+    const { data: userRoles } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId);
+
+    const roles = userRoles?.map(r => r.role) || [];
+
+    if (roles.includes('comptable')) {
+      navigate('/comptable');
+    } else if (roles.includes('candidat')) {
+      navigate('/candidat');
+    } else if (roles.includes('mandataire')) {
+      navigate('/mandataire');
+    } else {
+      navigate('/en-attente');
+    }
+  };
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        navigate('/');
+      if (session?.user) {
+        redirectBasedOnRole(session.user.id);
       }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        navigate('/');
+      if (session?.user) {
+        redirectBasedOnRole(session.user.id);
       }
     });
 
