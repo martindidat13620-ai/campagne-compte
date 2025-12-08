@@ -277,26 +277,69 @@ export function OperationsTable({
                   </TableCell>
                   {showValidationActions && (
                     <TableCell onClick={(e) => e.stopPropagation()}>
-                      {op.statut_validation === 'en_attente' && (
-                        <div className="flex gap-1">
-                          <Button 
-                            size="icon" 
-                            variant="ghost" 
-                            className="h-8 w-8 text-success hover:bg-success/10"
-                            onClick={() => onValidate?.(op.id)}
-                          >
-                            <CheckCircle2 size={16} />
-                          </Button>
-                          <Button 
-                            size="icon" 
-                            variant="ghost" 
-                            className="h-8 w-8 text-destructive hover:bg-destructive/10"
-                            onClick={() => onReject?.(op.id, 'Justificatif insuffisant')}
-                          >
-                            <XCircle size={16} />
-                          </Button>
-                        </div>
-                      )}
+                      <div className="flex gap-1">
+                        {op.statut_validation === 'en_attente' && (
+                          <>
+                            <Button 
+                              size="icon" 
+                              variant="ghost" 
+                              className="h-8 w-8 text-success hover:bg-success/10"
+                              onClick={() => onValidate?.(op.id)}
+                            >
+                              <CheckCircle2 size={16} />
+                            </Button>
+                            <Button 
+                              size="icon" 
+                              variant="ghost" 
+                              className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                              onClick={() => onReject?.(op.id, 'Justificatif insuffisant')}
+                            >
+                              <XCircle size={16} />
+                            </Button>
+                          </>
+                        )}
+                        {onDelete && (
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button 
+                                size="icon" 
+                                variant="ghost" 
+                                className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                                disabled={deletingId === op.id}
+                              >
+                                {deletingId === op.id ? (
+                                  <Loader2 size={16} className="animate-spin" />
+                                ) : (
+                                  <Trash2 size={16} />
+                                )}
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Supprimer cette opération ?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  {op.statut_validation === 'validee' ? (
+                                    <span className="text-warning font-medium">
+                                      Attention, vous avez validé cette {op.type_operation === 'depense' ? 'dépense' : 'recette'}. Êtes-vous sûr de vouloir la supprimer ?
+                                    </span>
+                                  ) : (
+                                    <>Cette action est irréversible. L'opération de {op.montant.toLocaleString('fr-FR')} € sera définitivement supprimée.</>
+                                  )}
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                <AlertDialogAction 
+                                  onClick={() => handleDelete(op.id)}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  Supprimer
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        )}
+                      </div>
                     </TableCell>
                   )}
                   {showDeleteAction && (
