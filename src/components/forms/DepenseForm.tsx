@@ -92,8 +92,24 @@ export function DepenseForm() {
     setSubmitting(true);
 
     try {
-      // TODO: Upload du justificatif vers Supabase Storage
-      // Pour l'instant on sauvegarde sans le fichier
+      let justificatifUrl: string | null = null;
+
+      // Upload du justificatif vers Supabase Storage
+      if (justificatif) {
+        const fileExt = justificatif.name.split('.').pop();
+        const fileName = `${mandataire.id}/${Date.now()}.${fileExt}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('justificatifs')
+          .upload(fileName, justificatif);
+
+        if (uploadError) {
+          console.error('Erreur upload:', uploadError);
+          throw new Error('Impossible d\'uploader le justificatif');
+        }
+
+        justificatifUrl = uploadData.path;
+      }
 
       const { error } = await supabase
         .from('operations')
@@ -107,6 +123,7 @@ export function DepenseForm() {
           categorie: formData.categorie,
           mode_paiement: formData.modePaiement,
           commentaire: formData.commentaire.trim() || null,
+          justificatif_url: justificatifUrl,
           justificatif_nom: justificatif?.name || null,
           statut_validation: 'en_attente'
         });
