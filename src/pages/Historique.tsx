@@ -1,11 +1,10 @@
 import { AppLayout } from '@/components/layout/AppLayout';
 import { OperationsTable } from '@/components/operations/OperationsTable';
-import { useAuth } from '@/contexts/AuthContext';
 import { getOperationsByMandataire } from '@/data/mockData';
 
 export default function Historique() {
-  const { user } = useAuth();
-  const mandataireId = user?.mandataireId || 'm1';
+  // For demo, using default mandataireId
+  const mandataireId = 'm1';
   const operations = getOperationsByMandataire(mandataireId);
 
   return (

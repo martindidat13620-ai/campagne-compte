@@ -4,23 +4,55 @@ export interface User {
   id: string;
   email: string;
   role: UserRole;
-  mandataireId?: string;
   nom: string;
   prenom: string;
 }
 
-export interface Mandataire {
+export interface Profile {
   id: string;
+  email: string;
+  nom: string | null;
+  prenom: string | null;
+  telephone: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Campaign {
+  id: string;
+  nom: string;
+  type_election: string;
+  annee: number;
+  date_debut: string | null;
+  date_fin: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Candidat {
+  id: string;
+  user_id: string | null;
+  campaign_id: string;
   nom: string;
   prenom: string;
   email: string;
-  telephone: string;
-  circonscription: string;
-  typeElection: string;
-  plafondDepenses: number;
-  dateDebut: string;
-  dateFin: string;
-  candidatNom?: string;
+  telephone: string | null;
+  circonscription: string | null;
+  plafond_depenses: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Mandataire {
+  id: string;
+  user_id: string | null;
+  nom: string;
+  prenom: string;
+  email: string;
+  telephone: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export type OperationType = 'recette' | 'depense';
@@ -85,4 +117,13 @@ export const MODES_PAIEMENT: { value: ModePaiement; label: string }[] = [
   { value: 'carte', label: 'Carte bancaire' },
   { value: 'especes', label: 'Espèces' },
   { value: 'prelevement', label: 'Prélèvement' },
+];
+
+export const TYPES_ELECTION = [
+  'Élections législatives',
+  'Élections municipales',
+  'Élections régionales',
+  'Élections départementales',
+  'Élections européennes',
+  'Élection présidentielle',
 ];

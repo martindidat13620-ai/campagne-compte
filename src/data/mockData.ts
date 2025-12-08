@@ -1,6 +1,21 @@
-import { Mandataire, Operation, PlafondCalcul } from '@/types';
+import { Operation, PlafondCalcul } from '@/types';
 
-export const mockMandataires: Mandataire[] = [
+// Mock mandataire data for demo (using old structure temporarily)
+export interface MockMandataire {
+  id: string;
+  nom: string;
+  prenom: string;
+  email: string;
+  telephone: string;
+  circonscription: string;
+  typeElection: string;
+  plafondDepenses: number;
+  dateDebut: string;
+  dateFin: string;
+  candidatNom: string;
+}
+
+export const mockMandataires: MockMandataire[] = [
   {
     id: 'm1',
     nom: 'Dupont',
@@ -164,7 +179,6 @@ export const mockOperations: Operation[] = [
     dateCreation: '2024-06-10T16:00:00',
     dateModification: '2024-06-10T16:00:00'
   },
-  // Operations for other mandataires
   {
     id: 'op9',
     mandataireId: 'm2',
@@ -245,6 +259,6 @@ export function getOperationsByMandataire(mandataireId: string): Operation[] {
   return mockOperations.filter(op => op.mandataireId === mandataireId);
 }
 
-export function getMandataireById(id: string): Mandataire | undefined {
+export function getMandataireById(id: string): MockMandataire | undefined {
   return mockMandataires.find(m => m.id === id);
 }

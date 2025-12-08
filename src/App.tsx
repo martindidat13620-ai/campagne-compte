@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import LandingPage from "./pages/LandingPage";
+import Auth from "./pages/Auth";
+import EnAttente from "./pages/EnAttente";
 import MandataireDashboard from "./pages/MandataireDashboard";
 import NouvelleDepense from "./pages/NouvelleDepense";
 import NouvelleRecette from "./pages/NouvelleRecette";
@@ -25,7 +27,9 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/dashboard" element={<MandataireDashboard />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/en-attente" element={<EnAttente />} />
+            <Route path="/mandataire" element={<MandataireDashboard />} />
             <Route path="/depense/nouvelle" element={<NouvelleDepense />} />
             <Route path="/recette/nouvelle" element={<NouvelleRecette />} />
             <Route path="/historique" element={<Historique />} />

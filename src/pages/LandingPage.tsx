@@ -10,25 +10,29 @@ import {
   Shield, 
   FileText, 
   BarChart3,
-  CheckCircle2
+  CheckCircle2,
+  LogIn,
+  Loader2
 } from 'lucide-react';
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { user, loading, hasRole } = useAuth();
 
-  const handleAccessSpace = (role: 'mandataire' | 'comptable' | 'candidat') => {
-    login(`${role}@example.com`, 'password');
-    
-    switch (role) {
-      case 'comptable':
-        navigate('/comptable');
-        break;
-      case 'candidat':
-        navigate('/candidat');
-        break;
-      default:
-        navigate('/dashboard');
+  const handleAccessSpace = () => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+
+    if (hasRole('comptable')) {
+      navigate('/comptable');
+    } else if (hasRole('mandataire')) {
+      navigate('/mandataire');
+    } else if (hasRole('candidat')) {
+      navigate('/candidat');
+    } else {
+      navigate('/en-attente');
     }
   };
 
@@ -82,6 +86,14 @@ const LandingPage = () => {
     }
   ];
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
       {/* Header */}
@@ -93,8 +105,9 @@ const LandingPage = () => {
             </div>
             <span className="font-bold text-xl text-foreground">ComptaCampagne</span>
           </div>
-          <Button variant="outline" size="sm">
-            Se connecter
+          <Button variant="outline" size="sm" onClick={() => navigate('/auth')}>
+            <LogIn className="h-4 w-4 mr-2" />
+            {user ? 'Mon espace' : 'Se connecter'}
           </Button>
         </div>
       </header>
@@ -109,6 +122,9 @@ const LandingPage = () => {
             La solution professionnelle pour les mandataires financiers, experts-comptables et candidats. 
             Conformité CNCCFP garantie.
           </p>
+          <Button size="lg" onClick={handleAccessSpace}>
+            {user ? 'Accéder à mon espace' : 'Commencer maintenant'}
+          </Button>
         </div>
       </section>
 
@@ -136,7 +152,7 @@ const LandingPage = () => {
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-foreground mb-4">Accédez à votre espace</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Choisissez votre profil pour accéder aux fonctionnalités adaptées à votre rôle
+            Connectez-vous pour accéder aux fonctionnalités adaptées à votre rôle
           </p>
         </div>
 
@@ -144,27 +160,16 @@ const LandingPage = () => {
           {spaces.map((space) => (
             <Card 
               key={space.role} 
-              className="border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg cursor-pointer group"
-              onClick={() => handleAccessSpace(space.role)}
+              className="border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg"
             >
               <CardHeader className="text-center pb-4">
-                <div className={`w-16 h-16 rounded-2xl ${space.color} flex items-center justify-center mx-auto mb-4 transition-transform group-hover:scale-110`}>
+                <div className={`w-16 h-16 rounded-2xl ${space.color} flex items-center justify-center mx-auto mb-4`}>
                   <space.icon className={`w-8 h-8 ${space.textColor}`} />
                 </div>
                 <CardTitle className="text-xl">{space.title}</CardTitle>
               </CardHeader>
               <CardContent className="text-center">
                 <CardDescription className="mb-6">{space.description}</CardDescription>
-                <Button 
-                  className={`w-full ${space.color} ${space.textColor}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAccessSpace(space.role);
-                  }}
-                >
-                  Accéder
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
               </CardContent>
             </Card>
           ))}
