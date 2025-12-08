@@ -12,7 +12,8 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Plus, Send, Building2, Users, UserCheck, Loader2, Trash2 } from 'lucide-react';
+import { Plus, Send, Building2, Users, UserCheck, Loader2, Trash2, Key } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { TYPES_ELECTION, Campaign, Candidat, Mandataire } from '@/types';
 
 export default function ComptableGestion() {
@@ -30,6 +31,8 @@ export default function ComptableGestion() {
   const [newMandataire, setNewMandataire] = useState({ nom: '', prenom: '', email: '', candidat_id: '' });
 
   const [dialogOpen, setDialogOpen] = useState({ campaign: false, candidat: false, mandataire: false });
+  const [inviteDialog, setInviteDialog] = useState<{ open: boolean; type: 'candidat' | 'mandataire'; record: Candidat | Mandataire | null }>({ open: false, type: 'candidat', record: null });
+  const [inviteOptions, setInviteOptions] = useState({ customPassword: '', skipEmail: false });
 
   useEffect(() => {
     fetchData();
@@ -116,8 +119,16 @@ export default function ComptableGestion() {
     fetchData();
   };
 
-  const inviteUser = async (type: 'candidat' | 'mandataire', record: Candidat | Mandataire) => {
+  const openInviteDialog = (type: 'candidat' | 'mandataire', record: Candidat | Mandataire) => {
+    setInviteDialog({ open: true, type, record });
+    setInviteOptions({ customPassword: '', skipEmail: false });
+  };
+
+  const inviteUser = async () => {
+    if (!inviteDialog.record) return;
+    
     setInviting(true);
+    const { type, record } = inviteDialog;
     
     try {
       const { data, error } = await supabase.functions.invoke('invite-user', {
@@ -127,13 +138,20 @@ export default function ComptableGestion() {
           prenom: record.prenom,
           role: type,
           candidat_id: type === 'candidat' ? record.id : undefined,
-          mandataire_id: type === 'mandataire' ? record.id : undefined
+          mandataire_id: type === 'mandataire' ? record.id : undefined,
+          custom_password: inviteOptions.customPassword || undefined,
+          skip_email: inviteOptions.skipEmail
         }
       });
 
       if (error) throw error;
       
-      toast.success(`Invitation envoyée à ${record.email}`);
+      if (inviteOptions.skipEmail && inviteOptions.customPassword) {
+        toast.success(`Compte créé pour ${record.email} avec le mot de passe défini`);
+      } else {
+        toast.success(`Invitation envoyée à ${record.email}`);
+      }
+      setInviteDialog({ open: false, type: 'candidat', record: null });
       fetchData();
     } catch (error: any) {
       console.error('Error inviting user:', error);
@@ -476,7 +494,7 @@ export default function ComptableGestion() {
                         {candidat.user_id ? (
                           <Badge className="bg-green-500">Invité</Badge>
                         ) : (
-                          <Button size="sm" onClick={() => inviteUser('candidat', candidat)} disabled={inviting}>
+                          <Button size="sm" onClick={() => openInviteDialog('candidat', candidat)} disabled={inviting}>
                             <Send className="h-4 w-4 mr-2" />
                             Inviter
                           </Button>
@@ -580,7 +598,7 @@ export default function ComptableGestion() {
                         {mandataire.user_id ? (
                           <Badge className="bg-green-500">Invité</Badge>
                         ) : (
-                          <Button size="sm" onClick={() => inviteUser('mandataire', mandataire)} disabled={inviting}>
+                          <Button size="sm" onClick={() => openInviteDialog('mandataire', mandataire)} disabled={inviting}>
                             <Send className="h-4 w-4 mr-2" />
                             Inviter
                           </Button>
@@ -617,6 +635,53 @@ export default function ComptableGestion() {
             </div>
           </TabsContent>
         </Tabs>
+
+        {/* Invite Dialog */}
+        <Dialog open={inviteDialog.open} onOpenChange={(open) => setInviteDialog({ ...inviteDialog, open })}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Key className="h-5 w-5" />
+                Inviter {inviteDialog.record?.prenom} {inviteDialog.record?.nom}
+              </DialogTitle>
+              <DialogDescription>
+                Créez un compte pour ce {inviteDialog.type}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Email</Label>
+                <Input value={inviteDialog.record?.email || ''} disabled className="bg-muted" />
+              </div>
+              <div>
+                <Label>Mot de passe personnalisé (optionnel)</Label>
+                <Input 
+                  type="text" 
+                  value={inviteOptions.customPassword} 
+                  onChange={(e) => setInviteOptions({ ...inviteOptions, customPassword: e.target.value })}
+                  placeholder="Laisser vide pour générer automatiquement"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Si vide, un mot de passe temporaire sera généré automatiquement
+                </p>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="skipEmail" 
+                  checked={inviteOptions.skipEmail}
+                  onCheckedChange={(checked) => setInviteOptions({ ...inviteOptions, skipEmail: checked === true })}
+                />
+                <Label htmlFor="skipEmail" className="text-sm font-normal cursor-pointer">
+                  Ne pas envoyer d'email (mode test)
+                </Label>
+              </div>
+              <Button onClick={inviteUser} className="w-full" disabled={inviting}>
+                {inviting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
+                Créer le compte
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </AppLayout>
   );
