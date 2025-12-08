@@ -456,11 +456,26 @@ export function OperationsTable({
                   variant="outline" 
                   className="w-full"
                   onClick={async () => {
-                    const { data } = await supabase.storage
-                      .from('justificatifs')
-                      .createSignedUrl(selectedOp.justificatif_url!, 3600);
-                    if (data?.signedUrl) {
-                      window.open(data.signedUrl, '_blank');
+                    try {
+                      const { data, error } = await supabase.storage
+                        .from('justificatifs')
+                        .createSignedUrl(selectedOp.justificatif_url!, 3600);
+                      
+                      if (error) {
+                        console.error('Erreur signed URL:', error);
+                        return;
+                      }
+                      
+                      if (data?.signedUrl) {
+                        // Ouvrir dans un nouvel onglet avec gestion du blocage pop-up
+                        const newWindow = window.open(data.signedUrl, '_blank');
+                        if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                          // Pop-up bloqué, rediriger dans la même fenêtre
+                          window.location.href = data.signedUrl;
+                        }
+                      }
+                    } catch (err) {
+                      console.error('Erreur:', err);
                     }
                   }}
                 >
