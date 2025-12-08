@@ -5,13 +5,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Plus, Send, Building2, Users, UserCheck, Loader2 } from 'lucide-react';
+import { Plus, Send, Building2, Users, UserCheck, Loader2, Trash2 } from 'lucide-react';
 import { TYPES_ELECTION, Campaign, Candidat, Mandataire } from '@/types';
 
 export default function ComptableGestion() {
@@ -21,6 +22,7 @@ export default function ComptableGestion() {
   const [mandataires, setMandataires] = useState<Mandataire[]>([]);
   const [loading, setLoading] = useState(true);
   const [inviting, setInviting] = useState(false);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   // Form states
   const [newCampaign, setNewCampaign] = useState({ nom: '', type_election: '', annee: new Date().getFullYear() });
@@ -141,6 +143,133 @@ export default function ComptableGestion() {
     }
   };
 
+  const deleteCampaign = async (campaign: Campaign) => {
+    setDeleting(campaign.id);
+    try {
+      // First, get all candidats for this campaign
+      const campaignCandidats = candidats.filter(c => c.campaign_id === campaign.id);
+      
+      // Delete all candidats (and their users) for this campaign
+      for (const candidat of campaignCandidats) {
+        await deleteCandidat(candidat, false);
+      }
+
+      // Delete the campaign
+      const { error } = await supabase.from('campaigns').delete().eq('id', campaign.id);
+      
+      if (error) {
+        toast.error('Erreur lors de la suppression de la campagne');
+        console.error('Delete campaign error:', error);
+        return;
+      }
+
+      toast.success('Campagne supprimée avec succès');
+      fetchData();
+    } catch (error) {
+      console.error('Error deleting campaign:', error);
+      toast.error('Erreur lors de la suppression de la campagne');
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  const deleteCandidat = async (candidat: Candidat, showToast = true) => {
+    if (showToast) setDeleting(candidat.id);
+    try {
+      // Get mandataires linked to this candidat
+      const { data: links } = await supabase
+        .from('mandataire_candidats')
+        .select('mandataire_id')
+        .eq('candidat_id', candidat.id);
+
+      // Delete operations for this candidat
+      await supabase.from('operations').delete().eq('candidat_id', candidat.id);
+
+      // Delete mandataire links
+      await supabase.from('mandataire_candidats').delete().eq('candidat_id', candidat.id);
+
+      // Check if any of the linked mandataires have no other candidats and delete them
+      if (links) {
+        for (const link of links) {
+          const { data: otherLinks } = await supabase
+            .from('mandataire_candidats')
+            .select('id')
+            .eq('mandataire_id', link.mandataire_id);
+
+          if (!otherLinks || otherLinks.length === 0) {
+            const mandataire = mandataires.find(m => m.id === link.mandataire_id);
+            if (mandataire) {
+              await deleteMandataire(mandataire, false);
+            }
+          }
+        }
+      }
+
+      // Delete user account if exists
+      if (candidat.user_id) {
+        await supabase.functions.invoke('delete-user', {
+          body: { user_id: candidat.user_id }
+        });
+      }
+
+      // Delete the candidat
+      const { error } = await supabase.from('candidats').delete().eq('id', candidat.id);
+      
+      if (error) {
+        if (showToast) toast.error('Erreur lors de la suppression du candidat');
+        console.error('Delete candidat error:', error);
+        return;
+      }
+
+      if (showToast) {
+        toast.success('Candidat supprimé avec succès');
+        fetchData();
+      }
+    } catch (error) {
+      console.error('Error deleting candidat:', error);
+      if (showToast) toast.error('Erreur lors de la suppression du candidat');
+    } finally {
+      if (showToast) setDeleting(null);
+    }
+  };
+
+  const deleteMandataire = async (mandataire: Mandataire, showToast = true) => {
+    if (showToast) setDeleting(mandataire.id);
+    try {
+      // Delete operations for this mandataire
+      await supabase.from('operations').delete().eq('mandataire_id', mandataire.id);
+
+      // Delete mandataire links
+      await supabase.from('mandataire_candidats').delete().eq('mandataire_id', mandataire.id);
+
+      // Delete user account if exists
+      if (mandataire.user_id) {
+        await supabase.functions.invoke('delete-user', {
+          body: { user_id: mandataire.user_id }
+        });
+      }
+
+      // Delete the mandataire
+      const { error } = await supabase.from('mandataires').delete().eq('id', mandataire.id);
+      
+      if (error) {
+        if (showToast) toast.error('Erreur lors de la suppression du mandataire');
+        console.error('Delete mandataire error:', error);
+        return;
+      }
+
+      if (showToast) {
+        toast.success('Mandataire supprimé avec succès');
+        fetchData();
+      }
+    } catch (error) {
+      console.error('Error deleting mandataire:', error);
+      if (showToast) toast.error('Erreur lors de la suppression du mandataire');
+    } finally {
+      if (showToast) setDeleting(null);
+    }
+  };
+
   const getCampaignName = (campaignId: string) => {
     const campaign = campaigns.find(c => c.id === campaignId);
     return campaign ? `${campaign.nom} (${campaign.annee})` : 'N/A';
@@ -232,17 +361,45 @@ export default function ComptableGestion() {
             </div>
 
             <div className="grid gap-4">
-              {campaigns.map(campaign => (
-                <Card key={campaign.id}>
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">{campaign.nom}</CardTitle>
-                      <Badge variant="outline">{campaign.annee}</Badge>
-                    </div>
-                    <CardDescription>{campaign.type_election}</CardDescription>
-                  </CardHeader>
-                </Card>
-              ))}
+              {campaigns.map(campaign => {
+                const campaignCandidats = candidats.filter(c => c.campaign_id === campaign.id);
+                return (
+                  <Card key={campaign.id}>
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle className="text-lg">{campaign.nom}</CardTitle>
+                          <CardDescription>{campaign.type_election} • {campaignCandidats.length} candidat(s)</CardDescription>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline">{campaign.annee}</Badge>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="destructive" size="icon" disabled={deleting === campaign.id}>
+                                {deleting === campaign.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Supprimer la campagne ?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Cette action est irréversible. Tous les candidats ({campaignCandidats.length}), mandataires associés et leurs comptes utilisateur seront également supprimés.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => deleteCampaign(campaign)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                  Supprimer
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </div>
+                    </CardHeader>
+                  </Card>
+                );
+              })}
               {campaigns.length === 0 && (
                 <p className="text-center text-muted-foreground py-8">Aucune campagne créée</p>
               )}
@@ -324,6 +481,27 @@ export default function ComptableGestion() {
                             Inviter
                           </Button>
                         )}
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive" size="icon" disabled={deleting === candidat.id}>
+                              {deleting === candidat.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Supprimer le candidat ?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Cette action est irréversible. Le candidat, ses opérations et son compte utilisateur seront supprimés.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Annuler</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => deleteCandidat(candidat)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                Supprimer
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </div>
                   </CardHeader>
@@ -407,6 +585,27 @@ export default function ComptableGestion() {
                             Inviter
                           </Button>
                         )}
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive" size="icon" disabled={deleting === mandataire.id}>
+                              {deleting === mandataire.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Supprimer le mandataire ?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Cette action est irréversible. Le mandataire, ses opérations et son compte utilisateur seront supprimés.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Annuler</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => deleteMandataire(mandataire)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                Supprimer
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </div>
                   </CardHeader>
