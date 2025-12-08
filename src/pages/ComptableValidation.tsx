@@ -157,6 +157,30 @@ export default function ComptableValidation() {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('operations')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setOperations(ops => ops.filter(op => op.id !== id));
+      toast({
+        title: "Opération supprimée",
+        description: "L'opération a été supprimée avec succès"
+      });
+    } catch (error) {
+      console.error('Erreur suppression:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer l'opération",
+        variant: "destructive"
+      });
+    }
+  };
+
   // Reset candidat filter when campaign changes
   const handleCampaignChange = (value: string) => {
     setSelectedCampaign(value);
@@ -233,6 +257,7 @@ export default function ComptableValidation() {
           showValidationActions={true}
           onValidate={handleValidate}
           onReject={handleReject}
+          onDelete={handleDelete}
         />
       </div>
     </AppLayout>
