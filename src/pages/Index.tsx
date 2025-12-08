@@ -10,7 +10,7 @@ const Index = () => {
     if (loading) return;
     
     if (!user) {
-      navigate('/');
+      navigate('/auth');
       return;
     }
     
