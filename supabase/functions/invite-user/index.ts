@@ -13,6 +13,8 @@ interface InviteUserRequest {
   role: "mandataire" | "candidat";
   candidat_id?: string;
   mandataire_id?: string;
+  custom_password?: string;
+  skip_email?: boolean;
 }
 
 function generateTempPassword(): string {
@@ -120,12 +122,12 @@ serve(async (req) => {
       throw new Error("Seul un comptable peut inviter des utilisateurs");
     }
 
-    const { email, nom, prenom, role, candidat_id, mandataire_id }: InviteUserRequest = await req.json();
+    const { email, nom, prenom, role, candidat_id, mandataire_id, custom_password, skip_email }: InviteUserRequest = await req.json();
 
     console.log(`Inviting user: ${email} as ${role}`);
 
-    // Generate temporary password
-    const tempPassword = generateTempPassword();
+    // Use custom password or generate temporary one
+    const tempPassword = custom_password || generateTempPassword();
 
     // Create user in Supabase Auth
     const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
@@ -165,13 +167,15 @@ serve(async (req) => {
         .eq("id", mandataire_id);
     }
 
-    // Send invitation email
-    try {
-      await sendInvitationEmail(email, nom, prenom, role, tempPassword);
-      console.log(`Invitation email sent to ${email}`);
-    } catch (emailError) {
-      console.error("Error sending email:", emailError);
-      // Continue - user was created successfully
+    // Send invitation email (unless skipped)
+    if (!skip_email) {
+      try {
+        await sendInvitationEmail(email, nom, prenom, role, tempPassword);
+        console.log(`Invitation email sent to ${email}`);
+      } catch (emailError) {
+        console.error("Error sending email:", emailError);
+        // Continue - user was created successfully
+      }
     }
 
     return new Response(
