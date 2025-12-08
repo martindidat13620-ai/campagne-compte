@@ -319,9 +319,7 @@ export function OperationsTable({
                                 <AlertDialogTitle>Supprimer cette opération ?</AlertDialogTitle>
                                 <AlertDialogDescription>
                                   {op.statut_validation === 'validee' ? (
-                                    <span className="text-warning font-medium">
-                                      Attention, vous avez validé cette {op.type_operation === 'depense' ? 'dépense' : 'recette'}. Êtes-vous sûr de vouloir la supprimer ?
-                                    </span>
+                                    <>Attention, vous avez validé cette {op.type_operation === 'depense' ? 'dépense' : 'recette'}. Êtes-vous sûr de vouloir la supprimer ?</>
                                   ) : (
                                     <>Cette action est irréversible. L'opération de {op.montant.toLocaleString('fr-FR')} € sera définitivement supprimée.</>
                                   )}
