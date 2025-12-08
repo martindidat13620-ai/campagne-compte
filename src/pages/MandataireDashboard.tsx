@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Operation } from '@/types';
 
 interface CandidatInfo {
   id: string;
@@ -25,6 +26,8 @@ interface CandidatInfo {
 export default function MandataireDashboard() {
   const { user } = useAuth();
   const [candidat, setCandidat] = useState<CandidatInfo | null>(null);
+  const [mandataireId, setMandataireId] = useState<string | null>(null);
+  const [operations, setOperations] = useState<Operation[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,6 +47,8 @@ export default function MandataireDashboard() {
           setLoading(false);
           return;
         }
+
+        setMandataireId(mandataire.id);
 
         // Get candidat linked to this mandataire
         const { data: link, error: linkError } = await supabase
@@ -97,6 +102,20 @@ export default function MandataireDashboard() {
             campaign: campaign || { nom: '', type_election: '' }
           });
         }
+
+        // Fetch operations for this mandataire
+        const { data: operationsData, error: operationsError } = await supabase
+          .from('operations')
+          .select('*')
+          .eq('mandataire_id', mandataire.id)
+          .order('date', { ascending: false });
+
+        if (operationsError) {
+          console.error('Error fetching operations:', operationsError);
+        } else {
+          setOperations(operationsData as Operation[] || []);
+        }
+
       } catch (error) {
         console.error('Error:', error);
       } finally {
@@ -107,11 +126,18 @@ export default function MandataireDashboard() {
     fetchMandataireData();
   }, [user]);
 
-  // Pour l'instant, pas d'opérations (table à créer)
-  const operations: any[] = [];
-  const totalDepenses = 0;
-  const totalRecettes = 0;
-  const depensesEnAttente = 0;
+  // Calculate totals from operations
+  const totalDepenses = operations
+    .filter(op => op.type_operation === 'depense' && op.statut_validation === 'validee')
+    .reduce((sum, op) => sum + op.montant, 0);
+
+  const totalRecettes = operations
+    .filter(op => op.type_operation === 'recette' && op.statut_validation === 'validee')
+    .reduce((sum, op) => sum + op.montant, 0);
+
+  const depensesEnAttente = operations
+    .filter(op => op.statut_validation === 'en_attente')
+    .length;
 
   if (loading) {
     return (
