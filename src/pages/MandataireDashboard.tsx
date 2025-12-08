@@ -50,10 +50,16 @@ export default function MandataireDashboard() {
           .from('mandataire_candidats')
           .select('candidat_id')
           .eq('mandataire_id', mandataire.id)
-          .single();
+          .maybeSingle();
 
-        if (linkError || !link) {
+        if (linkError) {
           console.error('Error fetching mandataire-candidat link:', linkError);
+          setLoading(false);
+          return;
+        }
+
+        if (!link) {
+          console.log('No candidat linked to this mandataire');
           setLoading(false);
           return;
         }
