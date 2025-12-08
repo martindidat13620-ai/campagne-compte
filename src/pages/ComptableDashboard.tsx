@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Building2, Users, TrendingUp, AlertTriangle, ChevronRight, FileCheck } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -12,8 +11,8 @@ import { cn } from '@/lib/utils';
 export default function ComptableDashboard() {
   const totalCampagnes = mockMandataires.length;
   const totalOperations = mockOperations.length;
-  const operationsEnAttente = mockOperations.filter(op => op.statutValidation === 'en_attente').length;
-  const pieceManquantes = mockOperations.filter(op => op.type === 'depense' && !op.pieceJustificativeUrl).length;
+  const operationsEnAttente = mockOperations.filter(op => op.statut_validation === 'en_attente').length;
+  const pieceManquantes = mockOperations.filter(op => op.type_operation === 'depense' && !op.justificatif_url).length;
 
   return (
     <AppLayout>
@@ -67,9 +66,9 @@ export default function ComptableDashboard() {
           <div className="space-y-4">
             {mockMandataires.map((mandataire) => {
               const plafondData = calculatePlafond(mandataire.id);
-              const mandataireOps = mockOperations.filter(op => op.mandataireId === mandataire.id);
-              const pendingCount = mandataireOps.filter(op => op.statutValidation === 'en_attente').length;
-              const missingDocs = mandataireOps.filter(op => op.type === 'depense' && !op.pieceJustificativeUrl).length;
+              const mandataireOps = mockOperations.filter(op => op.mandataire_id === mandataire.id);
+              const pendingCount = mandataireOps.filter(op => op.statut_validation === 'en_attente').length;
+              const missingDocs = mandataireOps.filter(op => op.type_operation === 'depense' && !op.justificatif_url).length;
 
               return (
                 <div 

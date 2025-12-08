@@ -19,7 +19,7 @@ const COLORS = [
 ];
 
 export function ExpenseChart({ operations, type }: ExpenseChartProps) {
-  const depenses = operations.filter(op => op.type === 'depense' && op.statutValidation === 'validee');
+  const depenses = operations.filter(op => op.type_operation === 'depense' && op.statut_validation === 'validee');
 
   const barData = useMemo(() => {
     const grouped: Record<string, number> = {};

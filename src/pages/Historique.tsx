@@ -1,11 +1,46 @@
+import { useState, useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { OperationsTable } from '@/components/operations/OperationsTable';
-import { getOperationsByMandataire } from '@/data/mockData';
+import { supabase } from '@/integrations/supabase/client';
+import { useMandataireData } from '@/hooks/useMandataireData';
+import { Operation } from '@/types';
+import { Loader2 } from 'lucide-react';
 
 export default function Historique() {
-  // For demo, using default mandataireId
-  const mandataireId = 'm1';
-  const operations = getOperationsByMandataire(mandataireId);
+  const { mandataire, candidat, loading: mandataireLoading } = useMandataireData();
+  const [operations, setOperations] = useState<Operation[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchOperations() {
+      if (!mandataire) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('operations')
+          .select('*')
+          .eq('mandataire_id', mandataire.id)
+          .order('date', { ascending: false });
+
+        if (error) throw error;
+
+        setOperations(data as Operation[] || []);
+      } catch (err) {
+        console.error('Erreur lors du chargement des opérations:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (!mandataireLoading) {
+      fetchOperations();
+    }
+  }, [mandataire, mandataireLoading]);
+
+  const isLoading = mandataireLoading || loading;
 
   return (
     <AppLayout>
@@ -17,7 +52,20 @@ export default function Historique() {
           </p>
         </div>
 
-        <OperationsTable operations={operations} />
+        {isLoading ? (
+          <div className="flex items-center justify-center p-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : operations.length === 0 ? (
+          <div className="text-center p-12 bg-card rounded-lg border border-border">
+            <p className="text-muted-foreground">Aucune opération enregistrée</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Commencez par ajouter une dépense ou une recette
+            </p>
+          </div>
+        ) : (
+          <OperationsTable operations={operations} />
+        )}
       </div>
     </AppLayout>
   );

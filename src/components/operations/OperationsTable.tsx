@@ -11,7 +11,7 @@ import {
   Download,
   Eye
 } from 'lucide-react';
-import { Operation, OperationType, ValidationStatus } from '@/types';
+import { Operation, ValidationStatus } from '@/types';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -61,11 +61,11 @@ export function OperationsTable({
       .filter(op => {
         const matchesSearch = 
           (op.beneficiaire?.toLowerCase().includes(search.toLowerCase()) || '') ||
-          (op.donateurNom?.toLowerCase().includes(search.toLowerCase()) || '') ||
+          (op.donateur_nom?.toLowerCase().includes(search.toLowerCase()) || '') ||
           op.categorie.toLowerCase().includes(search.toLowerCase());
         
-        const matchesType = typeFilter === 'all' || op.type === typeFilter;
-        const matchesStatus = statusFilter === 'all' || op.statutValidation === statusFilter;
+        const matchesType = typeFilter === 'all' || op.type_operation === typeFilter;
+        const matchesStatus = statusFilter === 'all' || op.statut_validation === statusFilter;
         
         return matchesSearch && matchesType && matchesStatus;
       })
@@ -81,7 +81,7 @@ export function OperationsTable({
             Validée
           </Badge>
         );
-      case 'refusee':
+      case 'rejetee':
         return (
           <Badge variant="outline" className="badge-rejected gap-1">
             <XCircle size={12} />
@@ -110,11 +110,11 @@ export function OperationsTable({
     const headers = ['Date', 'Type', 'Montant', 'Catégorie', 'Bénéficiaire/Donateur', 'Statut'];
     const rows = filteredOps.map(op => [
       op.date,
-      op.type,
+      op.type_operation,
       op.montant,
       op.categorie,
-      op.beneficiaire || op.donateurNom || '',
-      op.statutValidation
+      op.beneficiaire || op.donateur_nom || '',
+      op.statut_validation
     ]);
 
     const csv = [headers, ...rows].map(row => row.join(';')).join('\n');
@@ -161,7 +161,7 @@ export function OperationsTable({
               <SelectItem value="all">Tous statuts</SelectItem>
               <SelectItem value="en_attente">En attente</SelectItem>
               <SelectItem value="validee">Validée</SelectItem>
-              <SelectItem value="refusee">Refusée</SelectItem>
+              <SelectItem value="rejetee">Refusée</SelectItem>
             </SelectContent>
           </Select>
 
@@ -199,7 +199,7 @@ export function OperationsTable({
                   key={op.id} 
                   className={cn(
                     "table-row-hover cursor-pointer",
-                    !op.pieceJustificativeUrl && op.type === 'depense' && 'bg-destructive/5'
+                    !op.justificatif_url && op.type_operation === 'depense' && 'bg-destructive/5'
                   )}
                   onClick={() => setSelectedOp(op)}
                 >
@@ -210,16 +210,16 @@ export function OperationsTable({
                     <div className="flex items-center gap-2">
                       <div className={cn(
                         "p-1.5 rounded-md",
-                        op.type === 'depense' ? 'bg-destructive/10' : 'bg-success/10'
+                        op.type_operation === 'depense' ? 'bg-destructive/10' : 'bg-success/10'
                       )}>
-                        {op.type === 'depense' ? (
+                        {op.type_operation === 'depense' ? (
                           <ArrowUpRight size={14} className="text-destructive" />
                         ) : (
                           <ArrowDownLeft size={14} className="text-success" />
                         )}
                       </div>
                       <span className="font-medium truncate max-w-[200px]">
-                        {op.beneficiaire || op.donateurNom || op.categorie}
+                        {op.beneficiaire || op.donateur_nom || op.categorie}
                       </span>
                     </div>
                   </TableCell>
@@ -228,27 +228,27 @@ export function OperationsTable({
                   </TableCell>
                   <TableCell className={cn(
                     "text-right font-semibold",
-                    op.type === 'depense' ? 'text-destructive' : 'text-success'
+                    op.type_operation === 'depense' ? 'text-destructive' : 'text-success'
                   )}>
-                    {op.type === 'depense' ? '-' : '+'}{op.montant.toLocaleString('fr-FR')} €
+                    {op.type_operation === 'depense' ? '-' : '+'}{op.montant.toLocaleString('fr-FR')} €
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">
-                    {getStatusBadge(op.statutValidation)}
+                    {getStatusBadge(op.statut_validation)}
                   </TableCell>
                   <TableCell>
-                    {op.pieceJustificativeUrl ? (
+                    {op.justificatif_url ? (
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-accent">
                         <FileText size={16} />
                       </Button>
                     ) : (
-                      op.type === 'depense' && (
+                      op.type_operation === 'depense' && (
                         <span className="text-xs text-destructive">Manquant</span>
                       )
                     )}
                   </TableCell>
                   {showValidationActions && (
                     <TableCell onClick={(e) => e.stopPropagation()}>
-                      {op.statutValidation === 'en_attente' && (
+                      {op.statut_validation === 'en_attente' && (
                         <div className="flex gap-1">
                           <Button 
                             size="icon" 
@@ -288,9 +288,9 @@ export function OperationsTable({
               <div className="flex items-center gap-3">
                 <div className={cn(
                   "p-3 rounded-lg",
-                  selectedOp.type === 'depense' ? 'bg-destructive/10' : 'bg-success/10'
+                  selectedOp.type_operation === 'depense' ? 'bg-destructive/10' : 'bg-success/10'
                 )}>
-                  {selectedOp.type === 'depense' ? (
+                  {selectedOp.type_operation === 'depense' ? (
                     <ArrowUpRight size={24} className="text-destructive" />
                   ) : (
                     <ArrowDownLeft size={24} className="text-success" />
@@ -298,7 +298,7 @@ export function OperationsTable({
                 </div>
                 <div>
                   <p className="font-semibold text-lg">
-                    {selectedOp.beneficiaire || selectedOp.donateurNom || selectedOp.categorie}
+                    {selectedOp.beneficiaire || selectedOp.donateur_nom || selectedOp.categorie}
                   </p>
                   <p className="text-muted-foreground">{selectedOp.categorie}</p>
                 </div>
@@ -313,18 +313,18 @@ export function OperationsTable({
                   <p className="text-sm text-muted-foreground">Montant</p>
                   <p className={cn(
                     "font-bold text-lg",
-                    selectedOp.type === 'depense' ? 'text-destructive' : 'text-success'
+                    selectedOp.type_operation === 'depense' ? 'text-destructive' : 'text-success'
                   )}>
                     {selectedOp.montant.toLocaleString('fr-FR')} €
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Mode de paiement</p>
-                  <p className="font-medium capitalize">{selectedOp.modePaiement}</p>
+                  <p className="font-medium capitalize">{selectedOp.mode_paiement}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Statut</p>
-                  {getStatusBadge(selectedOp.statutValidation)}
+                  {getStatusBadge(selectedOp.statut_validation)}
                 </div>
               </div>
 
@@ -335,14 +335,14 @@ export function OperationsTable({
                 </div>
               )}
 
-              {selectedOp.commentaireComptable && (
+              {selectedOp.commentaire_comptable && (
                 <div className="p-3 bg-warning/10 rounded-lg">
                   <p className="text-sm font-medium text-warning mb-1">Note du comptable</p>
-                  <p className="text-foreground">{selectedOp.commentaireComptable}</p>
+                  <p className="text-foreground">{selectedOp.commentaire_comptable}</p>
                 </div>
               )}
 
-              {selectedOp.pieceJustificativeUrl && (
+              {selectedOp.justificatif_url && (
                 <Button variant="outline" className="w-full">
                   <Eye size={16} className="mr-2" />
                   Voir le justificatif

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload, Calendar, Euro, CreditCard, FileText, X, AlertCircle } from 'lucide-react';
+import { Upload, Calendar, Euro, CreditCard, FileText, X, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,9 +14,13 @@ import {
 } from '@/components/ui/select';
 import { CATEGORIES_DEPENSES, MODES_PAIEMENT } from '@/types';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useMandataireData } from '@/hooks/useMandataireData';
 
 export function DepenseForm() {
   const navigate = useNavigate();
+  const { candidat, mandataire, loading: dataLoading } = useMandataireData();
+  const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     montant: '',
@@ -64,7 +68,7 @@ export function DepenseForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validate()) {
@@ -76,14 +80,64 @@ export function DepenseForm() {
       return;
     }
 
-    // Simulated submission
-    toast({
-      title: "Dépense enregistrée",
-      description: `Dépense de ${parseFloat(formData.montant).toLocaleString('fr-FR')} € ajoutée avec succès`,
-    });
+    if (!candidat || !mandataire) {
+      toast({
+        title: "Erreur",
+        description: "Données mandataire/candidat non disponibles",
+        variant: "destructive"
+      });
+      return;
+    }
 
-    navigate('/mandataire');
+    setSubmitting(true);
+
+    try {
+      // TODO: Upload du justificatif vers Supabase Storage
+      // Pour l'instant on sauvegarde sans le fichier
+
+      const { error } = await supabase
+        .from('operations')
+        .insert({
+          candidat_id: candidat.id,
+          mandataire_id: mandataire.id,
+          type_operation: 'depense',
+          date: formData.date,
+          montant: parseFloat(formData.montant),
+          beneficiaire: formData.beneficiaire.trim(),
+          categorie: formData.categorie,
+          mode_paiement: formData.modePaiement,
+          commentaire: formData.commentaire.trim() || null,
+          justificatif_nom: justificatif?.name || null,
+          statut_validation: 'en_attente'
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Dépense enregistrée",
+        description: `Dépense de ${parseFloat(formData.montant).toLocaleString('fr-FR')} € ajoutée avec succès`,
+      });
+
+      navigate('/mandataire');
+    } catch (error) {
+      console.error('Erreur lors de l\'enregistrement:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'enregistrer la dépense",
+        variant: "destructive"
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  if (dataLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -260,11 +314,23 @@ export function DepenseForm() {
           variant="outline"
           onClick={() => navigate(-1)}
           className="flex-1 sm:flex-none"
+          disabled={submitting}
         >
           Annuler
         </Button>
-        <Button type="submit" className="flex-1 sm:flex-none bg-primary hover:bg-primary/90">
-          Enregistrer la dépense
+        <Button 
+          type="submit" 
+          className="flex-1 sm:flex-none bg-primary hover:bg-primary/90"
+          disabled={submitting}
+        >
+          {submitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Enregistrement...
+            </>
+          ) : (
+            'Enregistrer la dépense'
+          )}
         </Button>
       </div>
     </form>

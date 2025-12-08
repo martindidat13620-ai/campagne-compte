@@ -56,28 +56,30 @@ export interface Mandataire {
 }
 
 export type OperationType = 'recette' | 'depense';
-export type ValidationStatus = 'en_attente' | 'validee' | 'refusee';
+export type ValidationStatus = 'en_attente' | 'validee' | 'rejetee';
 export type ModePaiement = 'especes' | 'cheque' | 'virement' | 'carte' | 'prelevement';
 
 export interface Operation {
   id: string;
-  mandataireId: string;
-  type: OperationType;
+  candidat_id: string;
+  mandataire_id: string;
+  type_operation: OperationType;
   date: string;
   montant: number;
-  modePaiement: ModePaiement;
+  mode_paiement: string;
   categorie: string;
-  beneficiaire?: string;
-  donateurNom?: string;
-  donateurAdresse?: string;
-  donateurNationalite?: string;
-  numeroRecu?: string;
-  commentaire?: string;
-  pieceJustificativeUrl?: string;
-  statutValidation: ValidationStatus;
-  commentaireComptable?: string;
-  dateCreation: string;
-  dateModification: string;
+  beneficiaire?: string | null;
+  donateur_nom?: string | null;
+  donateur_adresse?: string | null;
+  donateur_nationalite?: string | null;
+  numero_recu?: string | null;
+  commentaire?: string | null;
+  justificatif_url?: string | null;
+  justificatif_nom?: string | null;
+  statut_validation: ValidationStatus;
+  commentaire_comptable?: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface PlafondCalcul {
