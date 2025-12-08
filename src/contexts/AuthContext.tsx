@@ -87,9 +87,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+    // Always clear local state even if server logout fails
     setUser(null);
     setSession(null);
+    // Clear localStorage to ensure clean state
+    localStorage.removeItem('sb-lfxabmcppcqepplkgppf-auth-token');
   };
 
   const hasRole = (role: UserRole): boolean => {
