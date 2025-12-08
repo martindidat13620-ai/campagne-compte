@@ -12,18 +12,30 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Plus, Send, Building2, Users, UserCheck, Loader2, Trash2, Key } from 'lucide-react';
+import { Plus, Send, Building2, Users, UserCheck, Loader2, Trash2, Key, Filter } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TYPES_ELECTION, Campaign, Candidat, Mandataire } from '@/types';
+
+interface MandataireCandidatLink {
+  id: string;
+  mandataire_id: string;
+  candidat_id: string;
+}
 
 export default function ComptableGestion() {
   const { session } = useAuth();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [candidats, setCandidats] = useState<Candidat[]>([]);
   const [mandataires, setMandataires] = useState<Mandataire[]>([]);
+  const [mandataireCandidatLinks, setMandataireCandidatLinks] = useState<MandataireCandidatLink[]>([]);
   const [loading, setLoading] = useState(true);
   const [inviting, setInviting] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+
+  // Filter states
+  const [candidatCampaignFilter, setCandidatCampaignFilter] = useState<string>('all');
+  const [mandataireCampaignFilter, setMandataireCampaignFilter] = useState<string>('all');
+  const [mandataireCandidatFilter, setMandataireCandidatFilter] = useState<string>('all');
 
   // Form states
   const [newCampaign, setNewCampaign] = useState({ nom: '', type_election: '', annee: new Date().getFullYear() });
@@ -41,18 +53,67 @@ export default function ComptableGestion() {
   const fetchData = async () => {
     setLoading(true);
     
-    const [campaignsRes, candidatsRes, mandatairesRes] = await Promise.all([
+    const [campaignsRes, candidatsRes, mandatairesRes, linksRes] = await Promise.all([
       supabase.from('campaigns').select('*').order('created_at', { ascending: false }),
       supabase.from('candidats').select('*').order('created_at', { ascending: false }),
-      supabase.from('mandataires').select('*').order('created_at', { ascending: false })
+      supabase.from('mandataires').select('*').order('created_at', { ascending: false }),
+      supabase.from('mandataire_candidats').select('*')
     ]);
 
     if (campaignsRes.data) setCampaigns(campaignsRes.data as Campaign[]);
     if (candidatsRes.data) setCandidats(candidatsRes.data as Candidat[]);
     if (mandatairesRes.data) setMandataires(mandatairesRes.data as Mandataire[]);
+    if (linksRes.data) setMandataireCandidatLinks(linksRes.data as MandataireCandidatLink[]);
     
     setLoading(false);
   };
+
+  // Get candidats linked to a mandataire
+  const getMandataireCandidats = (mandataireId: string) => {
+    const candidatIds = mandataireCandidatLinks
+      .filter(link => link.mandataire_id === mandataireId)
+      .map(link => link.candidat_id);
+    return candidats.filter(c => candidatIds.includes(c.id));
+  };
+
+  // Get campaigns linked to a mandataire (through their candidats)
+  const getMandataireCampaigns = (mandataireId: string) => {
+    const linkedCandidats = getMandataireCandidats(mandataireId);
+    const campaignIds = [...new Set(linkedCandidats.map(c => c.campaign_id))];
+    return campaigns.filter(c => campaignIds.includes(c.id));
+  };
+
+  // Filter candidats by campaign
+  const filteredCandidats = candidatCampaignFilter === 'all'
+    ? candidats
+    : candidats.filter(c => c.campaign_id === candidatCampaignFilter);
+
+  // Filter mandataires by campaign and/or candidat
+  const filteredMandataires = mandataires.filter(mandataire => {
+    const linkedCandidats = getMandataireCandidats(mandataire.id);
+    const linkedCampaignIds = linkedCandidats.map(c => c.campaign_id);
+    
+    // Filter by campaign
+    if (mandataireCampaignFilter !== 'all') {
+      if (!linkedCampaignIds.includes(mandataireCampaignFilter)) {
+        return false;
+      }
+    }
+    
+    // Filter by candidat
+    if (mandataireCandidatFilter !== 'all') {
+      if (!linkedCandidats.some(c => c.id === mandataireCandidatFilter)) {
+        return false;
+      }
+    }
+    
+    return true;
+  });
+
+  // Get candidats available for mandataire filter (based on campaign filter)
+  const mandataireFilterCandidats = mandataireCampaignFilter === 'all'
+    ? candidats
+    : candidats.filter(c => c.campaign_id === mandataireCampaignFilter);
 
   const createCampaign = async () => {
     const { error } = await supabase.from('campaigns').insert({
@@ -426,7 +487,21 @@ export default function ComptableGestion() {
 
           {/* Candidats Tab */}
           <TabsContent value="candidats" className="space-y-4">
-            <div className="flex justify-end">
+            <div className="flex flex-col sm:flex-row justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <Filter size={18} className="text-muted-foreground" />
+                <Select value={candidatCampaignFilter} onValueChange={setCandidatCampaignFilter}>
+                  <SelectTrigger className="w-[250px]">
+                    <SelectValue placeholder="Filtrer par campagne" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes les campagnes</SelectItem>
+                    {campaigns.map(c => (
+                      <SelectItem key={c.id} value={c.id}>{c.nom} ({c.annee})</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <Dialog open={dialogOpen.candidat} onOpenChange={(open) => setDialogOpen({ ...dialogOpen, candidat: open })}>
                 <DialogTrigger asChild>
                   <Button disabled={campaigns.length === 0}>
@@ -481,18 +556,25 @@ export default function ComptableGestion() {
               </Dialog>
             </div>
 
+            <div className="text-sm text-muted-foreground">
+              {filteredCandidats.length} candidat(s) trouvé(s)
+            </div>
+
             <div className="grid gap-4">
-              {candidats.map(candidat => (
+              {filteredCandidats.map(candidat => (
                 <Card key={candidat.id}>
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <div>
                         <CardTitle className="text-lg">{candidat.prenom} {candidat.nom}</CardTitle>
-                        <CardDescription>{candidat.email} • {getCampaignName(candidat.campaign_id)}</CardDescription>
+                        <CardDescription>{candidat.email}</CardDescription>
                       </div>
                       <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="bg-primary/10">
+                          {getCampaignName(candidat.campaign_id)}
+                        </Badge>
                         {candidat.user_id ? (
-                          <Badge className="bg-green-500">Invité</Badge>
+                          <Badge className="bg-success">Invité</Badge>
                         ) : (
                           <Button size="sm" onClick={() => openInviteDialog('candidat', candidat)} disabled={inviting}>
                             <Send className="h-4 w-4 mr-2" />
@@ -530,15 +612,43 @@ export default function ComptableGestion() {
                   </CardContent>
                 </Card>
               ))}
-              {candidats.length === 0 && (
-                <p className="text-center text-muted-foreground py-8">Aucun candidat créé</p>
+              {filteredCandidats.length === 0 && (
+                <p className="text-center text-muted-foreground py-8">Aucun candidat trouvé</p>
               )}
             </div>
           </TabsContent>
 
           {/* Mandataires Tab */}
           <TabsContent value="mandataires" className="space-y-4">
-            <div className="flex justify-end">
+            <div className="flex flex-col sm:flex-row justify-between gap-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <Filter size={18} className="text-muted-foreground" />
+                <Select value={mandataireCampaignFilter} onValueChange={(v) => {
+                  setMandataireCampaignFilter(v);
+                  setMandataireCandidatFilter('all');
+                }}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Filtrer par campagne" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes les campagnes</SelectItem>
+                    {campaigns.map(c => (
+                      <SelectItem key={c.id} value={c.id}>{c.nom} ({c.annee})</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={mandataireCandidatFilter} onValueChange={setMandataireCandidatFilter}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Filtrer par candidat" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous les candidats</SelectItem>
+                    {mandataireFilterCandidats.map(c => (
+                      <SelectItem key={c.id} value={c.id}>{c.prenom} {c.nom}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <Dialog open={dialogOpen.mandataire} onOpenChange={(open) => setDialogOpen({ ...dialogOpen, mandataire: open })}>
                 <DialogTrigger asChild>
                   <Button disabled={candidats.length === 0}>
@@ -574,7 +684,7 @@ export default function ComptableGestion() {
                         </SelectTrigger>
                         <SelectContent>
                           {candidats.map(c => (
-                            <SelectItem key={c.id} value={c.id}>{c.prenom} {c.nom}</SelectItem>
+                            <SelectItem key={c.id} value={c.id}>{c.prenom} {c.nom} - {getCampaignName(c.campaign_id)}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -585,52 +695,86 @@ export default function ComptableGestion() {
               </Dialog>
             </div>
 
+            <div className="text-sm text-muted-foreground">
+              {filteredMandataires.length} mandataire(s) trouvé(s)
+            </div>
+
             <div className="grid gap-4">
-              {mandataires.map(mandataire => (
-                <Card key={mandataire.id}>
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="text-lg">{mandataire.prenom} {mandataire.nom}</CardTitle>
-                        <CardDescription>{mandataire.email}</CardDescription>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {mandataire.user_id ? (
-                          <Badge className="bg-green-500">Invité</Badge>
-                        ) : (
-                          <Button size="sm" onClick={() => openInviteDialog('mandataire', mandataire)} disabled={inviting}>
-                            <Send className="h-4 w-4 mr-2" />
-                            Inviter
-                          </Button>
-                        )}
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="destructive" size="icon" disabled={deleting === mandataire.id}>
-                              {deleting === mandataire.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+              {filteredMandataires.map(mandataire => {
+                const linkedCandidats = getMandataireCandidats(mandataire.id);
+                const linkedCampaigns = getMandataireCampaigns(mandataire.id);
+                
+                return (
+                  <Card key={mandataire.id}>
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle className="text-lg">{mandataire.prenom} {mandataire.nom}</CardTitle>
+                          <CardDescription>{mandataire.email}</CardDescription>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {mandataire.user_id ? (
+                            <Badge className="bg-success">Invité</Badge>
+                          ) : (
+                            <Button size="sm" onClick={() => openInviteDialog('mandataire', mandataire)} disabled={inviting}>
+                              <Send className="h-4 w-4 mr-2" />
+                              Inviter
                             </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Supprimer le mandataire ?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Cette action est irréversible. Le mandataire, ses opérations et son compte utilisateur seront supprimés.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Annuler</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => deleteMandataire(mandataire)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                Supprimer
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                          )}
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="destructive" size="icon" disabled={deleting === mandataire.id}>
+                                {deleting === mandataire.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Supprimer le mandataire ?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Cette action est irréversible. Le mandataire, ses opérations et son compte utilisateur seront supprimés.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => deleteMandataire(mandataire)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                  Supprimer
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
                       </div>
-                    </div>
-                  </CardHeader>
-                </Card>
-              ))}
-              {mandataires.length === 0 && (
-                <p className="text-center text-muted-foreground py-8">Aucun mandataire créé</p>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      {linkedCampaigns.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          <span className="text-sm text-muted-foreground">Campagnes:</span>
+                          {linkedCampaigns.map(c => (
+                            <Badge key={c.id} variant="outline" className="bg-primary/10">
+                              {c.nom} ({c.annee})
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                      {linkedCandidats.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          <span className="text-sm text-muted-foreground">Candidats:</span>
+                          {linkedCandidats.map(c => (
+                            <Badge key={c.id} variant="secondary">
+                              {c.prenom} {c.nom}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                      {linkedCandidats.length === 0 && (
+                        <p className="text-sm text-warning">Aucun candidat associé</p>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+              {filteredMandataires.length === 0 && (
+                <p className="text-center text-muted-foreground py-8">Aucun mandataire trouvé</p>
               )}
             </div>
           </TabsContent>
