@@ -459,28 +459,30 @@ export function OperationsTable({
                     try {
                       const { data, error } = await supabase.storage
                         .from('justificatifs')
-                        .createSignedUrl(selectedOp.justificatif_url!, 3600);
+                        .download(selectedOp.justificatif_url!);
                       
                       if (error) {
-                        console.error('Erreur signed URL:', error);
+                        console.error('Erreur téléchargement:', error);
                         return;
                       }
                       
-                      if (data?.signedUrl) {
-                        // Ouvrir dans un nouvel onglet avec gestion du blocage pop-up
-                        const newWindow = window.open(data.signedUrl, '_blank');
-                        if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-                          // Pop-up bloqué, rediriger dans la même fenêtre
-                          window.location.href = data.signedUrl;
-                        }
+                      if (data) {
+                        const url = URL.createObjectURL(data);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = selectedOp.justificatif_nom || 'justificatif';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
                       }
                     } catch (err) {
                       console.error('Erreur:', err);
                     }
                   }}
                 >
-                  <ExternalLink size={16} className="mr-2" />
-                  Voir le justificatif
+                  <Download size={16} className="mr-2" />
+                  Télécharger le justificatif
                 </Button>
               )}
             </div>
