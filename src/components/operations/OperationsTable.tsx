@@ -11,13 +11,15 @@ import {
   Download,
   Eye,
   Trash2,
-  Loader2
+  Loader2,
+  ExternalLink
 } from 'lucide-react';
 import { Operation, ValidationStatus } from '@/types';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { supabase } from '@/integrations/supabase/client';
 import {
   Select,
   SelectContent,
@@ -450,8 +452,19 @@ export function OperationsTable({
               )}
 
               {selectedOp.justificatif_url && (
-                <Button variant="outline" className="w-full">
-                  <Eye size={16} className="mr-2" />
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={async () => {
+                    const { data } = await supabase.storage
+                      .from('justificatifs')
+                      .createSignedUrl(selectedOp.justificatif_url!, 3600);
+                    if (data?.signedUrl) {
+                      window.open(data.signedUrl, '_blank');
+                    }
+                  }}
+                >
+                  <ExternalLink size={16} className="mr-2" />
                   Voir le justificatif
                 </Button>
               )}
