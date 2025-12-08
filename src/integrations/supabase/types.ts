@@ -14,16 +14,256 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      campaigns: {
+        Row: {
+          annee: number
+          created_at: string | null
+          created_by: string | null
+          date_debut: string | null
+          date_fin: string | null
+          id: string
+          nom: string
+          type_election: string
+          updated_at: string | null
+        }
+        Insert: {
+          annee: number
+          created_at?: string | null
+          created_by?: string | null
+          date_debut?: string | null
+          date_fin?: string | null
+          id?: string
+          nom: string
+          type_election: string
+          updated_at?: string | null
+        }
+        Update: {
+          annee?: number
+          created_at?: string | null
+          created_by?: string | null
+          date_debut?: string | null
+          date_fin?: string | null
+          id?: string
+          nom?: string
+          type_election?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      candidats: {
+        Row: {
+          campaign_id: string
+          circonscription: string | null
+          created_at: string | null
+          email: string
+          id: string
+          nom: string
+          plafond_depenses: number | null
+          prenom: string
+          telephone: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          campaign_id: string
+          circonscription?: string | null
+          created_at?: string | null
+          email: string
+          id?: string
+          nom: string
+          plafond_depenses?: number | null
+          prenom: string
+          telephone?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          campaign_id?: string
+          circonscription?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          nom?: string
+          plafond_depenses?: number | null
+          prenom?: string
+          telephone?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidats_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comptable_campaigns: {
+        Row: {
+          campaign_id: string
+          comptable_id: string
+          created_at: string | null
+          id: string
+        }
+        Insert: {
+          campaign_id: string
+          comptable_id: string
+          created_at?: string | null
+          id?: string
+        }
+        Update: {
+          campaign_id?: string
+          comptable_id?: string
+          created_at?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comptable_campaigns_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mandataire_candidats: {
+        Row: {
+          candidat_id: string
+          created_at: string | null
+          id: string
+          mandataire_id: string
+        }
+        Insert: {
+          candidat_id: string
+          created_at?: string | null
+          id?: string
+          mandataire_id: string
+        }
+        Update: {
+          candidat_id?: string
+          created_at?: string | null
+          id?: string
+          mandataire_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mandataire_candidats_candidat_id_fkey"
+            columns: ["candidat_id"]
+            isOneToOne: false
+            referencedRelation: "candidats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mandataire_candidats_mandataire_id_fkey"
+            columns: ["mandataire_id"]
+            isOneToOne: false
+            referencedRelation: "mandataires"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mandataires: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          nom: string
+          prenom: string
+          telephone: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          nom: string
+          prenom: string
+          telephone?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          nom?: string
+          prenom?: string
+          telephone?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          nom: string | null
+          prenom: string | null
+          telephone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id: string
+          nom?: string | null
+          prenom?: string | null
+          telephone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          nom?: string | null
+          prenom?: string | null
+          telephone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "comptable" | "mandataire" | "candidat"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +390,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["comptable", "mandataire", "candidat"],
+    },
   },
 } as const

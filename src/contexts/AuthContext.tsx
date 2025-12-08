@@ -1,73 +1,103 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { User, UserRole } from '@/types';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { User as SupabaseUser, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
+import { UserRole } from '@/types';
+
+interface AuthUser {
+  id: string;
+  email: string;
+  nom: string | null;
+  prenom: string | null;
+  roles: UserRole[];
+}
 
 interface AuthContextType {
-  user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  switchRole: (role: UserRole) => void;
+  user: AuthUser | null;
+  session: Session | null;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<{ error: string | null }>;
+  logout: () => Promise<void>;
+  hasRole: (role: UserRole) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Mock users for demo
-const mockUsers: Record<string, User> = {
-  'mandataire@demo.fr': {
-    id: '1',
-    email: 'mandataire@demo.fr',
-    role: 'mandataire',
-    mandataireId: 'm1',
-    nom: 'Dupont',
-    prenom: 'Marie'
-  },
-  'comptable@demo.fr': {
-    id: '2',
-    email: 'comptable@demo.fr',
-    role: 'comptable',
-    nom: 'Martin',
-    prenom: 'Jean'
-  },
-  'candidat@demo.fr': {
-    id: '3',
-    email: 'candidat@demo.fr',
-    role: 'candidat',
-    mandataireId: 'm1',
-    nom: 'Durand',
-    prenom: 'Pierre'
-  }
-};
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    // Auto-login as mandataire for demo
-    return mockUsers['mandataire@demo.fr'];
-  });
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    const foundUser = mockUsers[email];
-    if (foundUser) {
-      setUser(foundUser);
-      return true;
-    }
-    return false;
+  const fetchUserData = async (supabaseUser: SupabaseUser) => {
+    // Fetch profile
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', supabaseUser.id)
+      .maybeSingle();
+
+    // Fetch roles
+    const { data: userRoles } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', supabaseUser.id);
+
+    const roles = (userRoles?.map(r => r.role) || []) as UserRole[];
+
+    setUser({
+      id: supabaseUser.id,
+      email: supabaseUser.email || '',
+      nom: profile?.nom || null,
+      prenom: profile?.prenom || null,
+      roles
+    });
   };
 
-  const logout = () => {
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
+      
+      if (session?.user) {
+        // Defer Supabase calls
+        setTimeout(() => {
+          fetchUserData(session.user);
+        }, 0);
+      } else {
+        setUser(null);
+      }
+      setLoading(false);
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session?.user) {
+        fetchUserData(session.user);
+      }
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const login = async (email: string, password: string): Promise<{ error: string | null }> => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      return { error: error.message };
+    }
+    return { error: null };
+  };
+
+  const logout = async () => {
+    await supabase.auth.signOut();
     setUser(null);
+    setSession(null);
   };
 
-  const switchRole = (role: UserRole) => {
-    if (role === 'mandataire') {
-      setUser(mockUsers['mandataire@demo.fr']);
-    } else if (role === 'comptable') {
-      setUser(mockUsers['comptable@demo.fr']);
-    } else {
-      setUser(mockUsers['candidat@demo.fr']);
-    }
+  const hasRole = (role: UserRole): boolean => {
+    return user?.roles.includes(role) || false;
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, switchRole }}>
+    <AuthContext.Provider value={{ user, session, loading, login, logout, hasRole }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,5 +1,5 @@
 import { ReactNode, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   PlusCircle, 
@@ -28,12 +28,13 @@ interface AppLayoutProps {
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
-  const { user, logout, switchRole } = useAuth();
+  const { user, logout, hasRole } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const mandataireNavItems = [
-    { href: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
+    { href: '/mandataire', label: 'Tableau de bord', icon: LayoutDashboard },
     { href: '/depense/nouvelle', label: 'Nouvelle dépense', icon: PlusCircle },
     { href: '/recette/nouvelle', label: 'Nouvelle recette', icon: PlusCircle },
     { href: '/historique', label: 'Historique', icon: History },
@@ -49,25 +50,23 @@ export function AppLayout({ children }: AppLayoutProps) {
   ];
 
   const getNavItems = () => {
-    switch (user?.role) {
-      case 'comptable':
-        return comptableNavItems;
-      case 'candidat':
-        return candidatNavItems;
-      default:
-        return mandataireNavItems;
-    }
+    if (hasRole('comptable')) return comptableNavItems;
+    if (hasRole('candidat')) return candidatNavItems;
+    return mandataireNavItems;
   };
 
   const navItems = getNavItems();
 
-  const getRoleLabel = (role: string) => {
-    switch (role) {
-      case 'mandataire': return 'Mandataire';
-      case 'comptable': return 'Expert-Comptable';
-      case 'candidat': return 'Candidat';
-      default: return role;
-    }
+  const getCurrentRole = () => {
+    if (hasRole('comptable')) return 'Expert-Comptable';
+    if (hasRole('candidat')) return 'Candidat';
+    if (hasRole('mandataire')) return 'Mandataire';
+    return 'Utilisateur';
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
   };
 
   return (
@@ -117,28 +116,18 @@ export function AppLayout({ children }: AppLayoutProps) {
                   <User size={16} className="text-accent-foreground" />
                 </div>
                 <div className="hidden sm:block text-left">
-                  <p className="text-sm font-medium">{user?.prenom} {user?.nom}</p>
-                  <p className="text-xs opacity-75">{getRoleLabel(user?.role || '')}</p>
+                  <p className="text-sm font-medium">{user?.prenom || ''} {user?.nom || ''}</p>
+                  <p className="text-xs opacity-75">{getCurrentRole()}</p>
                 </div>
                 <ChevronDown size={16} className="opacity-75" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <div className="px-2 py-1.5 text-sm text-muted-foreground">
-                Connecté en tant que {getRoleLabel(user?.role || '')}
+                {user?.email}
               </div>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => switchRole('mandataire')}>
-                Voir en tant que Mandataire
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => switchRole('comptable')}>
-                Voir en tant que Comptable
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => switchRole('candidat')}>
-                Voir en tant que Candidat
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={logout} className="text-destructive">
+              <DropdownMenuItem onClick={handleLogout} className="text-destructive">
                 <LogOut size={16} className="mr-2" />
                 Déconnexion
               </DropdownMenuItem>

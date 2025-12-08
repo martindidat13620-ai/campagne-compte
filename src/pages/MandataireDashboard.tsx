@@ -6,12 +6,11 @@ import { PlafondCard } from '@/components/dashboard/PlafondCard';
 import { RecentOperations } from '@/components/dashboard/RecentOperations';
 import { ExpenseChart } from '@/components/dashboard/ExpenseChart';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
 import { calculatePlafond, getOperationsByMandataire, getMandataireById } from '@/data/mockData';
 
 export default function MandataireDashboard() {
-  const { user } = useAuth();
-  const mandataireId = user?.mandataireId || 'm1';
+  // For demo, using default mandataireId - will be linked to user later
+  const mandataireId = 'm1';
   
   const mandataire = getMandataireById(mandataireId);
   const operations = getOperationsByMandataire(mandataireId);
