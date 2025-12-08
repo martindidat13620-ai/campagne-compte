@@ -41,7 +41,8 @@ export function AppLayout({ children }: AppLayoutProps) {
   ];
 
   const comptableNavItems = [
-    { href: '/comptable', label: 'Campagnes', icon: Building2 },
+    { href: '/comptable', label: 'Tableau de bord', icon: LayoutDashboard },
+    { href: '/comptable/gestion', label: 'Gestion', icon: Building2 },
     { href: '/comptable/validation', label: 'Validation', icon: FileCheck },
   ];
 

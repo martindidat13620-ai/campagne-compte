@@ -13,6 +13,7 @@ import NouvelleRecette from "./pages/NouvelleRecette";
 import Historique from "./pages/Historique";
 import ComptableDashboard from "./pages/ComptableDashboard";
 import ComptableValidation from "./pages/ComptableValidation";
+import ComptableGestion from "./pages/ComptableGestion";
 import CandidatDashboard from "./pages/CandidatDashboard";
 import NotFound from "./pages/NotFound";
 
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/recette/nouvelle" element={<NouvelleRecette />} />
             <Route path="/historique" element={<Historique />} />
             <Route path="/comptable" element={<ComptableDashboard />} />
+            <Route path="/comptable/gestion" element={<ComptableGestion />} />
             <Route path="/comptable/validation" element={<ComptableValidation />} />
             <Route path="/candidat" element={<CandidatDashboard />} />
             <Route path="*" element={<NotFound />} />
