@@ -35,9 +35,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   const mandataireNavItems = [
     { href: '/mandataire', label: 'Tableau de bord', icon: LayoutDashboard },
-    { href: '/depense/nouvelle', label: 'Nouvelle dépense', icon: PlusCircle },
-    { href: '/recette/nouvelle', label: 'Nouvelle recette', icon: PlusCircle },
-    { href: '/historique', label: 'Historique', icon: History },
+    { href: '/mandataire/operations', label: 'Mes opérations', icon: FileCheck },
   ];
 
   const comptableNavItems = [

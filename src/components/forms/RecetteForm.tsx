@@ -14,9 +14,18 @@ import {
 } from '@/components/ui/select';
 import { CATEGORIES_RECETTES, MODES_PAIEMENT } from '@/types';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useMandataireData } from '@/hooks/useMandataireData';
+import { Loader2 } from 'lucide-react';
 
-export function RecetteForm() {
+interface RecetteFormProps {
+  onSuccess?: () => void;
+}
+
+export function RecetteForm({ onSuccess }: RecetteFormProps) {
   const navigate = useNavigate();
+  const { candidat, mandataire, loading: dataLoading } = useMandataireData();
+  const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     montant: '',
@@ -74,7 +83,7 @@ export function RecetteForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validate()) {
@@ -86,13 +95,88 @@ export function RecetteForm() {
       return;
     }
 
-    toast({
-      title: "Recette enregistrée",
-      description: `Recette de ${parseFloat(formData.montant).toLocaleString('fr-FR')} € ajoutée avec succès`,
-    });
+    if (!candidat || !mandataire) {
+      toast({
+        title: "Erreur",
+        description: "Données mandataire/candidat non disponibles",
+        variant: "destructive"
+      });
+      return;
+    }
 
-    navigate('/dashboard');
+    setSubmitting(true);
+
+    try {
+      let justificatifUrl: string | null = null;
+
+      // Upload du justificatif vers Supabase Storage
+      if (justificatif) {
+        const fileExt = justificatif.name.split('.').pop();
+        const fileName = `${mandataire.id}/${Date.now()}.${fileExt}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('justificatifs')
+          .upload(fileName, justificatif);
+
+        if (uploadError) {
+          console.error('Erreur upload:', uploadError);
+          throw new Error('Impossible d\'uploader le justificatif');
+        }
+
+        justificatifUrl = uploadData.path;
+      }
+
+      const { error } = await supabase
+        .from('operations')
+        .insert({
+          candidat_id: candidat.id,
+          mandataire_id: mandataire.id,
+          type_operation: 'recette',
+          date: formData.date,
+          montant: parseFloat(formData.montant),
+          donateur_nom: formData.donateurNom.trim(),
+          donateur_adresse: formData.donateurAdresse.trim() || null,
+          donateur_nationalite: formData.donateurNationalite,
+          categorie: formData.categorie,
+          mode_paiement: formData.modePaiement,
+          numero_recu: formData.numeroRecu.trim(),
+          commentaire: formData.commentaire.trim() || null,
+          justificatif_url: justificatifUrl,
+          justificatif_nom: justificatif?.name || null,
+          statut_validation: 'en_attente'
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Recette enregistrée",
+        description: `Recette de ${parseFloat(formData.montant).toLocaleString('fr-FR')} € ajoutée avec succès`,
+      });
+
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        navigate('/mandataire');
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'enregistrement:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'enregistrer la recette",
+        variant: "destructive"
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  if (dataLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -305,11 +389,23 @@ export function RecetteForm() {
           variant="outline"
           onClick={() => navigate(-1)}
           className="flex-1 sm:flex-none"
+          disabled={submitting}
         >
           Annuler
         </Button>
-        <Button type="submit" className="flex-1 sm:flex-none bg-primary hover:bg-primary/90">
-          Enregistrer la recette
+        <Button 
+          type="submit" 
+          className="flex-1 sm:flex-none bg-primary hover:bg-primary/90"
+          disabled={submitting}
+        >
+          {submitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Enregistrement...
+            </>
+          ) : (
+            'Enregistrer la recette'
+          )}
         </Button>
       </div>
     </form>
