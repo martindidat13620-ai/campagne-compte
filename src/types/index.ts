@@ -68,6 +68,7 @@ export interface Operation {
   montant: number;
   mode_paiement: string;
   categorie: string;
+  compte_comptable?: string | null;
   beneficiaire?: string | null;
   donateur_nom?: string | null;
   donateur_adresse?: string | null;
