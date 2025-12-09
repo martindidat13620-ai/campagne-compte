@@ -6,7 +6,6 @@ import {
   Users, 
   Calculator, 
   Eye, 
-  ArrowRight, 
   Shield, 
   FileText, 
   BarChart3,
@@ -14,6 +13,7 @@ import {
   LogIn,
   Loader2
 } from 'lucide-react';
+import logo from '@/assets/logo_mcc.png';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -100,10 +100,7 @@ const LandingPage = () => {
       <header className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-lg">CC</span>
-            </div>
-            <span className="font-bold text-xl text-foreground">ComptaCampagne</span>
+            <img src={logo} alt="Mes Comptes de Campagne" className="h-10 w-auto" />
           </div>
           <Button variant="outline" size="sm" onClick={() => navigate('/auth')}>
             <LogIn className="h-4 w-4 mr-2" />
@@ -115,8 +112,9 @@ const LandingPage = () => {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-16 md:py-24 text-center">
         <div className="max-w-3xl mx-auto">
+          <img src={logo} alt="Mes Comptes de Campagne" className="h-24 w-auto mx-auto mb-8" />
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6 leading-tight">
-            Gérez vos comptes de campagne en toute <span className="text-primary">simplicité</span>
+            Votre assistant de <span className="text-primary">campagne</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground mb-8">
             La solution professionnelle pour les mandataires financiers, experts-comptables et candidats. 
@@ -181,13 +179,10 @@ const LandingPage = () => {
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">CC</span>
-              </div>
-              <span className="font-semibold text-foreground">ComptaCampagne</span>
+              <img src={logo} alt="Mes Comptes de Campagne" className="h-8 w-auto" />
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2024 ComptaCampagne. Solution conforme CNCCFP.
+              © 2024 Mes Comptes de Campagne. Solution conforme CNCCFP.
             </p>
           </div>
         </div>

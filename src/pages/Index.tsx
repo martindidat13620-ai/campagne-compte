@@ -28,10 +28,11 @@ const Index = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="text-center">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-primary flex items-center justify-center">
-          <span className="text-primary-foreground font-bold text-2xl">CC</span>
-        </div>
-        <h1 className="mb-2 text-2xl font-bold text-foreground">ComptaCampagne</h1>
+        <img 
+          src="/logo_mcc.png" 
+          alt="Mes Comptes de Campagne" 
+          className="w-32 h-auto mx-auto mb-4"
+        />
         <p className="text-muted-foreground">Chargement...</p>
       </div>
     </div>

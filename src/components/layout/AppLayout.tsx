@@ -2,8 +2,6 @@ import { ReactNode, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
-  PlusCircle, 
-  History, 
   User, 
   LogOut,
   Menu,
@@ -22,6 +20,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
+import logo from '@/assets/logo_mcc.png';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -81,10 +80,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
-                <span className="text-accent-foreground font-bold text-sm">CC</span>
-              </div>
-              <span className="font-semibold text-lg hidden sm:block">ComptaCampagne</span>
+              <img src={logo} alt="Mes Comptes de Campagne" className="h-8 w-auto brightness-0 invert" />
             </Link>
           </div>
 
