@@ -57,6 +57,7 @@ interface OperationsTableProps {
   operations: Operation[];
   showValidationActions?: boolean;
   showDeleteAction?: boolean;
+  isComptable?: boolean;
   onValidate?: (id: string) => void;
   onReject?: (id: string, comment: string) => void;
   onDelete?: (id: string) => Promise<void>;
@@ -66,6 +67,7 @@ export function OperationsTable({
   operations, 
   showValidationActions = false,
   showDeleteAction = false,
+  isComptable = false,
   onValidate,
   onReject,
   onDelete
@@ -128,7 +130,7 @@ export function OperationsTable({
 
   const exportCSV = () => {
     // Inclure le compte comptable dans l'export pour le comptable
-    const headers = showValidationActions 
+    const headers = isComptable 
       ? ['Date', 'Type', 'Montant', 'Catégorie', 'Compte Comptable', 'Bénéficiaire/Donateur', 'Statut']
       : ['Date', 'Type', 'Montant', 'Catégorie', 'Bénéficiaire/Donateur', 'Statut'];
     
@@ -140,7 +142,7 @@ export function OperationsTable({
         op.type_operation === 'recette' ? (getCategorieLabel(op.categorie) || op.categorie) : op.categorie,
       ];
       
-      if (showValidationActions) {
+      if (isComptable) {
         // Ajouter le compte comptable pour les recettes côté comptable
         baseRow.push((op as any).compte_comptable || '');
       }
@@ -456,7 +458,7 @@ export function OperationsTable({
                   {getStatusBadge(selectedOp.statut_validation)}
                 </div>
                 {/* Compte comptable visible uniquement pour le comptable (recettes) */}
-                {showValidationActions && selectedOp.type_operation === 'recette' && (selectedOp as any).compte_comptable && (
+                {isComptable && selectedOp.type_operation === 'recette' && (selectedOp as any).compte_comptable && (
                   <div className="col-span-2">
                     <p className="text-sm text-muted-foreground">Compte comptable</p>
                     <p className="font-medium font-mono text-primary">{(selectedOp as any).compte_comptable}</p>

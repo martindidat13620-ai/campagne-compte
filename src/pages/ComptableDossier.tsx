@@ -441,6 +441,7 @@ export default function ComptableDossier() {
             <OperationsTable 
               operations={transformedOperations}
               showValidationActions={false}
+              isComptable={true}
             />
           </TabsContent>
 
@@ -449,6 +450,7 @@ export default function ComptableDossier() {
             <OperationsTable 
               operations={transformedOperations.filter(op => op.statut_validation === 'en_attente')}
               showValidationActions={true}
+              isComptable={true}
               onValidate={handleValidate}
               onReject={handleReject}
               onDelete={handleDelete}
