@@ -112,10 +112,7 @@ const LandingPage = () => {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-16 md:py-24 text-center">
         <div className="max-w-3xl mx-auto">
-          <img src={logo} alt="Mes Comptes de Campagne" className="h-24 w-auto mx-auto mb-8" />
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6 leading-tight">
-            Votre assistant de <span className="text-primary">campagne</span>
-          </h1>
+          <img src={logo} alt="Mes Comptes de Campagne" className="h-40 md:h-52 w-auto mx-auto mb-6" />
           <p className="text-lg md:text-xl text-muted-foreground mb-8">
             La solution professionnelle pour les mandataires financiers, experts-comptables et candidats. 
             Conformité CNCCFP garantie.
