@@ -12,7 +12,8 @@ import {
   Eye,
   Trash2,
   Loader2,
-  ExternalLink
+  ExternalLink,
+  Pencil
 } from 'lucide-react';
 import { Operation, ValidationStatus, getCategorieLabel, getCategorieDepenseLabel } from '@/types';
 import { cn } from '@/lib/utils';
@@ -61,6 +62,7 @@ interface OperationsTableProps {
   onValidate?: (id: string) => void;
   onReject?: (id: string, comment: string) => void;
   onDelete?: (id: string) => Promise<void>;
+  onEdit?: (operation: Operation) => void;
 }
 
 export function OperationsTable({ 
@@ -70,7 +72,8 @@ export function OperationsTable({
   isComptable = false,
   onValidate,
   onReject,
-  onDelete
+  onDelete,
+  onEdit
 }: OperationsTableProps) {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
@@ -317,6 +320,16 @@ export function OperationsTable({
                               <XCircle size={16} />
                             </Button>
                           </>
+                        )}
+                        {onEdit && (
+                          <Button 
+                            size="icon" 
+                            variant="ghost" 
+                            className="h-8 w-8 text-primary hover:bg-primary/10"
+                            onClick={() => onEdit(op)}
+                          >
+                            <Pencil size={16} />
+                          </Button>
                         )}
                         {onDelete && (
                           <AlertDialog>
