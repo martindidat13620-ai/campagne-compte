@@ -105,13 +105,42 @@ export const CATEGORIES_DEPENSES = [
   'Autres'
 ];
 
-export const CATEGORIES_RECETTES = [
-  'Don de personne physique',
-  'Apport personnel du candidat',
-  'Contribution parti politique',
-  'Prêt bancaire',
-  'Autres'
+// Structure des catégories de recettes avec compte comptable
+export interface CategorieRecette {
+  value: string;
+  label: string;
+  compteComptable: string;
+  parent?: string; // Pour les sous-catégories
+}
+
+export const CATEGORIES_RECETTES: CategorieRecette[] = [
+  { value: 'dons', label: 'Dons', compteComptable: '7010' },
+  { value: 'versements_personnels', label: 'Versements personnels des candidats au mandataire', compteComptable: '7021' },
+  // Emprunts
+  { value: 'emprunts_bancaires', label: 'Emprunts bancaires des candidats', compteComptable: '7022', parent: 'Emprunts' },
+  { value: 'emprunts_formations_politiques', label: 'Emprunts des candidats auprès des formations politiques', compteComptable: '7023', parent: 'Emprunts' },
+  { value: 'emprunts_personnes_physiques', label: 'Emprunts des candidats auprès des personnes physiques', compteComptable: '7025', parent: 'Emprunts' },
+  // Versements formations politiques
+  { value: 'versements_formations_politiques', label: 'Versements définitifs des formations politiques', compteComptable: '7031' },
+  { value: 'depenses_directes_formations', label: 'Dépenses payées directement par les formations politiques', compteComptable: '7032' },
+  // Concours en nature
+  { value: 'concours_nature_candidats', label: 'Concours en nature fournis par les candidats', compteComptable: '7050', parent: 'Concours en nature' },
+  { value: 'concours_nature_formations', label: 'Concours en nature fournis par les formations politiques', compteComptable: '7051', parent: 'Concours en nature' },
+  { value: 'concours_nature_personnes', label: 'Concours en nature fournis par les personnes physiques', compteComptable: '7052', parent: 'Concours en nature' },
+  // Autres
+  { value: 'produits_divers', label: 'Produits divers', compteComptable: '7580' },
+  { value: 'produits_financiers', label: 'Produits financiers', compteComptable: '7600' },
 ];
+
+// Fonction helper pour obtenir le compte comptable d'une catégorie
+export function getCompteComptable(categorieValue: string): string | undefined {
+  return CATEGORIES_RECETTES.find(cat => cat.value === categorieValue)?.compteComptable;
+}
+
+// Fonction helper pour obtenir le label d'une catégorie
+export function getCategorieLabel(categorieValue: string): string | undefined {
+  return CATEGORIES_RECETTES.find(cat => cat.value === categorieValue)?.label;
+}
 
 export const MODES_PAIEMENT: { value: ModePaiement; label: string }[] = [
   { value: 'cheque', label: 'Chèque' },
