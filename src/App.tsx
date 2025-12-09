@@ -8,6 +8,7 @@ import LandingPage from "./pages/LandingPage";
 import Auth from "./pages/Auth";
 import EnAttente from "./pages/EnAttente";
 import MandataireDashboard from "./pages/MandataireDashboard";
+import MesOperations from "./pages/MesOperations";
 import NouvelleDepense from "./pages/NouvelleDepense";
 import NouvelleRecette from "./pages/NouvelleRecette";
 import Historique from "./pages/Historique";
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/en-attente" element={<EnAttente />} />
             <Route path="/mandataire" element={<MandataireDashboard />} />
+            <Route path="/mandataire/operations" element={<MesOperations />} />
             <Route path="/depense/nouvelle" element={<NouvelleDepense />} />
             <Route path="/recette/nouvelle" element={<NouvelleRecette />} />
             <Route path="/historique" element={<Historique />} />

@@ -17,7 +17,11 @@ import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useMandataireData } from '@/hooks/useMandataireData';
 
-export function DepenseForm() {
+interface DepenseFormProps {
+  onSuccess?: () => void;
+}
+
+export function DepenseForm({ onSuccess }: DepenseFormProps) {
   const navigate = useNavigate();
   const { candidat, mandataire, loading: dataLoading } = useMandataireData();
   const [submitting, setSubmitting] = useState(false);
@@ -135,7 +139,11 @@ export function DepenseForm() {
         description: `Dépense de ${parseFloat(formData.montant).toLocaleString('fr-FR')} € ajoutée avec succès`,
       });
 
-      navigate('/mandataire');
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        navigate('/mandataire');
+      }
     } catch (error) {
       console.error('Erreur lors de l\'enregistrement:', error);
       toast({
