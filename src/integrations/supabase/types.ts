@@ -338,6 +338,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      candidat_owns_link: {
+        Args: { _candidat_id: string; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -353,12 +357,24 @@ export type Database = {
         Args: { _candidat_id: string; _user_id: string }
         Returns: boolean
       }
+      is_comptable_for_mandataire: {
+        Args: { _mandataire_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_mandataire_for_candidat: {
         Args: { _candidat_id: string; _user_id: string }
         Returns: boolean
       }
+      is_own_mandataire: {
+        Args: { _mandataire_id: string; _user_id: string }
+        Returns: boolean
+      }
       mandataire_has_campaign_access: {
         Args: { _campaign_id: string; _user_id: string }
+        Returns: boolean
+      }
+      mandataire_owns_link: {
+        Args: { _mandataire_id: string; _user_id: string }
         Returns: boolean
       }
     }
