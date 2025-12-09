@@ -205,6 +205,7 @@ export type Database = {
           categorie: string
           commentaire: string | null
           commentaire_comptable: string | null
+          compte_comptable: string | null
           created_at: string
           date: string
           donateur_adresse: string | null
@@ -227,6 +228,7 @@ export type Database = {
           categorie: string
           commentaire?: string | null
           commentaire_comptable?: string | null
+          compte_comptable?: string | null
           created_at?: string
           date: string
           donateur_adresse?: string | null
@@ -249,6 +251,7 @@ export type Database = {
           categorie?: string
           commentaire?: string | null
           commentaire_comptable?: string | null
+          compte_comptable?: string | null
           created_at?: string
           date?: string
           donateur_adresse?: string | null
