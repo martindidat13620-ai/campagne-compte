@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { CATEGORIES_RECETTES, MODES_PAIEMENT } from '@/types';
+import { CATEGORIES_RECETTES, MODES_PAIEMENT, type CategorieRecette } from '@/types';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useMandataireData } from '@/hooks/useMandataireData';
@@ -192,8 +192,25 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
               <SelectValue placeholder="Sélectionner le type de recette" />
             </SelectTrigger>
             <SelectContent>
-              {CATEGORIES_RECETTES.map((cat) => (
-                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+              {/* Catégories simples (sans parent) */}
+              {CATEGORIES_RECETTES.filter(cat => !cat.parent).map((cat) => (
+                <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+              ))}
+              
+              {/* Groupe Emprunts */}
+              <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50 mt-1">
+                Emprunts
+              </div>
+              {CATEGORIES_RECETTES.filter(cat => cat.parent === 'Emprunts').map((cat) => (
+                <SelectItem key={cat.value} value={cat.value} className="pl-6">{cat.label}</SelectItem>
+              ))}
+              
+              {/* Groupe Concours en nature */}
+              <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50 mt-1">
+                Concours en nature
+              </div>
+              {CATEGORIES_RECETTES.filter(cat => cat.parent === 'Concours en nature').map((cat) => (
+                <SelectItem key={cat.value} value={cat.value} className="pl-6">{cat.label}</SelectItem>
               ))}
             </SelectContent>
           </Select>
