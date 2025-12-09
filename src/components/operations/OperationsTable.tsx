@@ -14,7 +14,7 @@ import {
   Loader2,
   ExternalLink
 } from 'lucide-react';
-import { Operation, ValidationStatus } from '@/types';
+import { Operation, ValidationStatus, getCategorieLabel } from '@/types';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -127,15 +127,31 @@ export function OperationsTable({
   };
 
   const exportCSV = () => {
-    const headers = ['Date', 'Type', 'Montant', 'Catégorie', 'Bénéficiaire/Donateur', 'Statut'];
-    const rows = filteredOps.map(op => [
-      op.date,
-      op.type_operation,
-      op.montant,
-      op.categorie,
-      op.beneficiaire || op.donateur_nom || '',
-      op.statut_validation
-    ]);
+    // Inclure le compte comptable dans l'export pour le comptable
+    const headers = showValidationActions 
+      ? ['Date', 'Type', 'Montant', 'Catégorie', 'Compte Comptable', 'Bénéficiaire/Donateur', 'Statut']
+      : ['Date', 'Type', 'Montant', 'Catégorie', 'Bénéficiaire/Donateur', 'Statut'];
+    
+    const rows = filteredOps.map(op => {
+      const baseRow = [
+        op.date,
+        op.type_operation,
+        op.montant,
+        op.type_operation === 'recette' ? (getCategorieLabel(op.categorie) || op.categorie) : op.categorie,
+      ];
+      
+      if (showValidationActions) {
+        // Ajouter le compte comptable pour les recettes côté comptable
+        baseRow.push((op as any).compte_comptable || '');
+      }
+      
+      baseRow.push(
+        op.beneficiaire || op.donateur_nom || '',
+        op.statut_validation
+      );
+      
+      return baseRow;
+    });
 
     const csv = [headers, ...rows].map(row => row.join(';')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -250,12 +266,12 @@ export function OperationsTable({
                         )}
                       </div>
                       <span className="font-medium truncate max-w-[200px]">
-                        {op.beneficiaire || op.donateur_nom || op.categorie}
+                        {op.beneficiaire || op.donateur_nom || (op.type_operation === 'recette' ? (getCategorieLabel(op.categorie) || op.categorie) : op.categorie)}
                       </span>
                     </div>
                   </TableCell>
                   <TableCell className="hidden md:table-cell text-muted-foreground">
-                    {op.categorie}
+                    {op.type_operation === 'recette' ? (getCategorieLabel(op.categorie) || op.categorie) : op.categorie}
                   </TableCell>
                   <TableCell className={cn(
                     "text-right font-semibold",
@@ -409,7 +425,11 @@ export function OperationsTable({
                   <p className="font-semibold text-lg">
                     {selectedOp.beneficiaire || selectedOp.donateur_nom || selectedOp.categorie}
                   </p>
-                  <p className="text-muted-foreground">{selectedOp.categorie}</p>
+                  <p className="text-muted-foreground">
+                    {selectedOp.type_operation === 'recette' 
+                      ? (getCategorieLabel(selectedOp.categorie) || selectedOp.categorie)
+                      : selectedOp.categorie}
+                  </p>
                 </div>
               </div>
 
@@ -435,6 +455,13 @@ export function OperationsTable({
                   <p className="text-sm text-muted-foreground">Statut</p>
                   {getStatusBadge(selectedOp.statut_validation)}
                 </div>
+                {/* Compte comptable visible uniquement pour le comptable (recettes) */}
+                {showValidationActions && selectedOp.type_operation === 'recette' && (selectedOp as any).compte_comptable && (
+                  <div className="col-span-2">
+                    <p className="text-sm text-muted-foreground">Compte comptable</p>
+                    <p className="font-medium font-mono text-primary">{(selectedOp as any).compte_comptable}</p>
+                  </div>
+                )}
               </div>
 
               {selectedOp.commentaire && (
