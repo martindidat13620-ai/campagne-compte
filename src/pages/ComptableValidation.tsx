@@ -255,6 +255,7 @@ export default function ComptableValidation() {
         <OperationsTable 
           operations={filteredOperations}
           showValidationActions={true}
+          isComptable={true}
           onValidate={handleValidate}
           onReject={handleReject}
           onDelete={handleDelete}
