@@ -1,13 +1,15 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowUpRight, ArrowDownLeft, TrendingUp, Users, Loader2, LayoutDashboard, FileText, FileCheck } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, ArrowDownLeft, TrendingUp, Users, Loader2, LayoutDashboard, FileText, FileCheck, Plus } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { PlafondCard } from '@/components/dashboard/PlafondCard';
 import { ExpenseChart } from '@/components/dashboard/ExpenseChart';
 import { OperationsTable } from '@/components/operations/OperationsTable';
+import { OperationFormModal } from '@/components/operations/OperationFormModal';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -63,6 +65,8 @@ export default function ComptableDossier() {
   const [operations, setOperations] = useState<Operation[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [operationModalOpen, setOperationModalOpen] = useState(false);
+  const [selectedOperationForEdit, setSelectedOperationForEdit] = useState<Operation | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -169,6 +173,32 @@ export default function ComptableDossier() {
     }
   };
 
+  const handleEditOperation = (operation: OperationType) => {
+    const op = operations.find(o => o.id === operation.id);
+    if (op) {
+      setSelectedOperationForEdit(op);
+      setOperationModalOpen(true);
+    }
+  };
+
+  const handleNewOperation = () => {
+    setSelectedOperationForEdit(null);
+    setOperationModalOpen(true);
+  };
+
+  const handleOperationSuccess = async () => {
+    // Refetch operations after create/edit
+    const { data: operationsData } = await supabase
+      .from('operations')
+      .select('*')
+      .eq('candidat_id', candidatId)
+      .order('date', { ascending: false });
+    
+    if (operationsData) {
+      setOperations(operationsData);
+    }
+  };
+
   if (loading) {
     return (
       <AppLayout>
@@ -260,7 +290,11 @@ export default function ComptableDossier() {
                 {campaign.nom} • {candidat.circonscription || 'Circonscription non définie'}
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
+              <Button onClick={handleNewOperation}>
+                <Plus size={16} className="mr-2" />
+                Nouvelle opération
+              </Button>
               {pendingOperations.length > 0 && (
                 <Badge variant="outline" className="badge-pending">
                   {pendingOperations.length} en attente
@@ -440,8 +474,10 @@ export default function ComptableDossier() {
           <TabsContent value="operations" className="mt-6">
             <OperationsTable 
               operations={transformedOperations}
-              showValidationActions={false}
+              showValidationActions={true}
               isComptable={true}
+              onEdit={handleEditOperation}
+              onDelete={handleDelete}
             />
           </TabsContent>
 
@@ -454,6 +490,7 @@ export default function ComptableDossier() {
               onValidate={handleValidate}
               onReject={handleReject}
               onDelete={handleDelete}
+              onEdit={handleEditOperation}
             />
             {pendingOperations.length === 0 && (
               <div className="text-center py-12">
@@ -463,6 +500,15 @@ export default function ComptableDossier() {
             )}
           </TabsContent>
         </Tabs>
+
+        {/* Operation Form Modal */}
+        <OperationFormModal
+          open={operationModalOpen}
+          onOpenChange={setOperationModalOpen}
+          operation={selectedOperationForEdit}
+          candidatId={candidatId!}
+          onSuccess={handleOperationSuccess}
+        />
       </div>
     </AppLayout>
   );
