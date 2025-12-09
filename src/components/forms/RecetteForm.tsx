@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { CATEGORIES_RECETTES, MODES_PAIEMENT, type CategorieRecette } from '@/types';
+import { CATEGORIES_RECETTES, MODES_PAIEMENT, getCompteComptable, type CategorieRecette } from '@/types';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useMandataireData } from '@/hooks/useMandataireData';
@@ -126,6 +126,9 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
         justificatifUrl = uploadData.path;
       }
 
+      // Récupérer le compte comptable associé à la catégorie
+      const compteComptable = getCompteComptable(formData.categorie);
+
       const { error } = await supabase
         .from('operations')
         .insert({
@@ -138,13 +141,14 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
           donateur_adresse: formData.donateurAdresse.trim() || null,
           donateur_nationalite: formData.donateurNationalite,
           categorie: formData.categorie,
+          compte_comptable: compteComptable || null,
           mode_paiement: formData.modePaiement,
           numero_recu: formData.numeroRecu.trim(),
           commentaire: formData.commentaire.trim() || null,
           justificatif_url: justificatifUrl,
           justificatif_nom: justificatif?.name || null,
           statut_validation: 'en_attente'
-        });
+        } as any);
 
       if (error) throw error;
 
