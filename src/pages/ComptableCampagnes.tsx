@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Building2, Users, TrendingUp, AlertTriangle, ChevronRight, Loader2, ArrowLeft, Settings } from 'lucide-react';
+import { Building2, Users, ChevronRight, Loader2, ArrowLeft, Settings } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { ProgressBar } from '@/components/dashboard/ProgressBar';
@@ -144,8 +144,6 @@ export default function ComptableCampagnes() {
 
   const totalCampagnes = campaigns.length;
   const allCandidats = campaigns.flatMap(c => c.candidats);
-  const operationsEnAttente = allCandidats.reduce((sum, c) => sum + c.pendingCount, 0);
-  const pieceManquantes = allCandidats.reduce((sum, c) => sum + c.missingDocs, 0);
 
   if (loading) {
     return (
@@ -186,23 +184,16 @@ export default function ComptableCampagnes() {
         </div>
 
         {/* Stats */}
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 max-w-md">
           <StatCard
             title="Campagnes actives"
             value={totalCampagnes}
             icon={<Building2 size={18} className="text-primary" />}
           />
           <StatCard
-            title="En attente de validation"
-            value={operationsEnAttente}
-            icon={<Users size={18} className="text-warning" />}
-            variant={operationsEnAttente > 0 ? 'warning' : 'default'}
-          />
-          <StatCard
-            title="Pièces manquantes"
-            value={pieceManquantes}
-            icon={<AlertTriangle size={18} className="text-destructive" />}
-            variant={pieceManquantes > 0 ? 'danger' : 'default'}
+            title="Candidats"
+            value={allCandidats.length}
+            icon={<Users size={18} className="text-accent" />}
           />
         </div>
 
