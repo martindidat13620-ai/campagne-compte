@@ -12,7 +12,10 @@ import MesOperations from "./pages/MesOperations";
 import NouvelleDepense from "./pages/NouvelleDepense";
 import NouvelleRecette from "./pages/NouvelleRecette";
 import Historique from "./pages/Historique";
-import ComptableDashboard from "./pages/ComptableDashboard";
+import ComptableHome from "./pages/ComptableHome";
+import ComptableCampagnes from "./pages/ComptableCampagnes";
+import ComptableDossier from "./pages/ComptableDossier";
+import ComptableOutils from "./pages/ComptableOutils";
 import ComptableValidation from "./pages/ComptableValidation";
 import ComptableGestion from "./pages/ComptableGestion";
 import CandidatDashboard from "./pages/CandidatDashboard";
@@ -36,7 +39,10 @@ const App = () => (
             <Route path="/depense/nouvelle" element={<NouvelleDepense />} />
             <Route path="/recette/nouvelle" element={<NouvelleRecette />} />
             <Route path="/historique" element={<Historique />} />
-            <Route path="/comptable" element={<ComptableDashboard />} />
+            <Route path="/comptable" element={<ComptableHome />} />
+            <Route path="/comptable/campagnes" element={<ComptableCampagnes />} />
+            <Route path="/comptable/dossier/:candidatId" element={<ComptableDossier />} />
+            <Route path="/comptable/outils" element={<ComptableOutils />} />
             <Route path="/comptable/gestion" element={<ComptableGestion />} />
             <Route path="/comptable/validation" element={<ComptableValidation />} />
             <Route path="/candidat" element={<CandidatDashboard />} />
