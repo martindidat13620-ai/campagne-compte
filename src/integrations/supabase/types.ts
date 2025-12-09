@@ -345,6 +345,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_comptable_for_campaign: {
+        Args: { _campaign_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_comptable_for_candidat: {
+        Args: { _candidat_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_mandataire_for_candidat: {
         Args: { _candidat_id: string; _user_id: string }
         Returns: boolean
