@@ -14,7 +14,7 @@ import {
   Loader2,
   ExternalLink
 } from 'lucide-react';
-import { Operation, ValidationStatus, getCategorieLabel } from '@/types';
+import { Operation, ValidationStatus, getCategorieLabel, getCategorieDepenseLabel } from '@/types';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -139,7 +139,7 @@ export function OperationsTable({
         op.date,
         op.type_operation,
         op.montant,
-        op.type_operation === 'recette' ? (getCategorieLabel(op.categorie) || op.categorie) : op.categorie,
+        op.type_operation === 'recette' ? (getCategorieLabel(op.categorie) || op.categorie) : (getCategorieDepenseLabel(op.categorie) || op.categorie),
       ];
       
       if (isComptable) {
@@ -268,12 +268,12 @@ export function OperationsTable({
                         )}
                       </div>
                       <span className="font-medium truncate max-w-[200px]">
-                        {op.beneficiaire || op.donateur_nom || (op.type_operation === 'recette' ? (getCategorieLabel(op.categorie) || op.categorie) : op.categorie)}
+                        {op.beneficiaire || op.donateur_nom || (op.type_operation === 'recette' ? (getCategorieLabel(op.categorie) || op.categorie) : (getCategorieDepenseLabel(op.categorie) || op.categorie))}
                       </span>
                     </div>
                   </TableCell>
                   <TableCell className="hidden md:table-cell text-muted-foreground">
-                    {op.type_operation === 'recette' ? (getCategorieLabel(op.categorie) || op.categorie) : op.categorie}
+                    {op.type_operation === 'recette' ? (getCategorieLabel(op.categorie) || op.categorie) : (getCategorieDepenseLabel(op.categorie) || op.categorie)}
                   </TableCell>
                   <TableCell className={cn(
                     "text-right font-semibold",
@@ -457,8 +457,8 @@ export function OperationsTable({
                   <p className="text-sm text-muted-foreground">Statut</p>
                   {getStatusBadge(selectedOp.statut_validation)}
                 </div>
-                {/* Compte comptable visible uniquement pour le comptable (recettes) */}
-                {isComptable && selectedOp.type_operation === 'recette' && (selectedOp as any).compte_comptable && (
+                {/* Compte comptable visible uniquement pour le comptable (recettes et dépenses) */}
+                {isComptable && (selectedOp as any).compte_comptable && (
                   <div className="col-span-2">
                     <p className="text-sm text-muted-foreground">Compte comptable</p>
                     <p className="font-medium font-mono text-primary">{(selectedOp as any).compte_comptable}</p>
