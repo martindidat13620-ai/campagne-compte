@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { CATEGORIES_DEPENSES, MODES_PAIEMENT } from '@/types';
+import { CATEGORIES_DEPENSES, MODES_PAIEMENT, getCompteComptableDepense } from '@/types';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useMandataireData } from '@/hooks/useMandataireData';
@@ -115,6 +115,9 @@ export function DepenseForm({ onSuccess }: DepenseFormProps) {
         justificatifUrl = uploadData.path;
       }
 
+      // Récupérer le compte comptable pour la catégorie sélectionnée
+      const compteComptable = getCompteComptableDepense(formData.categorie);
+
       const { error } = await supabase
         .from('operations')
         .insert({
@@ -125,6 +128,7 @@ export function DepenseForm({ onSuccess }: DepenseFormProps) {
           montant: parseFloat(formData.montant),
           beneficiaire: formData.beneficiaire.trim(),
           categorie: formData.categorie,
+          compte_comptable: compteComptable || null,
           mode_paiement: formData.modePaiement,
           commentaire: formData.commentaire.trim() || null,
           justificatif_url: justificatifUrl,
@@ -227,7 +231,7 @@ export function DepenseForm({ onSuccess }: DepenseFormProps) {
             </SelectTrigger>
             <SelectContent>
               {CATEGORIES_DEPENSES.map((cat) => (
-                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
               ))}
             </SelectContent>
           </Select>

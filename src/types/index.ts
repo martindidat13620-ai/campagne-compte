@@ -91,20 +91,50 @@ export interface PlafondCalcul {
   totalRecettes: number;
 }
 
-export const CATEGORIES_DEPENSES = [
-  'Communication',
-  'Réunions publiques',
-  'Déplacements',
-  'Personnel',
-  'Matériel',
-  'Impression',
-  'Location',
-  'Restauration',
-  'Téléphonie',
-  'Internet/Web',
-  'Frais postaux',
-  'Autres'
+// Structure des catégories de dépenses avec compte comptable
+export interface CategorieDepense {
+  value: string;
+  label: string;
+  compteComptable: string;
+  parent?: string; // Pour les sous-catégories
+}
+
+export const CATEGORIES_DEPENSES: CategorieDepense[] = [
+  { value: 'materiels', label: 'Matériels (valeur d\'utilisation)', compteComptable: '6051' },
+  { value: 'achats_fournitures', label: 'Achats de fournitures et de marchandises', compteComptable: '6060' },
+  // Locations
+  { value: 'location_immobiliere', label: 'Location ou mise à disposition immobilière', compteComptable: '6132', parent: 'Location' },
+  { value: 'location_materiel', label: 'Location ou mise à disposition de matériel', compteComptable: '6135', parent: 'Location' },
+  // Personnel
+  { value: 'personnel_salarie', label: 'Personnel salarié recruté spécifiquement pour la campagne, y compris charges sociales', compteComptable: '6040', parent: 'Personnel' },
+  { value: 'personnel_interimaire', label: 'Personnel intérimaire', compteComptable: '6210', parent: 'Personnel' },
+  { value: 'personnel_mis_disposition', label: 'Personnel mis à disposition', compteComptable: '6211', parent: 'Personnel' },
+  // Honoraires
+  { value: 'honoraires_communication', label: 'Honoraires et conseils en communication', compteComptable: '6226', parent: 'Honoraires' },
+  { value: 'honoraires_expert_comptable', label: 'Honoraires d\'expert-comptable', compteComptable: '6229', parent: 'Honoraires' },
+  // Communication et production
+  { value: 'productions_audiovisuelles', label: 'Productions audiovisuelles (film, DVD), internet, services télématiques', compteComptable: '6230' },
+  { value: 'publications_impressions', label: 'Publications, impressions hors dépenses de la campagne officielle (art. R. 39)', compteComptable: '6237' },
+  { value: 'enquetes_sondages', label: 'Enquêtes et sondages', compteComptable: '6235' },
+  // Autres charges
+  { value: 'transports_deplacements', label: 'Transports et déplacements', compteComptable: '6240' },
+  { value: 'reunions_publiques', label: 'Réunions publiques', compteComptable: '6254' },
+  { value: 'reception_hebergement', label: 'Frais de réception et d\'hébergement', compteComptable: '6257' },
+  { value: 'frais_postaux', label: 'Frais postaux et de distribution', compteComptable: '6260' },
+  { value: 'telephone_telecommunications', label: 'Téléphone et télécommunications', compteComptable: '6262' },
+  { value: 'frais_divers', label: 'Frais divers', compteComptable: '6280' },
+  { value: 'frais_financiers', label: 'Frais financiers', compteComptable: '6600' },
 ];
+
+// Fonction helper pour obtenir le compte comptable d'une catégorie de dépense
+export function getCompteComptableDepense(categorieValue: string): string | undefined {
+  return CATEGORIES_DEPENSES.find(cat => cat.value === categorieValue)?.compteComptable;
+}
+
+// Fonction helper pour obtenir le label d'une catégorie de dépense
+export function getCategorieDepenseLabel(categorieValue: string): string | undefined {
+  return CATEGORIES_DEPENSES.find(cat => cat.value === categorieValue)?.label;
+}
 
 // Structure des catégories de recettes avec compte comptable
 export interface CategorieRecette {
