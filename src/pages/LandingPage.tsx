@@ -3,43 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { 
-  Users, 
-  Calculator, 
-  Eye, 
-  FileText, 
-  BarChart3,
-  CheckCircle2,
-  LogIn,
-  Loader2,
-  Phone,
-  TrendingUp,
-  Clock,
-  Quote,
-  Copy,
-  Check
-} from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Users, Calculator, Eye, FileText, BarChart3, CheckCircle2, LogIn, Loader2, Phone, TrendingUp, Clock, Quote, Copy, Check } from 'lucide-react';
 import logo from '@/assets/logo_mcc.png';
-
 const LandingPage = () => {
   const navigate = useNavigate();
-  const { user, loading, hasRole } = useAuth();
+  const {
+    user,
+    loading,
+    hasRole
+  } = useAuth();
   const [copied, setCopied] = useState(false);
-
   const handleAccessSpace = () => {
     if (!user) {
       navigate('/auth');
       return;
     }
-
     if (hasRole('comptable')) {
       navigate('/comptable');
     } else if (hasRole('mandataire')) {
@@ -50,93 +29,68 @@ const LandingPage = () => {
       navigate('/en-attente');
     }
   };
-
   const handleCopyNumber = () => {
     navigator.clipboard.writeText('0624610716');
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
-  const features = [
-    {
-      icon: FileText,
-      title: "Saisie simplifiée",
-      description: "Enregistrez vos dépenses et recettes en quelques clics avec justificatifs"
-    },
-    {
-      icon: BarChart3,
-      title: "Suivi en temps réel",
-      description: "Visualisez l'avancement de votre campagne par rapport au plafond légal"
-    },
-    {
-      icon: Clock,
-      title: "Gain de temps",
-      description: "Automatisez vos calculs et générez vos rapports instantanément"
-    },
-    {
-      icon: CheckCircle2,
-      title: "Validation comptable",
-      description: "Processus de validation intégré avec votre expert-comptable"
-    }
-  ];
-
-  const benefits = [
-    "Suivi du plafond légal en temps réel",
-    "Tableau de bord complet et intuitif",
-    "Gestion centralisée des justificatifs",
-    "Collaboration simplifiée avec votre comptable"
-  ];
-
-  const spaces = [
-    {
-      role: 'mandataire' as const,
-      icon: Users,
-      title: "Espace Mandataire",
-      description: "Gérez les dépenses et recettes de votre campagne, suivez le plafond légal et consultez vos tableaux de bord.",
-      gradient: "from-primary to-primary/80"
-    },
-    {
-      role: 'comptable' as const,
-      icon: Calculator,
-      title: "Espace Comptable",
-      description: "Validez les opérations, vérifiez les justificatifs et exportez les données pour toutes les campagnes.",
-      gradient: "from-accent to-accent/80"
-    },
-    {
-      role: 'candidat' as const,
-      icon: Eye,
-      title: "Espace Candidat",
-      description: "Consultez en lecture seule les tableaux de bord et l'avancement de votre campagne.",
-      gradient: "from-secondary to-secondary/80"
-    }
-  ];
-
-  const testimonials = [
-    {
-      name: "Marie Dupont",
-      role: "Expert-Comptable",
-      company: "Cabinet Dupont & Associés",
-      quote: "Un outil indispensable pour gérer les comptes de campagne de mes clients. La validation des opérations est fluide et le suivi en temps réel me fait gagner un temps précieux.",
-      avatar: "MD"
-    },
-    {
-      name: "Jean-Pierre Martin",
-      role: "Candidat aux Municipales",
-      company: "Ville de Lyon",
-      quote: "Grâce à Mes Comptes de Campagne, je peux suivre l'évolution de mon budget en un coup d'œil. L'interface est claire et intuitive, même pour un non-spécialiste.",
-      avatar: "JM"
-    },
-    {
-      name: "Sophie Bernard",
-      role: "Mandataire Financière",
-      company: "Campagne Législatives 2024",
-      quote: "La saisie des dépenses est devenue un jeu d'enfant. Plus besoin de tableurs Excel, tout est centralisé et mon comptable valide directement sur la plateforme.",
-      avatar: "SB"
-    }
-  ];
-
-  const ContactDialog = () => (
-    <Dialog>
+  const features = [{
+    icon: FileText,
+    title: "Saisie simplifiée",
+    description: "Enregistrez vos dépenses et recettes en quelques clics avec justificatifs"
+  }, {
+    icon: BarChart3,
+    title: "Suivi en temps réel",
+    description: "Visualisez l'avancement de votre campagne par rapport au plafond légal"
+  }, {
+    icon: Clock,
+    title: "Gain de temps",
+    description: "Automatisez vos calculs et générez vos rapports instantanément"
+  }, {
+    icon: CheckCircle2,
+    title: "Validation comptable",
+    description: "Processus de validation intégré avec votre expert-comptable"
+  }];
+  const benefits = ["Suivi du plafond légal en temps réel", "Tableau de bord complet et intuitif", "Gestion centralisée des justificatifs", "Collaboration simplifiée avec votre comptable"];
+  const spaces = [{
+    role: 'mandataire' as const,
+    icon: Users,
+    title: "Espace Mandataire",
+    description: "Gérez les dépenses et recettes de votre campagne, suivez le plafond légal et consultez vos tableaux de bord.",
+    gradient: "from-primary to-primary/80"
+  }, {
+    role: 'comptable' as const,
+    icon: Calculator,
+    title: "Espace Comptable",
+    description: "Validez les opérations, vérifiez les justificatifs et exportez les données pour toutes les campagnes.",
+    gradient: "from-accent to-accent/80"
+  }, {
+    role: 'candidat' as const,
+    icon: Eye,
+    title: "Espace Candidat",
+    description: "Consultez en lecture seule les tableaux de bord et l'avancement de votre campagne.",
+    gradient: "from-secondary to-secondary/80"
+  }];
+  const testimonials = [{
+    name: "Marie Dupont",
+    role: "Expert-Comptable",
+    company: "Cabinet Dupont & Associés",
+    quote: "Un outil indispensable pour gérer les comptes de campagne de mes clients. La validation des opérations est fluide et le suivi en temps réel me fait gagner un temps précieux.",
+    avatar: "MD"
+  }, {
+    name: "Jean-Pierre Martin",
+    role: "Candidat aux Municipales",
+    company: "Ville de Lyon",
+    quote: "Grâce à Mes Comptes de Campagne, je peux suivre l'évolution de mon budget en un coup d'œil. L'interface est claire et intuitive, même pour un non-spécialiste.",
+    avatar: "JM"
+  }, {
+    name: "Sophie Bernard",
+    role: "Mandataire Financière",
+    company: "Campagne Législatives 2024",
+    quote: "La saisie des dépenses est devenue un jeu d'enfant. Plus besoin de tableurs Excel, tout est centralisé et mon comptable valide directement sur la plateforme.",
+    avatar: "SB"
+  }];
+  const ContactDialog = () => <Dialog>
       <DialogTrigger asChild>
         <Button size="lg" variant="outline" className="text-lg px-8 py-6">
           <Phone className="h-5 w-5 mr-2" />
@@ -164,34 +118,24 @@ const LandingPage = () => {
               Appeler
             </Button>
             <Button variant="outline" onClick={handleCopyNumber}>
-              {copied ? (
-                <>
+              {copied ? <>
                   <Check className="h-4 w-4 mr-2" />
                   Copié !
-                </>
-              ) : (
-                <>
+                </> : <>
                   <Copy className="h-4 w-4 mr-2" />
                   Copier
-                </>
-              )}
+                </>}
             </Button>
           </div>
         </div>
       </DialogContent>
-    </Dialog>
-  );
-
+    </Dialog>;
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
+    return <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b bg-background/95 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -201,10 +145,7 @@ const LandingPage = () => {
           <div className="flex items-center gap-3">
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Phone className="h-4 w-4 mr-2" />
-                  Nous contacter
-                </Button>
+                
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">
                 <DialogHeader>
@@ -227,17 +168,13 @@ const LandingPage = () => {
                       Appeler
                     </Button>
                     <Button variant="outline" onClick={handleCopyNumber}>
-                      {copied ? (
-                        <>
+                      {copied ? <>
                           <Check className="h-4 w-4 mr-2" />
                           Copié !
-                        </>
-                      ) : (
-                        <>
+                        </> : <>
                           <Copy className="h-4 w-4 mr-2" />
                           Copier
-                        </>
-                      )}
+                        </>}
                     </Button>
                   </div>
                 </div>
@@ -273,11 +210,7 @@ const LandingPage = () => {
               La solution de gestion de comptes de campagne
             </div>
             
-            <img 
-              src={logo} 
-              alt="Mes Comptes de Campagne" 
-              className="h-32 md:h-44 w-auto mx-auto mb-8 animate-fade-in [animation-delay:100ms]" 
-            />
+            <img src={logo} alt="Mes Comptes de Campagne" className="h-32 md:h-44 w-auto mx-auto mb-8 animate-fade-in [animation-delay:100ms]" />
             
             <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-6 leading-tight animate-fade-in [animation-delay:200ms]">
               Simplifiez la gestion de vos 
@@ -298,17 +231,12 @@ const LandingPage = () => {
 
             {/* Benefits list */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto animate-fade-in [animation-delay:500ms]">
-              {benefits.map((benefit, index) => (
-                <div 
-                  key={index} 
-                  className="flex items-center gap-3 text-left hover:translate-x-1 transition-transform"
-                >
+              {benefits.map((benefit, index) => <div key={index} className="flex items-center gap-3 text-left hover:translate-x-1 transition-transform">
                   <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
                     <CheckCircle2 className="w-4 h-4 text-primary" />
                   </div>
                   <span className="text-muted-foreground">{benefit}</span>
-                </div>
-              ))}
+                </div>)}
             </div>
           </div>
         </div>
@@ -327,8 +255,7 @@ const LandingPage = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, index) => (
-              <Card key={index} className="border-border/50 bg-card hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
+            {features.map((feature, index) => <Card key={index} className="border-border/50 bg-card hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
                 <CardHeader className="pb-2">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <feature.icon className="w-7 h-7 text-primary" />
@@ -338,8 +265,7 @@ const LandingPage = () => {
                 <CardContent>
                   <p className="text-muted-foreground text-sm">{feature.description}</p>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
@@ -355,11 +281,7 @@ const LandingPage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {spaces.map((space) => (
-              <Card 
-                key={space.role} 
-                className="border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-xl hover:-translate-y-2 overflow-hidden group"
-              >
+            {spaces.map(space => <Card key={space.role} className="border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-xl hover:-translate-y-2 overflow-hidden group">
                 <div className={`h-2 bg-gradient-to-r ${space.gradient}`} />
                 <CardHeader className="text-center pt-8 pb-4">
                   <div className={`w-20 h-20 rounded-3xl bg-gradient-to-br ${space.gradient} flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300`}>
@@ -370,8 +292,7 @@ const LandingPage = () => {
                 <CardContent className="text-center pb-8">
                   <CardDescription className="text-base">{space.description}</CardDescription>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
@@ -389,8 +310,7 @@ const LandingPage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="border-border/50 bg-card hover:shadow-lg transition-all duration-300 relative overflow-hidden">
+            {testimonials.map((testimonial, index) => <Card key={index} className="border-border/50 bg-card hover:shadow-lg transition-all duration-300 relative overflow-hidden">
                 <div className="absolute top-4 right-4 text-primary/10">
                   <Quote className="w-12 h-12" />
                 </div>
@@ -409,8 +329,7 @@ const LandingPage = () => {
                     </div>
                   </div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
@@ -447,10 +366,7 @@ const LandingPage = () => {
             </div>
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <Phone className="h-4 w-4 mr-2" />
-                  Nous contacter
-                </Button>
+                
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">
                 <DialogHeader>
@@ -473,17 +389,13 @@ const LandingPage = () => {
                       Appeler
                     </Button>
                     <Button variant="outline" onClick={handleCopyNumber}>
-                      {copied ? (
-                        <>
+                      {copied ? <>
                           <Check className="h-4 w-4 mr-2" />
                           Copié !
-                        </>
-                      ) : (
-                        <>
+                        </> : <>
                           <Copy className="h-4 w-4 mr-2" />
                           Copier
-                        </>
-                      )}
+                        </>}
                     </Button>
                   </div>
                 </div>
@@ -495,8 +407,6 @@ const LandingPage = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default LandingPage;
