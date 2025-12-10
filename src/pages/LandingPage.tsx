@@ -211,7 +211,7 @@ const LandingPage = () => {
               La solution de gestion de comptes de campagne
             </div>
             
-            <img src={logoBig} alt="Campagn'expert" className="h-40 md:h-56 w-auto mx-auto mb-8 animate-fade-in [animation-delay:100ms]" />
+            <img src={logoBig} alt="Campagn'expert" className="h-52 md:h-72 w-auto mx-auto mb-8 animate-fade-in [animation-delay:100ms]" />
             
             <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-6 leading-tight animate-fade-in [animation-delay:200ms]">
               Bienvenue sur <span className="text-primary">Campagn&apos;expert</span>
