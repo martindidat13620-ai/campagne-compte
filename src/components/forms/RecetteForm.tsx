@@ -57,10 +57,12 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const isDon = formData.categorie === 'dons';
+  const isVersementCandidat = formData.categorie === 'versement_candidat';
   const montant = parseFloat(formData.montant) || 0;
   const isEspeces = formData.modePaiement === 'especes';
   const donEspecesSuperieur150 = isDon && isEspeces && montant > 150;
   const donSuperieur3000 = isDon && montant > 3000;
+  const versementCandidatSuperieur10000 = isVersementCandidat && montant > 10000;
 
   // Reset specific fields when category changes
   useEffect(() => {
@@ -361,6 +363,47 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
           <AlertDescription className="text-amber-700 dark:text-amber-300">
             <p className="mb-2">
               Pour les dons supérieurs à 3 000 €, il est nécessaire de faire remplir une attestation d'origine des fonds par le donateur, dans le cadre du respect de la norme anti-blanchiment.
+            </p>
+            <a 
+              href="/documents/attestation_origine_fonds.pdf" 
+              download="attestation_origine_fonds.pdf"
+              className="inline-flex items-center gap-2 text-amber-800 dark:text-amber-200 underline hover:no-underline font-medium"
+            >
+              <FileText size={16} />
+              Télécharger l'attestation d'origine des fonds
+            </a>
+            <p className="mt-2 text-sm">
+              Ce document sera à annexer au compte de campagne.
+            </p>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Note justificatifs pour versement du candidat */}
+      {isVersementCandidat && (
+        <Alert className="border-blue-500 bg-blue-50 dark:bg-blue-950/20">
+          <Info className="h-4 w-4 text-blue-600" />
+          <AlertTitle className="text-blue-800 dark:text-blue-200">Pièces justificatives requises</AlertTitle>
+          <AlertDescription className="text-blue-700 dark:text-blue-300">
+            Pour ce versement, vous devez joindre comme justificatif l'un des documents suivants :
+            <ul className="list-disc list-inside mt-2 space-y-1">
+              <li>Avis de virement bancaire</li>
+              <li>Copie du chèque</li>
+              <li>Copie du relevé bancaire du candidat</li>
+              <li>Tout autre document attestant du versement</li>
+            </ul>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Alerte versement candidat > 10 000€ - Attestation origine des fonds */}
+      {versementCandidatSuperieur10000 && (
+        <Alert className="border-amber-500 bg-amber-50 dark:bg-amber-950/20">
+          <AlertTriangle className="h-4 w-4 text-amber-600" />
+          <AlertTitle className="text-amber-800 dark:text-amber-200">Attestation d'origine des fonds requise</AlertTitle>
+          <AlertDescription className="text-amber-700 dark:text-amber-300">
+            <p className="mb-2">
+              Pour les versements du candidat supérieurs à 10 000 €, il est nécessaire de faire remplir une attestation d'origine des fonds par le candidat, dans le cadre du respect de la norme anti-blanchiment.
             </p>
             <a 
               href="/documents/attestation_origine_fonds.pdf" 
