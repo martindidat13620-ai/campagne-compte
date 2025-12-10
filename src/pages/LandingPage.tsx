@@ -81,7 +81,7 @@ const LandingPage = () => {
     name: "Jean-Pierre Martin",
     role: "Candidat aux Municipales",
     company: "Ville de Lyon",
-    quote: "Grâce à Mes Comptes de Campagne, je peux suivre l'évolution de mon budget en un coup d'œil. L'interface est claire et intuitive, même pour un non-spécialiste.",
+    quote: "Grâce à Campagn'expert, je peux suivre l'évolution de mon budget en un coup d'œil. L'interface est claire et intuitive, même pour un non-spécialiste.",
     avatar: "JM"
   }, {
     name: "Sophie Bernard",
@@ -140,7 +140,7 @@ const LandingPage = () => {
       <header className="border-b bg-background/95 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src={logo} alt="Mes Comptes de Campagne" className="h-10 w-auto" />
+            <img src={logo} alt="Campagn'expert" className="h-10 w-auto" />
           </div>
           <div className="flex items-center gap-3">
             <Dialog>
@@ -210,7 +210,7 @@ const LandingPage = () => {
               La solution de gestion de comptes de campagne
             </div>
             
-            <img src={logo} alt="Mes Comptes de Campagne" className="h-32 md:h-44 w-auto mx-auto mb-8 animate-fade-in [animation-delay:100ms]" />
+            <img src={logo} alt="Campagn'expert" className="h-32 md:h-44 w-auto mx-auto mb-8 animate-fade-in [animation-delay:100ms]" />
             
             <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-6 leading-tight animate-fade-in [animation-delay:200ms]">
               Simplifiez la gestion de vos 
@@ -362,7 +362,7 @@ const LandingPage = () => {
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <img src={logo} alt="Mes Comptes de Campagne" className="h-8 w-auto" />
+              <img src={logo} alt="Campagn'expert" className="h-8 w-auto" />
             </div>
             <Dialog>
               <DialogTrigger asChild>
@@ -402,7 +402,7 @@ const LandingPage = () => {
               </DialogContent>
             </Dialog>
             <p className="text-sm text-muted-foreground">
-              © 2024 Mes Comptes de Campagne. Tous droits réservés.
+              © 2024 Campagn'expert. Tous droits réservés.
             </p>
           </div>
         </div>

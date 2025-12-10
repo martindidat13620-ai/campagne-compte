@@ -30,7 +30,7 @@ const Index = () => {
       <div className="text-center">
         <img 
           src="/logo_mcc.png" 
-          alt="Mes Comptes de Campagne" 
+          alt="Campagn'expert" 
           className="w-32 h-auto mx-auto mb-4"
         />
         <p className="text-muted-foreground">Chargement...</p>
