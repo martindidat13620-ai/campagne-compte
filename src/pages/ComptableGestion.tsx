@@ -119,13 +119,33 @@ export default function ComptableGestion() {
     : candidats.filter(c => c.campaign_id === mandataireCampaignFilter);
 
   const createCampaign = async () => {
-    const { error } = await supabase.from('campaigns').insert({
+    if (!session?.user?.id) {
+      toast.error('Session invalide');
+      return;
+    }
+
+    const { data, error } = await supabase.from('campaigns').insert({
       nom: newCampaign.nom,
       type_election: newCampaign.type_election,
-      annee: newCampaign.annee
-    });
+      annee: newCampaign.annee,
+      created_by: session.user.id
+    }).select().single();
 
     if (error) {
+      toast.error('Erreur lors de la création de la campagne');
+      return;
+    }
+
+    // Link campaign to comptable
+    const { error: linkError } = await supabase.from('comptable_campaigns').insert({
+      campaign_id: data.id,
+      comptable_id: session.user.id
+    });
+
+    if (linkError) {
+      console.error('Error linking campaign to comptable:', linkError);
+      // Delete the campaign if link fails
+      await supabase.from('campaigns').delete().eq('id', data.id);
       toast.error('Erreur lors de la création de la campagne');
       return;
     }
