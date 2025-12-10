@@ -33,7 +33,8 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const mandataireNavItems = [
-    { href: '/mandataire', label: 'Tableau de bord', icon: LayoutDashboard },
+    { href: '/mandataire', label: 'Accueil', icon: LayoutDashboard },
+    { href: '/mandataire/campagne', label: 'Ma Campagne', icon: Building2 },
     { href: '/mandataire/operations', label: 'Mes opérations', icon: FileCheck },
   ];
 
