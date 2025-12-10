@@ -20,7 +20,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import logo from '@/assets/logo_mcc.png';
+import logo from '@/assets/logo_petit.png';
 
 interface AppLayoutProps {
   children: ReactNode;
