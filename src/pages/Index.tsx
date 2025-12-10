@@ -29,7 +29,7 @@ const Index = () => {
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="text-center">
         <img 
-          src="/logo_mcc.png" 
+          src="/logo_petit.png" 
           alt="Campagn'expert" 
           className="w-32 h-auto mx-auto mb-4"
         />

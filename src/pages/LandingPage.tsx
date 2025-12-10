@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Users, Calculator, Eye, FileText, BarChart3, CheckCircle2, LogIn, Loader2, Phone, TrendingUp, Clock, Quote, Copy, Check } from 'lucide-react';
-import logo from '@/assets/logo_mcc.png';
+import logo from '@/assets/logo_petit.png';
+import logoBig from '@/assets/logo_grand.png';
 const LandingPage = () => {
   const navigate = useNavigate();
   const {
@@ -210,7 +211,7 @@ const LandingPage = () => {
               La solution de gestion de comptes de campagne
             </div>
             
-            <img src={logo} alt="Campagn'expert" className="h-32 md:h-44 w-auto mx-auto mb-8 animate-fade-in [animation-delay:100ms]" />
+            <img src={logoBig} alt="Campagn'expert" className="h-32 md:h-44 w-auto mx-auto mb-8 animate-fade-in [animation-delay:100ms]" />
             
             <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-6 leading-tight animate-fade-in [animation-delay:200ms]">
               Simplifiez la gestion de vos 
