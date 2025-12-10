@@ -132,34 +132,55 @@ export function OperationsTable({
   };
 
   const exportCSV = () => {
-    // Inclure le compte comptable dans l'export pour le comptable
+    // Headers étendus pour l'export comptable avec tous les champs donation
     const headers = isComptable 
-      ? ['Date', 'Type', 'Montant', 'Catégorie', 'Compte Comptable', 'Bénéficiaire/Donateur', 'Statut']
+      ? [
+          'Date', 'Type', 'Montant', 'Catégorie', 'Compte Comptable', 'Mode Paiement', 
+          'N° Relevé Bancaire', 'Bénéficiaire/Donateur', 'Prénom Donateur', 
+          'Adresse', 'Code Postal', 'Ville', 'Pays', 'Nationalité', 
+          'N° Reçu', 'Collecte', 'Date Collecte', 'Organisation Collecte', 'Statut'
+        ]
       : ['Date', 'Type', 'Montant', 'Catégorie', 'Bénéficiaire/Donateur', 'Statut'];
     
     const rows = filteredOps.map(op => {
-      const baseRow = [
+      const opAny = op as any;
+      
+      if (isComptable) {
+        return [
+          op.date,
+          op.type_operation,
+          op.montant,
+          op.type_operation === 'recette' ? (getCategorieLabel(op.categorie) || op.categorie) : (getCategorieDepenseLabel(op.categorie) || op.categorie),
+          opAny.compte_comptable || '',
+          op.mode_paiement || '',
+          opAny.numero_releve_bancaire || '',
+          op.beneficiaire || op.donateur_nom || '',
+          opAny.donateur_prenom || '',
+          op.donateur_adresse || '',
+          opAny.donateur_code_postal || '',
+          opAny.donateur_ville || '',
+          opAny.donateur_pays || '',
+          op.donateur_nationalite || '',
+          op.numero_recu || '',
+          opAny.is_collecte ? 'Oui' : 'Non',
+          opAny.collecte_date || '',
+          opAny.collecte_organisation || '',
+          op.statut_validation
+        ];
+      }
+      
+      return [
         op.date,
         op.type_operation,
         op.montant,
         op.type_operation === 'recette' ? (getCategorieLabel(op.categorie) || op.categorie) : (getCategorieDepenseLabel(op.categorie) || op.categorie),
-      ];
-      
-      if (isComptable) {
-        // Ajouter le compte comptable pour les recettes côté comptable
-        baseRow.push((op as any).compte_comptable || '');
-      }
-      
-      baseRow.push(
         op.beneficiaire || op.donateur_nom || '',
         op.statut_validation
-      );
-      
-      return baseRow;
+      ];
     });
 
     const csv = [headers, ...rows].map(row => row.join(';')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
@@ -470,7 +491,14 @@ export function OperationsTable({
                   <p className="text-sm text-muted-foreground">Statut</p>
                   {getStatusBadge(selectedOp.statut_validation)}
                 </div>
-                {/* Compte comptable visible uniquement pour le comptable (recettes et dépenses) */}
+                {/* N° relevé bancaire */}
+                {(selectedOp as any).numero_releve_bancaire && (
+                  <div className="col-span-2">
+                    <p className="text-sm text-muted-foreground">N° relevé bancaire</p>
+                    <p className="font-medium">{(selectedOp as any).numero_releve_bancaire}</p>
+                  </div>
+                )}
+                {/* Compte comptable visible uniquement pour le comptable */}
                 {isComptable && (selectedOp as any).compte_comptable && (
                   <div className="col-span-2">
                     <p className="text-sm text-muted-foreground">Compte comptable</p>
@@ -478,6 +506,73 @@ export function OperationsTable({
                   </div>
                 )}
               </div>
+
+              {/* Section Donateur (pour les dons non-collecte) */}
+              {selectedOp.type_operation === 'recette' && selectedOp.categorie === 'dons' && !(selectedOp as any).is_collecte && (
+                <div className="space-y-3 p-4 bg-secondary/30 rounded-lg">
+                  <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Informations du donateur</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    {selectedOp.donateur_nom && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Nom</p>
+                        <p className="font-medium">{selectedOp.donateur_nom}</p>
+                      </div>
+                    )}
+                    {(selectedOp as any).donateur_prenom && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Prénom</p>
+                        <p className="font-medium">{(selectedOp as any).donateur_prenom}</p>
+                      </div>
+                    )}
+                    {selectedOp.donateur_nationalite && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Nationalité</p>
+                        <p className="font-medium">{selectedOp.donateur_nationalite}</p>
+                      </div>
+                    )}
+                    {selectedOp.numero_recu && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">N° reçu don</p>
+                        <p className="font-medium">{selectedOp.numero_recu}</p>
+                      </div>
+                    )}
+                  </div>
+                  {/* Adresse complète */}
+                  {(selectedOp.donateur_adresse || (selectedOp as any).donateur_ville) && (
+                    <div className="pt-2 border-t border-border/50">
+                      <p className="text-sm text-muted-foreground mb-1">Adresse</p>
+                      <p className="font-medium">
+                        {selectedOp.donateur_adresse && <span>{selectedOp.donateur_adresse}<br/></span>}
+                        {(selectedOp as any).donateur_code_postal} {(selectedOp as any).donateur_ville}
+                        {(selectedOp as any).donateur_pays && (selectedOp as any).donateur_pays !== 'France' && (
+                          <span>, {(selectedOp as any).donateur_pays}</span>
+                        )}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Section Collecte */}
+              {selectedOp.type_operation === 'recette' && selectedOp.categorie === 'dons' && (selectedOp as any).is_collecte && (
+                <div className="space-y-3 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <h4 className="font-semibold text-sm text-blue-700 dark:text-blue-300 uppercase tracking-wide">Collecte</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    {(selectedOp as any).collecte_date && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Date de collecte</p>
+                        <p className="font-medium">{formatDate((selectedOp as any).collecte_date)}</p>
+                      </div>
+                    )}
+                  </div>
+                  {(selectedOp as any).collecte_organisation && (
+                    <div>
+                      <p className="text-sm text-muted-foreground">Organisation</p>
+                      <p className="font-medium">{(selectedOp as any).collecte_organisation}</p>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {selectedOp.commentaire && (
                 <div>

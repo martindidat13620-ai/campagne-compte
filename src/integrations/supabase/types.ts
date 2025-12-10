@@ -224,21 +224,29 @@ export type Database = {
           beneficiaire: string | null
           candidat_id: string
           categorie: string
+          collecte_date: string | null
+          collecte_organisation: string | null
           commentaire: string | null
           commentaire_comptable: string | null
           compte_comptable: string | null
           created_at: string
           date: string
           donateur_adresse: string | null
+          donateur_code_postal: string | null
           donateur_nationalite: string | null
           donateur_nom: string | null
+          donateur_pays: string | null
+          donateur_prenom: string | null
+          donateur_ville: string | null
           id: string
+          is_collecte: boolean | null
           justificatif_nom: string | null
           justificatif_url: string | null
           mandataire_id: string
           mode_paiement: string
           montant: number
           numero_recu: string | null
+          numero_releve_bancaire: string | null
           statut_validation: string
           type_operation: string
           updated_at: string
@@ -247,21 +255,29 @@ export type Database = {
           beneficiaire?: string | null
           candidat_id: string
           categorie: string
+          collecte_date?: string | null
+          collecte_organisation?: string | null
           commentaire?: string | null
           commentaire_comptable?: string | null
           compte_comptable?: string | null
           created_at?: string
           date: string
           donateur_adresse?: string | null
+          donateur_code_postal?: string | null
           donateur_nationalite?: string | null
           donateur_nom?: string | null
+          donateur_pays?: string | null
+          donateur_prenom?: string | null
+          donateur_ville?: string | null
           id?: string
+          is_collecte?: boolean | null
           justificatif_nom?: string | null
           justificatif_url?: string | null
           mandataire_id: string
           mode_paiement: string
           montant: number
           numero_recu?: string | null
+          numero_releve_bancaire?: string | null
           statut_validation?: string
           type_operation: string
           updated_at?: string
@@ -270,21 +286,29 @@ export type Database = {
           beneficiaire?: string | null
           candidat_id?: string
           categorie?: string
+          collecte_date?: string | null
+          collecte_organisation?: string | null
           commentaire?: string | null
           commentaire_comptable?: string | null
           compte_comptable?: string | null
           created_at?: string
           date?: string
           donateur_adresse?: string | null
+          donateur_code_postal?: string | null
           donateur_nationalite?: string | null
           donateur_nom?: string | null
+          donateur_pays?: string | null
+          donateur_prenom?: string | null
+          donateur_ville?: string | null
           id?: string
+          is_collecte?: boolean | null
           justificatif_nom?: string | null
           justificatif_url?: string | null
           mandataire_id?: string
           mode_paiement?: string
           montant?: number
           numero_recu?: string | null
+          numero_releve_bancaire?: string | null
           statut_validation?: string
           type_operation?: string
           updated_at?: string
