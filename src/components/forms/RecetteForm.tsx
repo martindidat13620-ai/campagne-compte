@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Euro, CreditCard, User, MapPin, Globe, FileText, AlertTriangle, Info, Receipt } from 'lucide-react';
+import { Calendar, Euro, CreditCard, User, MapPin, Globe, FileText, AlertTriangle, Info, Receipt, Upload, X, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,6 +32,7 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
   const navigate = useNavigate();
   const { candidat, mandataire, loading: dataLoading } = useMandataireData();
   const [submitting, setSubmitting] = useState(false);
+  const [justificatif, setJustificatif] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     montant: '',
@@ -55,6 +56,26 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
     commentaire: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        toast({
+          title: "Fichier trop volumineux",
+          description: "Le fichier ne doit pas dépasser 10 Mo",
+          variant: "destructive"
+        });
+        return;
+      }
+      setJustificatif(file);
+      setErrors(prev => ({ ...prev, justificatif: '' }));
+    }
+  };
+
+  const removeFile = () => {
+    setJustificatif(null);
+  };
 
   const isDon = formData.categorie === 'dons';
   const isVersementCandidat = formData.categorie === 'versements_personnels';
@@ -124,6 +145,11 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
       }
     }
 
+    // Validation justificatif obligatoire pour versement candidat
+    if (isVersementCandidat && !justificatif) {
+      newErrors.justificatif = 'Le justificatif est obligatoire';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -153,6 +179,25 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
 
     try {
       const compteComptable = getCompteComptable(formData.categorie);
+
+      let justificatifUrl: string | null = null;
+
+      // Upload du justificatif vers Supabase Storage (pour versement candidat)
+      if (justificatif && isVersementCandidat) {
+        const fileExt = justificatif.name.split('.').pop();
+        const fileName = `${mandataire.id}/${Date.now()}.${fileExt}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('justificatifs')
+          .upload(fileName, justificatif);
+
+        if (uploadError) {
+          console.error('Erreur upload:', uploadError);
+          throw new Error('Impossible d\'uploader le justificatif');
+        }
+
+        justificatifUrl = uploadData.path;
+      }
 
       // Construction de l'adresse complète pour stockage
       const adresseComplete = !formData.isCollecte && isDon 
@@ -184,6 +229,9 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
           is_collecte: isDon ? formData.isCollecte : false,
           collecte_date: formData.isCollecte && isDon ? formData.collecteDate : null,
           collecte_organisation: formData.isCollecte && isDon ? formData.collecteOrganisation.trim() : null,
+          // Justificatif (pour versement candidat)
+          justificatif_url: justificatifUrl,
+          justificatif_nom: justificatif?.name || null,
           // Autres
           commentaire: formData.commentaire.trim() || null,
           statut_validation: 'en_attente'
@@ -418,6 +466,68 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
             </p>
           </AlertDescription>
         </Alert>
+      )}
+
+      {/* Upload justificatif pour versement candidat */}
+      {isVersementCandidat && (
+        <div className="border-t border-border pt-6">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <Upload size={20} className="text-primary" />
+            Justificatif *
+          </h3>
+          
+          {!justificatif ? (
+            <div 
+              className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer hover:border-accent hover:bg-accent/5 ${
+                errors.justificatif ? 'border-destructive bg-destructive/5' : 'border-border'
+              }`}
+              onClick={() => document.getElementById('file-upload-recette')?.click()}
+            >
+              <Upload size={32} className="mx-auto text-muted-foreground mb-2" />
+              <p className="text-sm text-muted-foreground mb-1">
+                Cliquez pour télécharger ou glissez-déposez
+              </p>
+              <p className="text-xs text-muted-foreground">
+                PDF, JPG, PNG (max. 10 Mo)
+              </p>
+              <input
+                id="file-upload-recette"
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg">
+              <div className="p-2 bg-accent/10 rounded-lg">
+                <FileText size={20} className="text-accent" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-foreground truncate">{justificatif.name}</p>
+                <p className="text-sm text-muted-foreground">
+                  {(justificatif.size / 1024 / 1024).toFixed(2)} Mo
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={removeFile}
+                className="text-muted-foreground hover:text-destructive"
+              >
+                <X size={18} />
+              </Button>
+            </div>
+          )}
+          
+          {errors.justificatif && (
+            <p className="text-sm text-destructive flex items-center gap-1 mt-2">
+              <AlertCircle size={14} />
+              {errors.justificatif}
+            </p>
+          )}
+        </div>
       )}
 
       {/* Champs spécifiques aux dons */}
