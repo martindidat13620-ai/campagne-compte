@@ -178,10 +178,16 @@ export default function ComptableGestion() {
   };
 
   const createMandataire = async () => {
+    if (!session?.user?.id) {
+      toast.error('Session invalide');
+      return;
+    }
+
     const { data, error } = await supabase.from('mandataires').insert({
       nom: newMandataire.nom,
       prenom: newMandataire.prenom,
-      email: newMandataire.email
+      email: newMandataire.email,
+      created_by: session.user.id
     }).select().single();
 
     if (error) {
