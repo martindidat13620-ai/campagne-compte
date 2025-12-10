@@ -70,10 +70,21 @@ export interface Operation {
   categorie: string;
   compte_comptable?: string | null;
   beneficiaire?: string | null;
+  // Champs donateur
   donateur_nom?: string | null;
+  donateur_prenom?: string | null;
   donateur_adresse?: string | null;
+  donateur_code_postal?: string | null;
+  donateur_ville?: string | null;
+  donateur_pays?: string | null;
   donateur_nationalite?: string | null;
   numero_recu?: string | null;
+  numero_releve_bancaire?: string | null;
+  // Champs collecte
+  is_collecte?: boolean;
+  collecte_date?: string | null;
+  collecte_organisation?: string | null;
+  // Autres
   commentaire?: string | null;
   justificatif_url?: string | null;
   justificatif_nom?: string | null;
