@@ -141,7 +141,7 @@ const LandingPage = () => {
       <header className="border-b bg-background/95 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src={logo} alt="Campagn'expert" className="h-10 w-auto" />
+            <img src={logo} alt="Campagn'expert" className="h-14 w-auto" />
           </div>
           <div className="flex items-center gap-3">
             <Dialog>
@@ -211,12 +211,15 @@ const LandingPage = () => {
               La solution de gestion de comptes de campagne
             </div>
             
-            <img src={logoBig} alt="Campagn'expert" className="h-32 md:h-44 w-auto mx-auto mb-8 animate-fade-in [animation-delay:100ms]" />
+            <img src={logoBig} alt="Campagn'expert" className="h-40 md:h-56 w-auto mx-auto mb-8 animate-fade-in [animation-delay:100ms]" />
             
             <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-6 leading-tight animate-fade-in [animation-delay:200ms]">
-              Simplifiez la gestion de vos 
-              <span className="text-primary bg-gradient-to-r from-primary to-accent bg-clip-text"> comptes de campagne</span>
+              Bienvenue sur <span className="text-primary">Campagn&apos;expert</span>
             </h1>
+            
+            <p className="text-xl md:text-2xl text-muted-foreground mb-4 animate-fade-in [animation-delay:250ms]">
+              Simplifiez la gestion de vos <span className="text-primary font-medium">comptes de campagne</span>
+            </p>
             
             <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto animate-fade-in [animation-delay:300ms]">
               La solution professionnelle pour les mandataires financiers, experts-comptables et candidats. 
@@ -363,7 +366,7 @@ const LandingPage = () => {
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <img src={logo} alt="Campagn'expert" className="h-8 w-auto" />
+              <img src={logo} alt="Campagn'expert" className="h-10 w-auto" />
             </div>
             <Dialog>
               <DialogTrigger asChild>
