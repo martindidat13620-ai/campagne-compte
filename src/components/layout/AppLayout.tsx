@@ -80,7 +80,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
             <Link to="/" className="flex items-center gap-2">
-              <img src={logo} alt="Campagn'expert" className="h-12 w-auto brightness-0 invert" />
+              <img src={logo} alt="Campagn'expert" className="h-14 w-auto brightness-0 invert" />
             </Link>
           </div>
 
