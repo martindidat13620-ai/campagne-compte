@@ -57,7 +57,7 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const isDon = formData.categorie === 'dons';
-  const isVersementCandidat = formData.categorie === 'versement_candidat';
+  const isVersementCandidat = formData.categorie === 'versements_personnels';
   const montant = parseFloat(formData.montant) || 0;
   const isEspeces = formData.modePaiement === 'especes';
   const donEspecesSuperieur150 = isDon && isEspeces && montant > 150;
