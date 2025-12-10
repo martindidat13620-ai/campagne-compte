@@ -364,8 +364,7 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
             </p>
             <a 
               href="/documents/attestation_origine_fonds.pdf" 
-              target="_blank" 
-              rel="noopener noreferrer"
+              download="attestation_origine_fonds.pdf"
               className="inline-flex items-center gap-2 text-amber-800 dark:text-amber-200 underline hover:no-underline font-medium"
             >
               <FileText size={16} />
