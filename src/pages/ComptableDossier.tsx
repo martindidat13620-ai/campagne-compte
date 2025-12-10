@@ -46,9 +46,17 @@ interface Operation {
   mode_paiement: string;
   beneficiaire: string | null;
   donateur_nom: string | null;
+  donateur_prenom: string | null;
   donateur_adresse: string | null;
+  donateur_code_postal: string | null;
+  donateur_ville: string | null;
+  donateur_pays: string | null;
   donateur_nationalite: string | null;
   numero_recu: string | null;
+  numero_releve_bancaire: string | null;
+  is_collecte: boolean | null;
+  collecte_date: string | null;
+  collecte_organisation: string | null;
   commentaire: string | null;
   commentaire_comptable: string | null;
   compte_comptable: string | null;
