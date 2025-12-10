@@ -17,6 +17,10 @@ interface InviteUserRequest {
   skip_email?: boolean;
 }
 
+// Rate limiting configuration
+const RATE_LIMIT_WINDOW_HOURS = 1;
+const MAX_INVITATIONS_PER_WINDOW = 10;
+
 function generateTempPassword(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
   let password = "";
@@ -24,6 +28,49 @@ function generateTempPassword(): string {
     password += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   return password;
+}
+
+async function checkRateLimit(
+  supabaseAdmin: any,
+  comptableId: string
+): Promise<{ allowed: boolean; remaining: number; resetAt: Date }> {
+  const windowStart = new Date();
+  windowStart.setHours(windowStart.getHours() - RATE_LIMIT_WINDOW_HOURS);
+
+  const { count, error } = await supabaseAdmin
+    .from('invitation_logs')
+    .select('*', { count: 'exact', head: true })
+    .eq('comptable_id', comptableId)
+    .gte('created_at', windowStart.toISOString());
+
+  if (error) {
+    console.error('Error checking rate limit:', error);
+    return { allowed: true, remaining: MAX_INVITATIONS_PER_WINDOW, resetAt: new Date() };
+  }
+
+  const currentCount = count || 0;
+  const remaining = Math.max(0, MAX_INVITATIONS_PER_WINDOW - currentCount);
+  const resetAt = new Date(windowStart.getTime() + RATE_LIMIT_WINDOW_HOURS * 60 * 60 * 1000);
+
+  return {
+    allowed: currentCount < MAX_INVITATIONS_PER_WINDOW,
+    remaining,
+    resetAt
+  };
+}
+
+async function logInvitation(
+  supabaseAdmin: any,
+  comptableId: string,
+  email: string
+): Promise<void> {
+  const { error } = await supabaseAdmin
+    .from('invitation_logs')
+    .insert({ comptable_id: comptableId, invited_email: email });
+
+  if (error) {
+    console.error('Error logging invitation:', error);
+  }
 }
 
 async function sendInvitationEmail(email: string, nom: string, prenom: string, role: string, tempPassword: string) {
@@ -122,6 +169,23 @@ serve(async (req) => {
       throw new Error("Seul un comptable peut inviter des utilisateurs");
     }
 
+    // Check rate limit before processing
+    const rateLimitCheck = await checkRateLimit(supabaseAdmin, callerUser.id);
+    if (!rateLimitCheck.allowed) {
+      console.log(`Rate limit exceeded for comptable ${callerUser.id}`);
+      return new Response(
+        JSON.stringify({ 
+          error: `Limite d'invitations atteinte (${MAX_INVITATIONS_PER_WINDOW}/heure). Réessayez plus tard.`,
+          rate_limit: {
+            limit: MAX_INVITATIONS_PER_WINDOW,
+            remaining: rateLimitCheck.remaining,
+            reset_at: rateLimitCheck.resetAt.toISOString()
+          }
+        }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { email, nom, prenom, role, candidat_id, mandataire_id, custom_password, skip_email }: InviteUserRequest = await req.json();
 
     console.log(`Inviting user: ${email} as ${role}`);
@@ -167,6 +231,9 @@ serve(async (req) => {
         .eq("id", mandataire_id);
     }
 
+    // Log this invitation for rate limiting
+    await logInvitation(supabaseAdmin, callerUser.id, email);
+
     // Send invitation email (unless skipped)
     if (!skip_email) {
       try {
@@ -182,7 +249,11 @@ serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         user_id: newUser.user.id,
-        message: `Invitation envoyée à ${email}` 
+        message: `Invitation envoyée à ${email}`,
+        rate_limit: {
+          remaining: rateLimitCheck.remaining - 1,
+          limit: MAX_INVITATIONS_PER_WINDOW
+        }
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

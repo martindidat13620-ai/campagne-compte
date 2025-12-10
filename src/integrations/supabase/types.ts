@@ -129,6 +129,27 @@ export type Database = {
           },
         ]
       }
+      invitation_logs: {
+        Row: {
+          comptable_id: string
+          created_at: string
+          id: string
+          invited_email: string
+        }
+        Insert: {
+          comptable_id: string
+          created_at?: string
+          id?: string
+          invited_email: string
+        }
+        Update: {
+          comptable_id?: string
+          created_at?: string
+          id?: string
+          invited_email?: string
+        }
+        Relationships: []
+      }
       mandataire_candidats: {
         Row: {
           candidat_id: string
