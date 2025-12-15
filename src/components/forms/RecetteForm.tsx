@@ -110,6 +110,21 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
 
     // Validations communes
     if (!formData.date) newErrors.date = 'La date est obligatoire';
+    
+    // Validation des dates de campagne
+    if (formData.date && candidat?.campaign) {
+      const operationDate = new Date(formData.date);
+      const dateDebut = candidat.campaign.date_debut ? new Date(candidat.campaign.date_debut) : null;
+      const dateFin = candidat.campaign.date_fin ? new Date(candidat.campaign.date_fin) : null;
+      
+      if (dateDebut && operationDate < dateDebut) {
+        newErrors.date = `La date doit être après le début de la campagne (${dateDebut.toLocaleDateString('fr-FR')})`;
+      }
+      if (dateFin && operationDate > dateFin) {
+        newErrors.date = `La date doit être avant la fin de la campagne (${dateFin.toLocaleDateString('fr-FR')})`;
+      }
+    }
+    
     if (!formData.montant || montant <= 0) {
       newErrors.montant = 'Montant invalide';
     }

@@ -30,6 +30,8 @@ interface Campaign {
   nom: string;
   type_election: string;
   annee: number;
+  date_debut: string | null;
+  date_fin: string | null;
 }
 
 interface Operation {
@@ -516,6 +518,7 @@ export default function ComptableDossier() {
           operation={selectedOperationForEdit}
           candidatId={candidatId!}
           onSuccess={handleOperationSuccess}
+          campaignDates={campaign ? { date_debut: campaign.date_debut, date_fin: campaign.date_fin } : undefined}
         />
       </div>
     </AppLayout>
