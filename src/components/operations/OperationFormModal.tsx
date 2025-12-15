@@ -70,6 +70,10 @@ interface OperationFormModalProps {
   operation: Operation | null;
   candidatId: string;
   onSuccess: () => void;
+  campaignDates?: {
+    date_debut: string | null;
+    date_fin: string | null;
+  };
 }
 
 export function OperationFormModal({
@@ -78,6 +82,7 @@ export function OperationFormModal({
   operation,
   candidatId,
   onSuccess,
+  campaignDates,
 }: OperationFormModalProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -240,6 +245,21 @@ export function OperationFormModal({
 
     if (!montant || montantNum <= 0) newErrors.montant = 'Montant invalide';
     if (!date) newErrors.date = 'La date est obligatoire';
+    
+    // Validation des dates de campagne
+    if (date && campaignDates) {
+      const operationDate = new Date(date);
+      const dateDebut = campaignDates.date_debut ? new Date(campaignDates.date_debut) : null;
+      const dateFin = campaignDates.date_fin ? new Date(campaignDates.date_fin) : null;
+      
+      if (dateDebut && operationDate < dateDebut) {
+        newErrors.date = `La date doit être après le début de la campagne (${dateDebut.toLocaleDateString('fr-FR')})`;
+      }
+      if (dateFin && operationDate > dateFin) {
+        newErrors.date = `La date doit être avant la fin de la campagne (${dateFin.toLocaleDateString('fr-FR')})`;
+      }
+    }
+    
     if (!categorie) newErrors.categorie = 'La catégorie est obligatoire';
     if (!modePaiement) newErrors.modePaiement = 'Le mode de paiement est obligatoire';
     if (!mandataireId) newErrors.mandataireId = 'Le mandataire est obligatoire';

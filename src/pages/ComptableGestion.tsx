@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Plus, Send, Building2, Users, UserCheck, Loader2, Trash2, Key, Filter, Pencil } from 'lucide-react';
+import { Plus, Send, Building2, Users, UserCheck, Loader2, Trash2, Key, Filter, Pencil, Calendar } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TYPES_ELECTION, Campaign, Candidat, Mandataire } from '@/types';
 
@@ -38,7 +38,9 @@ export default function ComptableGestion() {
   const [mandataireCandidatFilter, setMandataireCandidatFilter] = useState<string>('all');
 
   // Form states
-  const [newCampaign, setNewCampaign] = useState({ nom: '', type_election: '', annee: new Date().getFullYear() });
+  const [newCampaign, setNewCampaign] = useState({ nom: '', type_election: '', annee: new Date().getFullYear(), date_debut: '', date_fin: '' });
+  const [editCampaignDialog, setEditCampaignDialog] = useState<{ open: boolean; campaign: Campaign | null }>({ open: false, campaign: null });
+  const [editCampaignDates, setEditCampaignDates] = useState({ date_debut: '', date_fin: '' });
   const [newCandidat, setNewCandidat] = useState({ nom: '', prenom: '', email: '', campaign_id: '', plafond_depenses: 0, circonscription: '' });
   const [newMandataire, setNewMandataire] = useState({ nom: '', prenom: '', email: '', candidat_id: '' });
 
@@ -128,6 +130,8 @@ export default function ComptableGestion() {
       nom: newCampaign.nom,
       type_election: newCampaign.type_election,
       annee: newCampaign.annee,
+      date_debut: newCampaign.date_debut || null,
+      date_fin: newCampaign.date_fin || null,
       created_by: session.user.id
     }).select().single();
 
@@ -152,7 +156,7 @@ export default function ComptableGestion() {
 
     toast.success('Campagne créée avec succès');
     setDialogOpen({ ...dialogOpen, campaign: false });
-    setNewCampaign({ nom: '', type_election: '', annee: new Date().getFullYear() });
+    setNewCampaign({ nom: '', type_election: '', annee: new Date().getFullYear(), date_debut: '', date_fin: '' });
     fetchData();
   };
 
@@ -388,6 +392,44 @@ export default function ComptableGestion() {
     setEditPlafond(candidat.plafond_depenses || 0);
   };
 
+  const openEditCampaignDialog = (campaign: Campaign) => {
+    setEditCampaignDialog({ open: true, campaign });
+    setEditCampaignDates({
+      date_debut: campaign.date_debut || '',
+      date_fin: campaign.date_fin || ''
+    });
+  };
+
+  const updateCampaignDates = async () => {
+    if (!editCampaignDialog.campaign) return;
+    
+    setUpdating(true);
+    try {
+      const { error } = await supabase
+        .from('campaigns')
+        .update({ 
+          date_debut: editCampaignDates.date_debut || null,
+          date_fin: editCampaignDates.date_fin || null
+        })
+        .eq('id', editCampaignDialog.campaign.id);
+
+      if (error) {
+        toast.error('Erreur lors de la mise à jour des dates');
+        console.error('Update error:', error);
+        return;
+      }
+
+      toast.success('Dates de campagne mises à jour');
+      setEditCampaignDialog({ open: false, campaign: null });
+      fetchData();
+    } catch (error) {
+      console.error('Error updating campaign dates:', error);
+      toast.error('Erreur lors de la mise à jour');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   const updateCandidatPlafond = async () => {
     if (!editCandidatDialog.candidat) return;
     
@@ -494,6 +536,24 @@ export default function ComptableGestion() {
                         onChange={(e) => setNewCampaign({ ...newCampaign, annee: parseInt(e.target.value) })}
                       />
                     </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>Date de début</Label>
+                        <Input 
+                          type="date" 
+                          value={newCampaign.date_debut} 
+                          onChange={(e) => setNewCampaign({ ...newCampaign, date_debut: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <Label>Date de fin</Label>
+                        <Input 
+                          type="date" 
+                          value={newCampaign.date_fin} 
+                          onChange={(e) => setNewCampaign({ ...newCampaign, date_fin: e.target.value })}
+                        />
+                      </div>
+                    </div>
                     <Button onClick={createCampaign} className="w-full">Créer la campagne</Button>
                   </div>
                 </DialogContent>
@@ -509,10 +569,23 @@ export default function ComptableGestion() {
                       <div className="flex items-center justify-between">
                         <div>
                           <CardTitle className="text-lg">{campaign.nom}</CardTitle>
-                          <CardDescription>{campaign.type_election} • {campaignCandidats.length} candidat(s)</CardDescription>
+                          <CardDescription>
+                            {campaign.type_election} • {campaignCandidats.length} candidat(s)
+                            {campaign.date_debut && campaign.date_fin && (
+                              <span className="ml-2">
+                                • Du {new Date(campaign.date_debut).toLocaleDateString('fr-FR')} au {new Date(campaign.date_fin).toLocaleDateString('fr-FR')}
+                              </span>
+                            )}
+                            {(!campaign.date_debut || !campaign.date_fin) && (
+                              <span className="ml-2 text-amber-600">• Dates non définies</span>
+                            )}
+                          </CardDescription>
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge variant="outline">{campaign.annee}</Badge>
+                          <Button variant="outline" size="icon" onClick={() => openEditCampaignDialog(campaign)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button variant="destructive" size="icon" disabled={deleting === campaign.id}>
@@ -912,6 +985,46 @@ export default function ComptableGestion() {
               <Button onClick={inviteUser} className="w-full" disabled={inviting}>
                 {inviting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
                 Créer le compte
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Campaign Dates Dialog */}
+        <Dialog open={editCampaignDialog.open} onOpenChange={(open) => setEditCampaignDialog({ ...editCampaignDialog, open })}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Dates de campagne
+              </DialogTitle>
+              <DialogDescription>
+                Définissez les dates de début et de fin de la campagne "{editCampaignDialog.campaign?.nom}"
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Date de début</Label>
+                <Input 
+                  type="date" 
+                  value={editCampaignDates.date_debut} 
+                  onChange={(e) => setEditCampaignDates({ ...editCampaignDates, date_debut: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label>Date de fin</Label>
+                <Input 
+                  type="date" 
+                  value={editCampaignDates.date_fin} 
+                  onChange={(e) => setEditCampaignDates({ ...editCampaignDates, date_fin: e.target.value })}
+                />
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Les opérations ne pourront être saisies qu'entre ces deux dates.
+              </p>
+              <Button onClick={updateCampaignDates} className="w-full" disabled={updating}>
+                {updating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                Enregistrer
               </Button>
             </div>
           </DialogContent>

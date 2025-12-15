@@ -10,6 +10,8 @@ interface CandidatInfo {
   campaign: {
     nom: string;
     type_election: string;
+    date_debut: string | null;
+    date_fin: string | null;
   };
 }
 
@@ -71,7 +73,7 @@ export function useMandataireData() {
             nom,
             prenom,
             plafond_depenses,
-            campaigns:campaign_id(nom, type_election)
+            campaigns:campaign_id(nom, type_election, date_debut, date_fin)
           `)
           .eq('id', linkData[0].candidat_id)
           .maybeSingle();
@@ -88,7 +90,7 @@ export function useMandataireData() {
           nom: candidatData.nom,
           prenom: candidatData.prenom,
           plafond_depenses: candidatData.plafond_depenses || 0,
-          campaign: candidatData.campaigns as { nom: string; type_election: string }
+          campaign: candidatData.campaigns as { nom: string; type_election: string; date_debut: string | null; date_fin: string | null }
         });
 
       } catch (err) {
