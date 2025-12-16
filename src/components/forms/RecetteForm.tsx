@@ -823,6 +823,18 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
               Justificatif *
             </h3>
             
+            {/* Note informative pour versements définitifs des partis */}
+            {formData.categorie === 'versements_partis_politiques' && (
+              <Alert className="mb-4 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
+                <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <AlertDescription className="text-blue-800 dark:text-blue-200">
+                  <span className="font-medium">Justification de l'origine des fonds</span>
+                  <br />
+                  L'origine des fonds doit être justifiée par tout moyen : copies des chèques, relevés bancaires mentionnant l'auteur et le motif des virements, relevés bancaires du parti faisant apparaître le débit.
+                </AlertDescription>
+              </Alert>
+            )}
+            
             {!justificatif ? (
               <div 
                 className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer hover:border-accent hover:bg-accent/5 ${
