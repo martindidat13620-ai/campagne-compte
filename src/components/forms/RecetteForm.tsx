@@ -824,7 +824,7 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
             </h3>
             
             {/* Note informative pour versements définitifs des partis */}
-            {formData.categorie === 'versements_partis_politiques' && (
+            {formData.categorie === 'versements_formations_politiques' && (
               <Alert className="mb-4 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
                 <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 <AlertDescription className="text-blue-800 dark:text-blue-200">
