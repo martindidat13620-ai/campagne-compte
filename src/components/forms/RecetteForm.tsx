@@ -52,6 +52,13 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
     isCollecte: false,
     collecteDate: '',
     collecteOrganisation: '',
+    // Champs parti politique
+    partiNom: '',
+    partiAdresse: '',
+    partiCodePostal: '',
+    partiVille: '',
+    partiSiret: '',
+    partiRna: '',
     // Autres
     commentaire: '',
   });
@@ -79,6 +86,7 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
 
   const isDon = formData.categorie === 'dons';
   const isVersementCandidat = formData.categorie === 'versements_personnels';
+  const isVersementParti = formData.categorie === 'versements_formations_politiques';
   const montant = parseFloat(formData.montant) || 0;
   const isEspeces = formData.modePaiement === 'especes';
   const donEspecesSuperieur150 = isDon && isEspeces && montant > 150;
@@ -165,6 +173,23 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
       newErrors.justificatif = 'Le justificatif est obligatoire';
     }
 
+    // Validations spécifiques aux versements des partis politiques
+    if (isVersementParti) {
+      if (!formData.partiNom.trim()) newErrors.partiNom = 'Le nom du parti est obligatoire';
+      if (!formData.partiAdresse.trim()) newErrors.partiAdresse = "L'adresse est obligatoire";
+      if (!formData.partiCodePostal.trim()) newErrors.partiCodePostal = 'Le code postal est obligatoire';
+      if (!formData.partiVille.trim()) newErrors.partiVille = 'La ville est obligatoire';
+      if (!formData.partiSiret.trim()) newErrors.partiSiret = 'Le SIRET est obligatoire';
+      if (!formData.partiRna.trim()) {
+        newErrors.partiRna = 'Le numéro RNA est obligatoire';
+      } else if (!formData.partiRna.trim().toUpperCase().startsWith('W')) {
+        newErrors.partiRna = 'Le numéro RNA doit commencer par W';
+      }
+      if (!justificatif) {
+        newErrors.justificatif = 'Le justificatif est obligatoire';
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -197,8 +222,8 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
 
       let justificatifUrl: string | null = null;
 
-      // Upload du justificatif vers Supabase Storage (pour versement candidat)
-      if (justificatif && isVersementCandidat) {
+      // Upload du justificatif vers Supabase Storage (pour versement candidat ou parti)
+      if (justificatif && (isVersementCandidat || isVersementParti)) {
         const fileExt = justificatif.name.split('.').pop();
         const fileName = `${mandataire.id}/${Date.now()}.${fileExt}`;
         
@@ -244,7 +269,14 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
           is_collecte: isDon ? formData.isCollecte : false,
           collecte_date: formData.isCollecte && isDon ? formData.collecteDate : null,
           collecte_organisation: formData.isCollecte && isDon ? formData.collecteOrganisation.trim() : null,
-          // Justificatif (pour versement candidat)
+          // Champs parti politique
+          parti_nom: isVersementParti ? formData.partiNom.trim() : null,
+          parti_adresse: isVersementParti ? formData.partiAdresse.trim() : null,
+          parti_code_postal: isVersementParti ? formData.partiCodePostal.trim() : null,
+          parti_ville: isVersementParti ? formData.partiVille.trim() : null,
+          parti_siret: isVersementParti ? formData.partiSiret.trim() : null,
+          parti_rna: isVersementParti ? formData.partiRna.trim().toUpperCase() : null,
+          // Justificatif (pour versement candidat ou parti)
           justificatif_url: justificatifUrl,
           justificatif_nom: justificatif?.name || null,
           // Autres
@@ -543,6 +575,162 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
             </p>
           )}
         </div>
+      )}
+
+      {/* Champs spécifiques aux versements des partis politiques */}
+      {isVersementParti && (
+        <>
+          <div className="border-t border-border pt-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <User size={20} className="text-primary" />
+              Coordonnées du parti politique
+            </h3>
+            
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* Nom du parti */}
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="partiNom">Nom du parti politique *</Label>
+                <Input
+                  id="partiNom"
+                  placeholder="Ex: Les Républicains"
+                  value={formData.partiNom}
+                  onChange={(e) => setFormData({ ...formData, partiNom: e.target.value })}
+                  className={errors.partiNom ? 'border-destructive' : ''}
+                />
+                {errors.partiNom && <p className="text-sm text-destructive">{errors.partiNom}</p>}
+              </div>
+
+              {/* Adresse */}
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="partiAdresse" className="flex items-center gap-2">
+                  <MapPin size={16} className="text-muted-foreground" />
+                  Adresse *
+                </Label>
+                <Input
+                  id="partiAdresse"
+                  placeholder="Numéro et nom de rue"
+                  value={formData.partiAdresse}
+                  onChange={(e) => setFormData({ ...formData, partiAdresse: e.target.value })}
+                  className={errors.partiAdresse ? 'border-destructive' : ''}
+                />
+                {errors.partiAdresse && <p className="text-sm text-destructive">{errors.partiAdresse}</p>}
+              </div>
+
+              {/* Code postal */}
+              <div className="space-y-2">
+                <Label htmlFor="partiCodePostal">Code postal *</Label>
+                <Input
+                  id="partiCodePostal"
+                  placeholder="Ex: 75008"
+                  value={formData.partiCodePostal}
+                  onChange={(e) => setFormData({ ...formData, partiCodePostal: e.target.value })}
+                  className={errors.partiCodePostal ? 'border-destructive' : ''}
+                />
+                {errors.partiCodePostal && <p className="text-sm text-destructive">{errors.partiCodePostal}</p>}
+              </div>
+
+              {/* Ville */}
+              <div className="space-y-2">
+                <Label htmlFor="partiVille">Ville *</Label>
+                <Input
+                  id="partiVille"
+                  placeholder="Ex: Paris"
+                  value={formData.partiVille}
+                  onChange={(e) => setFormData({ ...formData, partiVille: e.target.value })}
+                  className={errors.partiVille ? 'border-destructive' : ''}
+                />
+                {errors.partiVille && <p className="text-sm text-destructive">{errors.partiVille}</p>}
+              </div>
+
+              {/* SIRET */}
+              <div className="space-y-2">
+                <Label htmlFor="partiSiret">Numéro SIRET *</Label>
+                <Input
+                  id="partiSiret"
+                  placeholder="Ex: 123 456 789 00012"
+                  value={formData.partiSiret}
+                  onChange={(e) => setFormData({ ...formData, partiSiret: e.target.value })}
+                  className={errors.partiSiret ? 'border-destructive' : ''}
+                />
+                {errors.partiSiret && <p className="text-sm text-destructive">{errors.partiSiret}</p>}
+              </div>
+
+              {/* RNA */}
+              <div className="space-y-2">
+                <Label htmlFor="partiRna">Numéro RNA *</Label>
+                <Input
+                  id="partiRna"
+                  placeholder="Ex: W751234567"
+                  value={formData.partiRna}
+                  onChange={(e) => setFormData({ ...formData, partiRna: e.target.value })}
+                  className={errors.partiRna ? 'border-destructive' : ''}
+                />
+                {errors.partiRna && <p className="text-sm text-destructive">{errors.partiRna}</p>}
+                <p className="text-xs text-muted-foreground">Le numéro RNA commence par la lettre W</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Upload justificatif pour versement parti */}
+          <div className="border-t border-border pt-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Upload size={20} className="text-primary" />
+              Justificatif *
+            </h3>
+            
+            {!justificatif ? (
+              <div 
+                className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer hover:border-accent hover:bg-accent/5 ${
+                  errors.justificatif ? 'border-destructive bg-destructive/5' : 'border-border'
+                }`}
+                onClick={() => document.getElementById('file-upload-parti')?.click()}
+              >
+                <Upload size={32} className="mx-auto text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground mb-1">
+                  Cliquez pour télécharger ou glissez-déposez
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  PDF, JPG, PNG (max. 10 Mo)
+                </p>
+                <input
+                  id="file-upload-parti"
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg">
+                <div className="p-2 bg-accent/10 rounded-lg">
+                  <FileText size={20} className="text-accent" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-foreground truncate">{justificatif.name}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {(justificatif.size / 1024 / 1024).toFixed(2)} Mo
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={removeFile}
+                  className="text-muted-foreground hover:text-destructive"
+                >
+                  <X size={18} />
+                </Button>
+              </div>
+            )}
+            
+            {errors.justificatif && (
+              <p className="text-sm text-destructive flex items-center gap-1 mt-2">
+                <AlertCircle size={14} />
+                {errors.justificatif}
+              </p>
+            )}
+          </div>
+        </>
       )}
 
       {/* Champs spécifiques aux dons */}

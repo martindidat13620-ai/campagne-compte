@@ -59,6 +59,13 @@ interface Operation {
   is_collecte: boolean | null;
   collecte_date: string | null;
   collecte_organisation: string | null;
+  // Champs parti politique
+  parti_nom: string | null;
+  parti_adresse: string | null;
+  parti_code_postal: string | null;
+  parti_ville: string | null;
+  parti_siret: string | null;
+  parti_rna: string | null;
   commentaire: string | null;
   commentaire_comptable: string | null;
   compte_comptable: string | null;
@@ -111,6 +118,13 @@ export function OperationFormModal({
   const [isCollecte, setIsCollecte] = useState(false);
   const [collecteDate, setCollecteDate] = useState('');
   const [collecteOrganisation, setCollecteOrganisation] = useState('');
+  // Parti politique fields
+  const [partiNom, setPartiNom] = useState('');
+  const [partiAdresse, setPartiAdresse] = useState('');
+  const [partiCodePostal, setPartiCodePostal] = useState('');
+  const [partiVille, setPartiVille] = useState('');
+  const [partiSiret, setPartiSiret] = useState('');
+  const [partiRna, setPartiRna] = useState('');
   // Other fields
   const [commentaire, setCommentaire] = useState('');
   const [mandataireId, setMandataireId] = useState('');
@@ -121,6 +135,7 @@ export function OperationFormModal({
   // Computed values for conditional rendering
   const isDon = categorie === 'dons';
   const isVersementCandidat = categorie === 'versements_personnels';
+  const isVersementParti = categorie === 'versements_formations_politiques';
   const isDepense = typeOperation === 'depense';
   const montantNum = parseFloat(montant) || 0;
   const isEspeces = modePaiement === 'especes';
@@ -188,6 +203,12 @@ export function OperationFormModal({
       setIsCollecte(operation.is_collecte || false);
       setCollecteDate(operation.collecte_date || '');
       setCollecteOrganisation(operation.collecte_organisation || '');
+      setPartiNom(operation.parti_nom || '');
+      setPartiAdresse(operation.parti_adresse || '');
+      setPartiCodePostal(operation.parti_code_postal || '');
+      setPartiVille(operation.parti_ville || '');
+      setPartiSiret(operation.parti_siret || '');
+      setPartiRna(operation.parti_rna || '');
       setCommentaire(operation.commentaire || '');
       setMandataireId(operation.mandataire_id);
       setStatutValidation(operation.statut_validation);
@@ -212,6 +233,12 @@ export function OperationFormModal({
       setIsCollecte(false);
       setCollecteDate('');
       setCollecteOrganisation('');
+      setPartiNom('');
+      setPartiAdresse('');
+      setPartiCodePostal('');
+      setPartiVille('');
+      setPartiSiret('');
+      setPartiRna('');
       setCommentaire('');
       setMandataireId('');
       setStatutValidation('validee');
@@ -305,6 +332,23 @@ export function OperationFormModal({
       if (isVersementCandidat && !justificatif && !operation?.justificatif_url) {
         newErrors.justificatif = 'Le justificatif est obligatoire';
       }
+
+      // Validations spécifiques aux versements des partis politiques
+      if (isVersementParti) {
+        if (!partiNom.trim()) newErrors.partiNom = 'Le nom du parti est obligatoire';
+        if (!partiAdresse.trim()) newErrors.partiAdresse = "L'adresse est obligatoire";
+        if (!partiCodePostal.trim()) newErrors.partiCodePostal = 'Le code postal est obligatoire';
+        if (!partiVille.trim()) newErrors.partiVille = 'La ville est obligatoire';
+        if (!partiSiret.trim()) newErrors.partiSiret = 'Le SIRET est obligatoire';
+        if (!partiRna.trim()) {
+          newErrors.partiRna = 'Le numéro RNA est obligatoire';
+        } else if (!partiRna.trim().toUpperCase().startsWith('W')) {
+          newErrors.partiRna = 'Le numéro RNA doit commencer par W';
+        }
+        if (!justificatif && !operation?.justificatif_url) {
+          newErrors.justificatif = 'Le justificatif est obligatoire';
+        }
+      }
     }
 
     setErrors(newErrors);
@@ -376,6 +420,13 @@ export function OperationFormModal({
         is_collecte: isDon && !isDepense ? isCollecte : false,
         collecte_date: isCollecte && isDon && !isDepense ? collecteDate : null,
         collecte_organisation: isCollecte && isDon && !isDepense ? collecteOrganisation.trim() : null,
+        // Parti politique fields
+        parti_nom: isVersementParti && !isDepense ? partiNom.trim() : null,
+        parti_adresse: isVersementParti && !isDepense ? partiAdresse.trim() : null,
+        parti_code_postal: isVersementParti && !isDepense ? partiCodePostal.trim() : null,
+        parti_ville: isVersementParti && !isDepense ? partiVille.trim() : null,
+        parti_siret: isVersementParti && !isDepense ? partiSiret.trim() : null,
+        parti_rna: isVersementParti && !isDepense ? partiRna.trim().toUpperCase() : null,
         // Justificatif
         justificatif_url: justificatifUrl,
         justificatif_nom: justificatifNom,
@@ -788,8 +839,78 @@ export function OperationFormModal({
             </Alert>
           )}
 
-          {/* Upload justificatif (dépenses + versement candidat) */}
-          {(isDepense || isVersementCandidat) && (
+          {/* Champs spécifiques aux versements des partis politiques */}
+          {isVersementParti && !isDepense && (
+            <div className="border-t border-border pt-4">
+              <h4 className="font-semibold mb-3">Coordonnées du parti politique</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2 col-span-2">
+                  <Label>Nom du parti politique *</Label>
+                  <Input
+                    value={partiNom}
+                    onChange={(e) => setPartiNom(e.target.value)}
+                    placeholder="Ex: Les Républicains"
+                    className={errors.partiNom ? 'border-destructive' : ''}
+                  />
+                  {errors.partiNom && <p className="text-sm text-destructive">{errors.partiNom}</p>}
+                </div>
+                <div className="space-y-2 col-span-2">
+                  <Label>Adresse *</Label>
+                  <Input
+                    value={partiAdresse}
+                    onChange={(e) => setPartiAdresse(e.target.value)}
+                    placeholder="Numéro et nom de rue"
+                    className={errors.partiAdresse ? 'border-destructive' : ''}
+                  />
+                  {errors.partiAdresse && <p className="text-sm text-destructive">{errors.partiAdresse}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label>Code postal *</Label>
+                  <Input
+                    value={partiCodePostal}
+                    onChange={(e) => setPartiCodePostal(e.target.value)}
+                    placeholder="Ex: 75008"
+                    className={errors.partiCodePostal ? 'border-destructive' : ''}
+                  />
+                  {errors.partiCodePostal && <p className="text-sm text-destructive">{errors.partiCodePostal}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label>Ville *</Label>
+                  <Input
+                    value={partiVille}
+                    onChange={(e) => setPartiVille(e.target.value)}
+                    placeholder="Ex: Paris"
+                    className={errors.partiVille ? 'border-destructive' : ''}
+                  />
+                  {errors.partiVille && <p className="text-sm text-destructive">{errors.partiVille}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label>Numéro SIRET *</Label>
+                  <Input
+                    value={partiSiret}
+                    onChange={(e) => setPartiSiret(e.target.value)}
+                    placeholder="Ex: 123 456 789 00012"
+                    className={errors.partiSiret ? 'border-destructive' : ''}
+                  />
+                  {errors.partiSiret && <p className="text-sm text-destructive">{errors.partiSiret}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label>Numéro RNA *</Label>
+                  <Input
+                    value={partiRna}
+                    onChange={(e) => setPartiRna(e.target.value)}
+                    placeholder="Ex: W751234567"
+                    className={errors.partiRna ? 'border-destructive' : ''}
+                  />
+                  {errors.partiRna && <p className="text-sm text-destructive">{errors.partiRna}</p>}
+                  <p className="text-xs text-muted-foreground">Le numéro RNA commence par la lettre W</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Upload justificatif (dépenses + versement candidat + versement parti) */}
+          {(isDepense || isVersementCandidat || isVersementParti) && (
             <div className="border-t border-border pt-4">
               <h4 className="font-semibold mb-3 flex items-center gap-2">
                 <Upload size={18} />
