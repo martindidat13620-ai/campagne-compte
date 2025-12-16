@@ -129,6 +129,8 @@ export function OperationFormModal({
   const [commentaire, setCommentaire] = useState('');
   const [mandataireId, setMandataireId] = useState('');
   const [statutValidation, setStatutValidation] = useState('en_attente');
+  // Catégorie de dépense associée (pour depenses_directes_formations)
+  const [categorieDepenseAssociee, setCategorieDepenseAssociee] = useState('');
 
   const isEditing = !!operation;
   
@@ -136,6 +138,7 @@ export function OperationFormModal({
   const isDon = categorie === 'dons';
   const isVersementCandidat = categorie === 'versements_personnels';
   const isVersementParti = categorie === 'versements_formations_politiques';
+  const isDepenseDirecteParti = categorie === 'depenses_directes_formations';
   const isDepense = typeOperation === 'depense';
   const montantNum = parseFloat(montant) || 0;
   const isEspeces = modePaiement === 'especes';
@@ -242,6 +245,7 @@ export function OperationFormModal({
       setCommentaire('');
       setMandataireId('');
       setStatutValidation('validee');
+      setCategorieDepenseAssociee('');
       setJustificatif(null);
       setErrors({});
     }
@@ -288,7 +292,10 @@ export function OperationFormModal({
     }
     
     if (!categorie) newErrors.categorie = 'La catégorie est obligatoire';
-    if (!modePaiement) newErrors.modePaiement = 'Le mode de paiement est obligatoire';
+    
+    // Mode de paiement non requis pour dépenses directes parti (pas de flux bancaire)
+    if (!isDepenseDirecteParti && !modePaiement) newErrors.modePaiement = 'Le mode de paiement est obligatoire';
+    
     if (!mandataireId) newErrors.mandataireId = 'Le mandataire est obligatoire';
 
     // Dépense specific
@@ -302,7 +309,8 @@ export function OperationFormModal({
 
     // Recette specific
     if (!isDepense) {
-      if (!numeroReleveBancaire.trim()) {
+      // Numéro relevé non requis pour dépenses directes parti
+      if (!isDepenseDirecteParti && !numeroReleveBancaire.trim()) {
         newErrors.numeroReleveBancaire = 'Le numéro du relevé bancaire est obligatoire';
       }
 
@@ -333,8 +341,8 @@ export function OperationFormModal({
         newErrors.justificatif = 'Le justificatif est obligatoire';
       }
 
-      // Validations spécifiques aux versements des partis politiques
-      if (isVersementParti) {
+      // Validations spécifiques aux versements des partis politiques ou dépenses directes
+      if (isVersementParti || isDepenseDirecteParti) {
         if (!partiNom.trim()) newErrors.partiNom = 'Le nom du parti est obligatoire';
         if (!partiAdresse.trim()) newErrors.partiAdresse = "L'adresse est obligatoire";
         if (!partiCodePostal.trim()) newErrors.partiCodePostal = 'Le code postal est obligatoire';
@@ -348,6 +356,11 @@ export function OperationFormModal({
         if (!justificatif && !operation?.justificatif_url) {
           newErrors.justificatif = 'Le justificatif est obligatoire';
         }
+      }
+
+      // Catégorie de dépense associée pour dépenses directes parti
+      if (isDepenseDirecteParti && !categorieDepenseAssociee) {
+        newErrors.categorieDepenseAssociee = 'La catégorie de dépense associée est obligatoire';
       }
     }
 
@@ -397,60 +410,130 @@ export function OperationFormModal({
         ? `${donateurAdresse}, ${donateurCodePostal} ${donateurVille}, ${donateurPays}`
         : null;
 
-      const operationData = {
-        candidat_id: candidatId,
-        mandataire_id: mandataireId,
-        type_operation: typeOperation,
-        montant: montantNum,
-        date,
-        categorie,
-        mode_paiement: modePaiement,
-        numero_releve_bancaire: !isDepense ? numeroReleveBancaire.trim() || null : null,
-        beneficiaire: isDepense ? beneficiaire.trim() || null : null,
-        // Donateur fields (only for dons non-collecte)
-        donateur_nom: !isCollecte && isDon && !isDepense ? donateurNom.trim() : null,
-        donateur_prenom: !isCollecte && isDon && !isDepense ? donateurPrenom.trim() : null,
-        donateur_nationalite: !isCollecte && isDon && !isDepense ? donateurNationalite : null,
-        donateur_adresse: adresseComplete,
-        donateur_code_postal: !isCollecte && isDon && !isDepense ? donateurCodePostal.trim() : null,
-        donateur_ville: !isCollecte && isDon && !isDepense ? donateurVille.trim() : null,
-        donateur_pays: !isCollecte && isDon && !isDepense ? donateurPays.trim() : null,
-        numero_recu: !isCollecte && isDon && !isDepense ? numeroRecu.trim() : null,
-        // Collecte fields
-        is_collecte: isDon && !isDepense ? isCollecte : false,
-        collecte_date: isCollecte && isDon && !isDepense ? collecteDate : null,
-        collecte_organisation: isCollecte && isDon && !isDepense ? collecteOrganisation.trim() : null,
-        // Parti politique fields
-        parti_nom: isVersementParti && !isDepense ? partiNom.trim() : null,
-        parti_adresse: isVersementParti && !isDepense ? partiAdresse.trim() : null,
-        parti_code_postal: isVersementParti && !isDepense ? partiCodePostal.trim() : null,
-        parti_ville: isVersementParti && !isDepense ? partiVille.trim() : null,
-        parti_siret: isVersementParti && !isDepense ? partiSiret.trim() : null,
-        parti_rna: isVersementParti && !isDepense ? partiRna.trim().toUpperCase() : null,
-        // Justificatif
-        justificatif_url: justificatifUrl,
-        justificatif_nom: justificatifNom,
-        // Other
-        commentaire: commentaire.trim() || null,
-        statut_validation: statutValidation,
-        compte_comptable: compteComptable || null,
+      // Données parti politique (pour versement parti ou dépense directe parti)
+      const partiData = (isVersementParti || isDepenseDirecteParti) && !isDepense ? {
+        parti_nom: partiNom.trim(),
+        parti_adresse: partiAdresse.trim(),
+        parti_code_postal: partiCodePostal.trim(),
+        parti_ville: partiVille.trim(),
+        parti_siret: partiSiret.trim(),
+        parti_rna: partiRna.trim().toUpperCase(),
+      } : {
+        parti_nom: null,
+        parti_adresse: null,
+        parti_code_postal: null,
+        parti_ville: null,
+        parti_siret: null,
+        parti_rna: null,
       };
 
-      if (isEditing && operation) {
-        const { error } = await supabase
-          .from('operations')
-          .update(operationData)
-          .eq('id', operation.id);
+      // Cas spécial: Dépenses payées directement par le parti (créer 2 opérations)
+      if (isDepenseDirecteParti && !isDepense && !isEditing) {
+        const compteComptableDepense = getCompteComptableDepense(categorieDepenseAssociee);
+        const commentaireRecette = `Dépense payée par ${partiNom.trim()}${commentaire ? ' - ' + commentaire.trim() : ''}`;
+        const commentaireDepense = `Payée par ${partiNom.trim()}${commentaire ? ' - ' + commentaire.trim() : ''}`;
 
-        if (error) throw error;
-        toast({ title: "Opération modifiée avec succès" });
+        // Créer la recette
+        const { error: errorRecette } = await supabase
+          .from('operations')
+          .insert({
+            candidat_id: candidatId,
+            mandataire_id: mandataireId,
+            type_operation: 'recette',
+            date,
+            montant: montantNum,
+            categorie,
+            compte_comptable: compteComptable || null,
+            mode_paiement: 'virement', // Pas de flux réel, valeur par défaut
+            numero_releve_bancaire: null, // Pas de relevé bancaire
+            ...partiData,
+            justificatif_url: justificatifUrl,
+            justificatif_nom: justificatifNom,
+            commentaire: commentaireRecette,
+            statut_validation: statutValidation,
+          });
+
+        if (errorRecette) throw errorRecette;
+
+        // Créer la dépense associée
+        const { error: errorDepense } = await supabase
+          .from('operations')
+          .insert({
+            candidat_id: candidatId,
+            mandataire_id: mandataireId,
+            type_operation: 'depense',
+            date,
+            montant: montantNum,
+            categorie: categorieDepenseAssociee,
+            compte_comptable: compteComptableDepense || null,
+            mode_paiement: 'virement', // Pas de flux réel, valeur par défaut
+            numero_releve_bancaire: null,
+            beneficiaire: partiNom.trim(),
+            ...partiData,
+            justificatif_url: justificatifUrl,
+            justificatif_nom: justificatifNom,
+            commentaire: commentaireDepense,
+            statut_validation: statutValidation,
+          });
+
+        if (errorDepense) throw errorDepense;
+
+        toast({ 
+          title: "Opérations créées avec succès",
+          description: `Recette et dépense de ${montantNum.toLocaleString('fr-FR')} € (opération à zéro)`
+        });
       } else {
-        const { error } = await supabase
-          .from('operations')
-          .insert(operationData);
+        // Cas normal: une seule opération
+        const operationData = {
+          candidat_id: candidatId,
+          mandataire_id: mandataireId,
+          type_operation: typeOperation,
+          montant: montantNum,
+          date,
+          categorie,
+          mode_paiement: modePaiement,
+          numero_releve_bancaire: !isDepense ? numeroReleveBancaire.trim() || null : null,
+          beneficiaire: isDepense ? beneficiaire.trim() || null : null,
+          // Donateur fields (only for dons non-collecte)
+          donateur_nom: !isCollecte && isDon && !isDepense ? donateurNom.trim() : null,
+          donateur_prenom: !isCollecte && isDon && !isDepense ? donateurPrenom.trim() : null,
+          donateur_nationalite: !isCollecte && isDon && !isDepense ? donateurNationalite : null,
+          donateur_adresse: adresseComplete,
+          donateur_code_postal: !isCollecte && isDon && !isDepense ? donateurCodePostal.trim() : null,
+          donateur_ville: !isCollecte && isDon && !isDepense ? donateurVille.trim() : null,
+          donateur_pays: !isCollecte && isDon && !isDepense ? donateurPays.trim() : null,
+          numero_recu: !isCollecte && isDon && !isDepense ? numeroRecu.trim() : null,
+          // Collecte fields
+          is_collecte: isDon && !isDepense ? isCollecte : false,
+          collecte_date: isCollecte && isDon && !isDepense ? collecteDate : null,
+          collecte_organisation: isCollecte && isDon && !isDepense ? collecteOrganisation.trim() : null,
+          // Parti politique fields
+          ...partiData,
+          // Justificatif
+          justificatif_url: justificatifUrl,
+          justificatif_nom: justificatifNom,
+          // Other
+          commentaire: commentaire.trim() || null,
+          statut_validation: statutValidation,
+          compte_comptable: compteComptable || null,
+        };
 
-        if (error) throw error;
-        toast({ title: "Opération créée avec succès" });
+        if (isEditing && operation) {
+          const { error } = await supabase
+            .from('operations')
+            .update(operationData)
+            .eq('id', operation.id);
+
+          if (error) throw error;
+          toast({ title: "Opération modifiée avec succès" });
+        } else {
+          const { error } = await supabase
+            .from('operations')
+            .insert(operationData);
+
+          if (error) throw error;
+          toast({ title: "Opération créée avec succès" });
+        }
       }
 
       onSuccess();
@@ -577,24 +660,26 @@ export function OperationFormModal({
             {errors.categorie && <p className="text-sm text-destructive">{errors.categorie}</p>}
           </div>
 
-          {/* Mode de paiement */}
-          <div className="space-y-2">
-            <Label>Mode de paiement *</Label>
-            <Select value={modePaiement} onValueChange={setModePaiement}>
-              <SelectTrigger className={errors.modePaiement ? 'border-destructive' : ''}>
-                <SelectValue placeholder="Sélectionner" />
-              </SelectTrigger>
-              <SelectContent>
-                {MODES_PAIEMENT.map((mode) => (
-                  <SelectItem key={mode.value} value={mode.value}>{mode.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.modePaiement && <p className="text-sm text-destructive">{errors.modePaiement}</p>}
-          </div>
+          {/* Mode de paiement - masqué pour dépenses directes parti */}
+          {!isDepenseDirecteParti && (
+            <div className="space-y-2">
+              <Label>Mode de paiement *</Label>
+              <Select value={modePaiement} onValueChange={setModePaiement}>
+                <SelectTrigger className={errors.modePaiement ? 'border-destructive' : ''}>
+                  <SelectValue placeholder="Sélectionner" />
+                </SelectTrigger>
+                <SelectContent>
+                  {MODES_PAIEMENT.map((mode) => (
+                    <SelectItem key={mode.value} value={mode.value}>{mode.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.modePaiement && <p className="text-sm text-destructive">{errors.modePaiement}</p>}
+            </div>
+          )}
 
-          {/* Numéro relevé bancaire (recettes only) */}
-          {!isDepense && (
+          {/* Numéro relevé bancaire (recettes only) - masqué pour dépenses directes parti */}
+          {!isDepense && !isDepenseDirecteParti && (
             <div className="space-y-2">
               <Label>N° relevé bancaire *</Label>
               <Input
@@ -839,8 +924,19 @@ export function OperationFormModal({
             </Alert>
           )}
 
-          {/* Champs spécifiques aux versements des partis politiques */}
-          {isVersementParti && !isDepense && (
+          {/* Alerte explicative pour dépenses directes parti */}
+          {isDepenseDirecteParti && !isDepense && (
+            <Alert className="border-blue-500 bg-blue-50 dark:bg-blue-950/20">
+              <Info className="h-4 w-4 text-blue-600" />
+              <AlertTitle className="text-blue-800 dark:text-blue-200">Opération à zéro</AlertTitle>
+              <AlertDescription className="text-blue-700 dark:text-blue-300">
+                Cette recette génère automatiquement une dépense du même montant. Le parti paie directement une dépense de campagne, ce qui crée deux écritures comptables qui s'équilibrent.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Champs spécifiques aux versements des partis politiques ou dépenses directes */}
+          {(isVersementParti || isDepenseDirecteParti) && !isDepense && (
             <div className="border-t border-border pt-4">
               <h4 className="font-semibold mb-3">Coordonnées du parti politique</h4>
               <div className="grid grid-cols-2 gap-4">
@@ -909,8 +1005,50 @@ export function OperationFormModal({
             </div>
           )}
 
-          {/* Upload justificatif (dépenses + versement candidat + versement parti) */}
-          {(isDepense || isVersementCandidat || isVersementParti) && (
+          {/* Sélecteur de catégorie de dépense associée (uniquement pour dépenses directes) */}
+          {isDepenseDirecteParti && !isDepense && (
+            <div className="border-t border-border pt-4">
+              <h4 className="font-semibold mb-3">Catégorie de dépense associée</h4>
+              <div className="space-y-2">
+                <Label>Type de dépense payée par le parti *</Label>
+                <Select value={categorieDepenseAssociee} onValueChange={setCategorieDepenseAssociee}>
+                  <SelectTrigger className={errors.categorieDepenseAssociee ? 'border-destructive' : ''}>
+                    <SelectValue placeholder="Sélectionner la catégorie de dépense" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES_DEPENSES.filter(cat => !cat.parent).map((cat) => (
+                      <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                    ))}
+                    <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50 mt-1">
+                      Location
+                    </div>
+                    {CATEGORIES_DEPENSES.filter(cat => cat.parent === 'Location').map((cat) => (
+                      <SelectItem key={cat.value} value={cat.value} className="pl-6">{cat.label}</SelectItem>
+                    ))}
+                    <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50 mt-1">
+                      Personnel
+                    </div>
+                    {CATEGORIES_DEPENSES.filter(cat => cat.parent === 'Personnel').map((cat) => (
+                      <SelectItem key={cat.value} value={cat.value} className="pl-6">{cat.label}</SelectItem>
+                    ))}
+                    <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50 mt-1">
+                      Honoraires
+                    </div>
+                    {CATEGORIES_DEPENSES.filter(cat => cat.parent === 'Honoraires').map((cat) => (
+                      <SelectItem key={cat.value} value={cat.value} className="pl-6">{cat.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.categorieDepenseAssociee && <p className="text-sm text-destructive">{errors.categorieDepenseAssociee}</p>}
+                <p className="text-xs text-muted-foreground mt-2">
+                  Sélectionnez le type de dépense que le parti a directement payé pour la campagne.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Upload justificatif (dépenses + versement candidat + versement parti + dépense directe) */}
+          {(isDepense || isVersementCandidat || isVersementParti || isDepenseDirecteParti) && (
             <div className="border-t border-border pt-4">
               <h4 className="font-semibold mb-3 flex items-center gap-2">
                 <Upload size={18} />
