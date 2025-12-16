@@ -85,6 +85,13 @@ export interface Operation {
   is_collecte?: boolean;
   collecte_date?: string | null;
   collecte_organisation?: string | null;
+  // Champs parti politique
+  parti_nom?: string | null;
+  parti_adresse?: string | null;
+  parti_code_postal?: string | null;
+  parti_ville?: string | null;
+  parti_siret?: string | null;
+  parti_rna?: string | null;
   // Autres
   commentaire?: string | null;
   justificatif_url?: string | null;
