@@ -18,7 +18,7 @@ import {
   AlertDescription,
   AlertTitle,
 } from '@/components/ui/alert';
-import { CATEGORIES_RECETTES, MODES_PAIEMENT, getCompteComptable } from '@/types';
+import { CATEGORIES_RECETTES, CATEGORIES_DEPENSES, MODES_PAIEMENT, getCompteComptable, getCompteComptableDepense } from '@/types';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useMandataireData } from '@/hooks/useMandataireData';
@@ -59,6 +59,8 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
     partiVille: '',
     partiSiret: '',
     partiRna: '',
+    // Catégorie de dépense associée (pour depenses_directes_formations)
+    categorieDepenseAssociee: '',
     // Autres
     commentaire: '',
   });
@@ -87,6 +89,7 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
   const isDon = formData.categorie === 'dons';
   const isVersementCandidat = formData.categorie === 'versements_personnels';
   const isVersementParti = formData.categorie === 'versements_formations_politiques';
+  const isDepenseDirecteParti = formData.categorie === 'depenses_directes_formations';
   const montant = parseFloat(formData.montant) || 0;
   const isEspeces = formData.modePaiement === 'especes';
   const donEspecesSuperieur150 = isDon && isEspeces && montant > 150;
@@ -174,7 +177,7 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
     }
 
     // Validations spécifiques aux versements des partis politiques
-    if (isVersementParti) {
+    if (isVersementParti || isDepenseDirecteParti) {
       if (!formData.partiNom.trim()) newErrors.partiNom = 'Le nom du parti est obligatoire';
       if (!formData.partiAdresse.trim()) newErrors.partiAdresse = "L'adresse est obligatoire";
       if (!formData.partiCodePostal.trim()) newErrors.partiCodePostal = 'Le code postal est obligatoire';
@@ -188,6 +191,11 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
       if (!justificatif) {
         newErrors.justificatif = 'Le justificatif est obligatoire';
       }
+    }
+
+    // Validation catégorie de dépense associée pour depenses_directes_formations
+    if (isDepenseDirecteParti && !formData.categorieDepenseAssociee) {
+      newErrors.categorieDepenseAssociee = 'La catégorie de dépense associée est obligatoire';
     }
 
     setErrors(newErrors);
@@ -222,8 +230,8 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
 
       let justificatifUrl: string | null = null;
 
-      // Upload du justificatif vers Supabase Storage (pour versement candidat ou parti)
-      if (justificatif && (isVersementCandidat || isVersementParti)) {
+      // Upload du justificatif vers Supabase Storage (pour versement candidat, parti ou dépense directe)
+      if (justificatif && (isVersementCandidat || isVersementParti || isDepenseDirecteParti)) {
         const fileExt = justificatif.name.split('.').pop();
         const fileName = `${mandataire.id}/${Date.now()}.${fileExt}`;
         
@@ -244,52 +252,122 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
         ? `${formData.donateurAdresse}, ${formData.donateurCodePostal} ${formData.donateurVille}, ${formData.donateurPays}`
         : null;
 
-      const { error } = await supabase
-        .from('operations')
-        .insert({
-          candidat_id: candidat.id,
-          mandataire_id: mandataire.id,
-          type_operation: 'recette',
-          date: formData.date,
-          montant: montant,
-          categorie: formData.categorie,
-          compte_comptable: compteComptable || null,
-          mode_paiement: formData.modePaiement,
-          numero_releve_bancaire: formData.numeroReleveBancaire.trim(),
-          // Champs donateur (uniquement pour les dons non-collecte)
-          donateur_nom: !formData.isCollecte && isDon ? formData.donateurNom.trim() : null,
-          donateur_prenom: !formData.isCollecte && isDon ? formData.donateurPrenom.trim() : null,
-          donateur_nationalite: !formData.isCollecte && isDon ? formData.donateurNationalite : null,
-          donateur_adresse: adresseComplete,
-          donateur_code_postal: !formData.isCollecte && isDon ? formData.donateurCodePostal.trim() : null,
-          donateur_ville: !formData.isCollecte && isDon ? formData.donateurVille.trim() : null,
-          donateur_pays: !formData.isCollecte && isDon ? formData.donateurPays.trim() : null,
-          numero_recu: !formData.isCollecte && isDon ? formData.numeroRecu.trim() : null,
-          // Champs collecte
-          is_collecte: isDon ? formData.isCollecte : false,
-          collecte_date: formData.isCollecte && isDon ? formData.collecteDate : null,
-          collecte_organisation: formData.isCollecte && isDon ? formData.collecteOrganisation.trim() : null,
-          // Champs parti politique
-          parti_nom: isVersementParti ? formData.partiNom.trim() : null,
-          parti_adresse: isVersementParti ? formData.partiAdresse.trim() : null,
-          parti_code_postal: isVersementParti ? formData.partiCodePostal.trim() : null,
-          parti_ville: isVersementParti ? formData.partiVille.trim() : null,
-          parti_siret: isVersementParti ? formData.partiSiret.trim() : null,
-          parti_rna: isVersementParti ? formData.partiRna.trim().toUpperCase() : null,
-          // Justificatif (pour versement candidat ou parti)
-          justificatif_url: justificatifUrl,
-          justificatif_nom: justificatif?.name || null,
-          // Autres
-          commentaire: formData.commentaire.trim() || null,
-          statut_validation: 'en_attente'
-        } as any);
+      // Champs communs parti politique (pour versement parti ou dépense directe parti)
+      const partiData = (isVersementParti || isDepenseDirecteParti) ? {
+        parti_nom: formData.partiNom.trim(),
+        parti_adresse: formData.partiAdresse.trim(),
+        parti_code_postal: formData.partiCodePostal.trim(),
+        parti_ville: formData.partiVille.trim(),
+        parti_siret: formData.partiSiret.trim(),
+        parti_rna: formData.partiRna.trim().toUpperCase(),
+      } : {
+        parti_nom: null,
+        parti_adresse: null,
+        parti_code_postal: null,
+        parti_ville: null,
+        parti_siret: null,
+        parti_rna: null,
+      };
 
-      if (error) throw error;
+      // Cas spécial: Dépenses payées directement par le parti (créer 2 opérations)
+      if (isDepenseDirecteParti) {
+        const compteComptableDepense = getCompteComptableDepense(formData.categorieDepenseAssociee);
+        const commentaireRecette = `Dépense payée par ${formData.partiNom.trim()}${formData.commentaire ? ' - ' + formData.commentaire.trim() : ''}`;
+        const commentaireDepense = `Payée par ${formData.partiNom.trim()}${formData.commentaire ? ' - ' + formData.commentaire.trim() : ''}`;
 
-      toast({
-        title: "Recette enregistrée",
-        description: `Recette de ${montant.toLocaleString('fr-FR')} € ajoutée avec succès`,
-      });
+        // Créer la recette
+        const { error: errorRecette } = await supabase
+          .from('operations')
+          .insert({
+            candidat_id: candidat.id,
+            mandataire_id: mandataire.id,
+            type_operation: 'recette',
+            date: formData.date,
+            montant: montant,
+            categorie: formData.categorie,
+            compte_comptable: compteComptable || null,
+            mode_paiement: formData.modePaiement,
+            numero_releve_bancaire: formData.numeroReleveBancaire.trim(),
+            ...partiData,
+            justificatif_url: justificatifUrl,
+            justificatif_nom: justificatif?.name || null,
+            commentaire: commentaireRecette,
+            statut_validation: 'en_attente'
+          } as any);
+
+        if (errorRecette) throw errorRecette;
+
+        // Créer la dépense associée
+        const { error: errorDepense } = await supabase
+          .from('operations')
+          .insert({
+            candidat_id: candidat.id,
+            mandataire_id: mandataire.id,
+            type_operation: 'depense',
+            date: formData.date,
+            montant: montant,
+            categorie: formData.categorieDepenseAssociee,
+            compte_comptable: compteComptableDepense || null,
+            mode_paiement: formData.modePaiement,
+            numero_releve_bancaire: formData.numeroReleveBancaire.trim(),
+            beneficiaire: formData.partiNom.trim(),
+            ...partiData,
+            justificatif_url: justificatifUrl,
+            justificatif_nom: justificatif?.name || null,
+            commentaire: commentaireDepense,
+            statut_validation: 'en_attente'
+          } as any);
+
+        if (errorDepense) throw errorDepense;
+
+        toast({
+          title: "Opérations enregistrées",
+          description: `Recette et dépense de ${montant.toLocaleString('fr-FR')} € créées (opération à zéro)`,
+        });
+      } else {
+        // Cas normal: une seule opération
+        const { error } = await supabase
+          .from('operations')
+          .insert({
+            candidat_id: candidat.id,
+            mandataire_id: mandataire.id,
+            type_operation: 'recette',
+            date: formData.date,
+            montant: montant,
+            categorie: formData.categorie,
+            compte_comptable: compteComptable || null,
+            mode_paiement: formData.modePaiement,
+            numero_releve_bancaire: formData.numeroReleveBancaire.trim(),
+            // Champs donateur (uniquement pour les dons non-collecte)
+            donateur_nom: !formData.isCollecte && isDon ? formData.donateurNom.trim() : null,
+            donateur_prenom: !formData.isCollecte && isDon ? formData.donateurPrenom.trim() : null,
+            donateur_nationalite: !formData.isCollecte && isDon ? formData.donateurNationalite : null,
+            donateur_adresse: adresseComplete,
+            donateur_code_postal: !formData.isCollecte && isDon ? formData.donateurCodePostal.trim() : null,
+            donateur_ville: !formData.isCollecte && isDon ? formData.donateurVille.trim() : null,
+            donateur_pays: !formData.isCollecte && isDon ? formData.donateurPays.trim() : null,
+            numero_recu: !formData.isCollecte && isDon ? formData.numeroRecu.trim() : null,
+            // Champs collecte
+            is_collecte: isDon ? formData.isCollecte : false,
+            collecte_date: formData.isCollecte && isDon ? formData.collecteDate : null,
+            collecte_organisation: formData.isCollecte && isDon ? formData.collecteOrganisation.trim() : null,
+            // Champs parti politique
+            ...partiData,
+            // Justificatif (pour versement candidat ou parti)
+            justificatif_url: justificatifUrl,
+            justificatif_nom: justificatif?.name || null,
+            // Autres
+            commentaire: formData.commentaire.trim() || null,
+            statut_validation: 'en_attente'
+          } as any);
+
+        if (error) throw error;
+
+        toast({
+          title: "Recette enregistrée",
+          description: `Recette de ${montant.toLocaleString('fr-FR')} € ajoutée avec succès`,
+        });
+      }
 
       if (onSuccess) {
         onSuccess();
@@ -577,15 +655,25 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
         </div>
       )}
 
-      {/* Champs spécifiques aux versements des partis politiques */}
-      {isVersementParti && (
+      {/* Champs spécifiques aux versements des partis politiques ou dépenses directes */}
+      {(isVersementParti || isDepenseDirecteParti) && (
         <>
+          {/* Alerte explicative pour dépenses directes */}
+          {isDepenseDirecteParti && (
+            <Alert className="border-blue-500 bg-blue-50 dark:bg-blue-950/20">
+              <Info className="h-4 w-4 text-blue-600" />
+              <AlertTitle className="text-blue-800 dark:text-blue-200">Opération à zéro</AlertTitle>
+              <AlertDescription className="text-blue-700 dark:text-blue-300">
+                Cette recette génère automatiquement une dépense du même montant. Le parti paie directement une dépense de campagne, ce qui crée deux écritures comptables qui s'équilibrent (recette = dépense).
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="border-t border-border pt-6">
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <User size={20} className="text-primary" />
               Coordonnées du parti politique
             </h3>
-            
             <div className="grid gap-6 md:grid-cols-2">
               {/* Nom du parti */}
               <div className="space-y-2 md:col-span-2">
@@ -670,6 +758,55 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
               </div>
             </div>
           </div>
+
+          {/* Sélecteur de catégorie de dépense associée (uniquement pour dépenses directes) */}
+          {isDepenseDirecteParti && (
+            <div className="border-t border-border pt-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Receipt size={20} className="text-primary" />
+                Catégorie de dépense associée
+              </h3>
+              
+              <div className="space-y-2">
+                <Label>Type de dépense payée par le parti *</Label>
+                <Select
+                  value={formData.categorieDepenseAssociee}
+                  onValueChange={(value) => setFormData({ ...formData, categorieDepenseAssociee: value })}
+                >
+                  <SelectTrigger className={errors.categorieDepenseAssociee ? 'border-destructive' : ''}>
+                    <SelectValue placeholder="Sélectionner la catégorie de dépense" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES_DEPENSES.filter(cat => !cat.parent).map((cat) => (
+                      <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                    ))}
+                    <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50 mt-1">
+                      Location
+                    </div>
+                    {CATEGORIES_DEPENSES.filter(cat => cat.parent === 'Location').map((cat) => (
+                      <SelectItem key={cat.value} value={cat.value} className="pl-6">{cat.label}</SelectItem>
+                    ))}
+                    <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50 mt-1">
+                      Personnel
+                    </div>
+                    {CATEGORIES_DEPENSES.filter(cat => cat.parent === 'Personnel').map((cat) => (
+                      <SelectItem key={cat.value} value={cat.value} className="pl-6">{cat.label}</SelectItem>
+                    ))}
+                    <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50 mt-1">
+                      Honoraires
+                    </div>
+                    {CATEGORIES_DEPENSES.filter(cat => cat.parent === 'Honoraires').map((cat) => (
+                      <SelectItem key={cat.value} value={cat.value} className="pl-6">{cat.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.categorieDepenseAssociee && <p className="text-sm text-destructive">{errors.categorieDepenseAssociee}</p>}
+                <p className="text-xs text-muted-foreground mt-2">
+                  Sélectionnez le type de dépense que le parti a directement payé pour la campagne.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Upload justificatif pour versement parti */}
           <div className="border-t border-border pt-6">
