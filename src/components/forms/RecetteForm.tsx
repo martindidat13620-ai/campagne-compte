@@ -140,9 +140,13 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
       newErrors.montant = 'Montant invalide';
     }
     if (!formData.categorie) newErrors.categorie = 'Le type de recette est obligatoire';
-    if (!formData.modePaiement) newErrors.modePaiement = 'Le mode de paiement est obligatoire';
-    if (!formData.numeroReleveBancaire.trim()) {
-      newErrors.numeroReleveBancaire = 'Le numéro du relevé bancaire est obligatoire';
+    
+    // Mode de paiement et relevé bancaire non requis pour dépenses directes parti (pas de flux bancaire)
+    if (!isDepenseDirecteParti) {
+      if (!formData.modePaiement) newErrors.modePaiement = 'Le mode de paiement est obligatoire';
+      if (!formData.numeroReleveBancaire.trim()) {
+        newErrors.numeroReleveBancaire = 'Le numéro du relevé bancaire est obligatoire';
+      }
     }
 
     // Validation don > 150€ en espèces
@@ -286,8 +290,8 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
             montant: montant,
             categorie: formData.categorie,
             compte_comptable: compteComptable || null,
-            mode_paiement: formData.modePaiement,
-            numero_releve_bancaire: formData.numeroReleveBancaire.trim(),
+            mode_paiement: 'virement', // Pas de flux réel, valeur par défaut
+            numero_releve_bancaire: null, // Pas de relevé bancaire pour ce type
             ...partiData,
             justificatif_url: justificatifUrl,
             justificatif_nom: justificatif?.name || null,
@@ -308,8 +312,8 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
             montant: montant,
             categorie: formData.categorieDepenseAssociee,
             compte_comptable: compteComptableDepense || null,
-            mode_paiement: formData.modePaiement,
-            numero_releve_bancaire: formData.numeroReleveBancaire.trim(),
+            mode_paiement: 'virement', // Pas de flux réel, valeur par défaut
+            numero_releve_bancaire: null, // Pas de relevé bancaire pour ce type
             beneficiaire: formData.partiNom.trim(),
             ...partiData,
             justificatif_url: justificatifUrl,
@@ -478,43 +482,47 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
           {errors.montant && <p className="text-sm text-destructive">{errors.montant}</p>}
         </div>
 
-        {/* Mode de paiement */}
-        <div className="space-y-2">
-          <Label className="flex items-center gap-2">
-            <CreditCard size={16} className="text-muted-foreground" />
-            Mode de règlement *
-          </Label>
-          <Select
-            value={formData.modePaiement}
-            onValueChange={(value) => setFormData({ ...formData, modePaiement: value })}
-          >
-            <SelectTrigger className={errors.modePaiement ? 'border-destructive' : ''}>
-              <SelectValue placeholder="Sélectionner" />
-            </SelectTrigger>
-            <SelectContent>
-              {MODES_PAIEMENT.map((mode) => (
-                <SelectItem key={mode.value} value={mode.value}>{mode.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.modePaiement && <p className="text-sm text-destructive">{errors.modePaiement}</p>}
-        </div>
+        {/* Mode de paiement - masqué pour dépenses directes parti */}
+        {!isDepenseDirecteParti && (
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <CreditCard size={16} className="text-muted-foreground" />
+              Mode de règlement *
+            </Label>
+            <Select
+              value={formData.modePaiement}
+              onValueChange={(value) => setFormData({ ...formData, modePaiement: value })}
+            >
+              <SelectTrigger className={errors.modePaiement ? 'border-destructive' : ''}>
+                <SelectValue placeholder="Sélectionner" />
+              </SelectTrigger>
+              <SelectContent>
+                {MODES_PAIEMENT.map((mode) => (
+                  <SelectItem key={mode.value} value={mode.value}>{mode.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.modePaiement && <p className="text-sm text-destructive">{errors.modePaiement}</p>}
+          </div>
+        )}
 
-        {/* Numéro relevé bancaire */}
-        <div className="space-y-2">
-          <Label htmlFor="numeroReleveBancaire" className="flex items-center gap-2">
-            <FileText size={16} className="text-muted-foreground" />
-            N° relevé bancaire *
-          </Label>
-          <Input
-            id="numeroReleveBancaire"
-            placeholder="Ex: RB-2024-001"
-            value={formData.numeroReleveBancaire}
-            onChange={(e) => setFormData({ ...formData, numeroReleveBancaire: e.target.value })}
-            className={errors.numeroReleveBancaire ? 'border-destructive' : ''}
-          />
-          {errors.numeroReleveBancaire && <p className="text-sm text-destructive">{errors.numeroReleveBancaire}</p>}
-        </div>
+        {/* Numéro relevé bancaire - masqué pour dépenses directes parti */}
+        {!isDepenseDirecteParti && (
+          <div className="space-y-2">
+            <Label htmlFor="numeroReleveBancaire" className="flex items-center gap-2">
+              <FileText size={16} className="text-muted-foreground" />
+              N° relevé bancaire *
+            </Label>
+            <Input
+              id="numeroReleveBancaire"
+              placeholder="Ex: RB-2024-001"
+              value={formData.numeroReleveBancaire}
+              onChange={(e) => setFormData({ ...formData, numeroReleveBancaire: e.target.value })}
+              className={errors.numeroReleveBancaire ? 'border-destructive' : ''}
+            />
+            {errors.numeroReleveBancaire && <p className="text-sm text-destructive">{errors.numeroReleveBancaire}</p>}
+          </div>
+        )}
       </div>
 
       {/* Alerte don > 150€ en espèces */}
