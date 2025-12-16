@@ -132,13 +132,15 @@ export function OperationsTable({
   };
 
   const exportCSV = () => {
-    // Headers étendus pour l'export comptable avec tous les champs donation
+    // Headers étendus pour l'export comptable avec tous les champs donation et parti politique
     const headers = isComptable 
       ? [
           'Date', 'Type', 'Montant', 'Catégorie', 'Compte Comptable', 'Mode Paiement', 
           'N° Relevé Bancaire', 'Bénéficiaire/Donateur', 'Prénom Donateur', 
           'Adresse', 'Code Postal', 'Ville', 'Pays', 'Nationalité', 
-          'N° Reçu', 'Collecte', 'Date Collecte', 'Organisation Collecte', 'Statut'
+          'N° Reçu', 'Collecte', 'Date Collecte', 'Organisation Collecte',
+          'Parti Politique', 'Adresse Parti', 'CP Parti', 'Ville Parti', 'SIRET Parti', 'RNA Parti',
+          'Statut'
         ]
       : ['Date', 'Type', 'Montant', 'Catégorie', 'Bénéficiaire/Donateur', 'Statut'];
     
@@ -165,6 +167,12 @@ export function OperationsTable({
           opAny.is_collecte ? 'Oui' : 'Non',
           opAny.collecte_date || '',
           opAny.collecte_organisation || '',
+          opAny.parti_nom || '',
+          opAny.parti_adresse || '',
+          opAny.parti_code_postal || '',
+          opAny.parti_ville || '',
+          opAny.parti_siret || '',
+          opAny.parti_rna || '',
           op.statut_validation
         ];
       }
