@@ -250,6 +250,12 @@ export type Database = {
           montant: number
           numero_recu: string | null
           numero_releve_bancaire: string | null
+          parti_adresse: string | null
+          parti_code_postal: string | null
+          parti_nom: string | null
+          parti_rna: string | null
+          parti_siret: string | null
+          parti_ville: string | null
           statut_validation: string
           type_operation: string
           updated_at: string
@@ -281,6 +287,12 @@ export type Database = {
           montant: number
           numero_recu?: string | null
           numero_releve_bancaire?: string | null
+          parti_adresse?: string | null
+          parti_code_postal?: string | null
+          parti_nom?: string | null
+          parti_rna?: string | null
+          parti_siret?: string | null
+          parti_ville?: string | null
           statut_validation?: string
           type_operation: string
           updated_at?: string
@@ -312,6 +324,12 @@ export type Database = {
           montant?: number
           numero_recu?: string | null
           numero_releve_bancaire?: string | null
+          parti_adresse?: string | null
+          parti_code_postal?: string | null
+          parti_nom?: string | null
+          parti_rna?: string | null
+          parti_siret?: string | null
+          parti_ville?: string | null
           statut_validation?: string
           type_operation?: string
           updated_at?: string

@@ -59,6 +59,13 @@ interface Operation {
   is_collecte: boolean | null;
   collecte_date: string | null;
   collecte_organisation: string | null;
+  // Champs parti politique
+  parti_nom: string | null;
+  parti_adresse: string | null;
+  parti_code_postal: string | null;
+  parti_ville: string | null;
+  parti_siret: string | null;
+  parti_rna: string | null;
   commentaire: string | null;
   commentaire_comptable: string | null;
   compte_comptable: string | null;
