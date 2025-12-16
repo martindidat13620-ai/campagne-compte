@@ -261,29 +261,12 @@ export default function ComptableDossier() {
     .map(([name, value]) => ({ name, value }))
     .sort((a, b) => b.value - a.value);
 
-  // Transform operations for OperationsTable
-  const transformedOperations: OperationType[] = operations.map(op => ({
-    id: op.id,
-    candidat_id: op.candidat_id,
-    mandataire_id: op.mandataire_id,
+  // Transform operations for OperationsTable (keep all DB fields)
+  const transformedOperations: OperationType[] = operations.map((op) => ({
+    ...(op as any),
     type_operation: op.type_operation as 'depense' | 'recette',
     montant: Number(op.montant),
     statut_validation: op.statut_validation as 'en_attente' | 'validee' | 'rejetee',
-    date: op.date,
-    categorie: op.categorie,
-    mode_paiement: op.mode_paiement,
-    beneficiaire: op.beneficiaire,
-    donateur_nom: op.donateur_nom,
-    donateur_adresse: op.donateur_adresse,
-    donateur_nationalite: op.donateur_nationalite,
-    numero_recu: op.numero_recu,
-    justificatif_url: op.justificatif_url,
-    justificatif_nom: op.justificatif_nom,
-    commentaire: op.commentaire,
-    commentaire_comptable: op.commentaire_comptable,
-    compte_comptable: op.compte_comptable,
-    created_at: op.created_at,
-    updated_at: op.updated_at
   }));
 
   return (
