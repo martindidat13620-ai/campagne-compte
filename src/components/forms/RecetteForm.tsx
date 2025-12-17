@@ -91,6 +91,7 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
   const isVersementParti = formData.categorie === 'versements_formations_politiques';
   const isDepenseDirecteParti = formData.categorie === 'depenses_directes_formations';
   const isProduitsDivers = formData.categorie === 'produits_divers';
+  const isProduitsFinanciers = formData.categorie === 'produits_financiers';
   const montant = parseFloat(formData.montant) || 0;
   const isEspeces = formData.modePaiement === 'especes';
   const donEspecesSuperieur150 = isDon && isEspeces && montant > 150;
@@ -922,6 +923,68 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
               </p>
               <input
                 id="file-upload-produits"
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg">
+              <div className="p-2 bg-accent/10 rounded-lg">
+                <FileText size={20} className="text-accent" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-foreground truncate">{justificatif.name}</p>
+                <p className="text-sm text-muted-foreground">
+                  {(justificatif.size / 1024 / 1024).toFixed(2)} Mo
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={removeFile}
+                className="text-muted-foreground hover:text-destructive"
+              >
+                <X size={18} />
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Champs spécifiques aux produits financiers */}
+      {isProduitsFinanciers && (
+        <div className="border-t border-border pt-6">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <Upload size={20} className="text-primary" />
+            Justificatif
+          </h3>
+          
+          <Alert className="mb-4 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
+            <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <AlertDescription className="text-blue-800 dark:text-blue-200">
+              <span className="font-medium">Document justificatif</span>
+              <br />
+              Tout document bancaire (relevé de compte, avis d'intérêts, etc.)
+            </AlertDescription>
+          </Alert>
+          
+          {!justificatif ? (
+            <div 
+              className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer hover:border-accent hover:bg-accent/5 border-border`}
+              onClick={() => document.getElementById('file-upload-financiers')?.click()}
+            >
+              <Upload size={32} className="mx-auto text-muted-foreground mb-2" />
+              <p className="text-sm text-muted-foreground mb-1">
+                Cliquez pour télécharger ou glissez-déposez
+              </p>
+              <p className="text-xs text-muted-foreground">
+                PDF, JPG, PNG (max. 10 Mo)
+              </p>
+              <input
+                id="file-upload-financiers"
                 type="file"
                 accept=".pdf,.jpg,.jpeg,.png"
                 onChange={handleFileChange}
