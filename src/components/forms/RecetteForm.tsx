@@ -834,6 +834,18 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
                 </AlertDescription>
               </Alert>
             )}
+
+            {/* Note informative pour produits divers */}
+            {formData.categorie === 'produits_divers' && (
+              <Alert className="mb-4 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
+                <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <AlertDescription className="text-blue-800 dark:text-blue-200">
+                  <span className="font-medium">Activité commerciale</span>
+                  <br />
+                  S'il s'agit d'une activité commerciale, merci d'y joindre la comptabilité correspondante précisant le coût unitaire de vente des produits, ainsi que le nombre de ventes.
+                </AlertDescription>
+              </Alert>
+            )}
             
             {!justificatif ? (
               <div 
