@@ -139,6 +139,8 @@ export function OperationFormModal({
   const isVersementCandidat = categorie === 'versements_personnels';
   const isVersementParti = categorie === 'versements_formations_politiques';
   const isDepenseDirecteParti = categorie === 'depenses_directes_formations';
+  const isProduitsDivers = categorie === 'produits_divers';
+  const isProduitsFinanciers = categorie === 'produits_financiers';
   const isDepense = typeOperation === 'depense';
   const montantNum = parseFloat(montant) || 0;
   const isEspeces = modePaiement === 'especes';
@@ -1047,8 +1049,30 @@ export function OperationFormModal({
             </div>
           )}
 
-          {/* Upload justificatif (dépenses + versement candidat + versement parti + dépense directe) */}
-          {(isDepense || isVersementCandidat || isVersementParti || isDepenseDirecteParti) && (
+          {/* Note pour produits divers */}
+          {isProduitsDivers && !isDepense && (
+            <Alert className="border-blue-500 bg-blue-50 dark:bg-blue-950/20">
+              <Info className="h-4 w-4 text-blue-600" />
+              <AlertTitle className="text-blue-800 dark:text-blue-200">Activité commerciale</AlertTitle>
+              <AlertDescription className="text-blue-700 dark:text-blue-300">
+                S'il s'agit d'une activité commerciale, merci d'y joindre la comptabilité correspondante précisant le coût unitaire de vente des produits, ainsi que le nombre de ventes.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Note pour produits financiers */}
+          {isProduitsFinanciers && !isDepense && (
+            <Alert className="border-blue-500 bg-blue-50 dark:bg-blue-950/20">
+              <Info className="h-4 w-4 text-blue-600" />
+              <AlertTitle className="text-blue-800 dark:text-blue-200">Document justificatif</AlertTitle>
+              <AlertDescription className="text-blue-700 dark:text-blue-300">
+                Tout document bancaire (relevé de compte, avis d'intérêts, etc.)
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Upload justificatif (dépenses + versement candidat + versement parti + dépense directe + produits divers + produits financiers) */}
+          {(isDepense || isVersementCandidat || isVersementParti || isDepenseDirecteParti || isProduitsDivers || isProduitsFinanciers) && (
             <div className="border-t border-border pt-4">
               <h4 className="font-semibold mb-3 flex items-center gap-2">
                 <Upload size={18} />
