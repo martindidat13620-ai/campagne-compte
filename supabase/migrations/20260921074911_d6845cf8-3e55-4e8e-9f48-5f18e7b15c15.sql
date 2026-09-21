@@ -1,0 +1,1 @@
+ALTER TABLE public.operations ADD COLUMN IF NOT EXISTS numero_cheque text;
