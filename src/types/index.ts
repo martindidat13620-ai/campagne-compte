@@ -81,6 +81,7 @@ export interface Operation {
   donateur_nationalite?: string | null;
   numero_recu?: string | null;
   numero_releve_bancaire?: string | null;
+  numero_cheque?: string | null;
   // Champs collecte
   is_collecte?: boolean;
   collecte_date?: string | null;

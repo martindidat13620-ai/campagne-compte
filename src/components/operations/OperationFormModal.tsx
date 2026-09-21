@@ -104,6 +104,7 @@ export function OperationFormModal({
   const [categorie, setCategorie] = useState('');
   const [modePaiement, setModePaiement] = useState('');
   const [numeroReleveBancaire, setNumeroReleveBancaire] = useState('');
+  const [numeroCheque, setNumeroCheque] = useState('');
   const [beneficiaire, setBeneficiaire] = useState('');
   // Donateur fields
   const [donateurNom, setDonateurNom] = useState('');
@@ -195,6 +196,7 @@ export function OperationFormModal({
       setDate(operation.date);
       setCategorie(operation.categorie);
       setModePaiement(operation.mode_paiement);
+      setNumeroCheque((operation as any).numero_cheque || '');
       setNumeroReleveBancaire(operation.numero_releve_bancaire || '');
       setBeneficiaire(operation.beneficiaire || '');
       setDonateurNom(operation.donateur_nom || '');
@@ -297,6 +299,9 @@ export function OperationFormModal({
     
     // Mode de paiement non requis pour dépenses directes parti (pas de flux bancaire)
     if (!isDepenseDirecteParti && !modePaiement) newErrors.modePaiement = 'Le mode de paiement est obligatoire';
+    if (!isDepenseDirecteParti && modePaiement === 'cheque' && !numeroCheque.trim()) {
+      newErrors.numeroCheque = 'Le numéro de chèque est obligatoire';
+    }
     
     if (!mandataireId) newErrors.mandataireId = 'Le mandataire est obligatoire';
 
@@ -495,6 +500,7 @@ export function OperationFormModal({
           categorie,
           mode_paiement: modePaiement,
           numero_releve_bancaire: !isDepense ? numeroReleveBancaire.trim() || null : null,
+          numero_cheque: modePaiement === 'cheque' ? numeroCheque.trim() || null : null,
           beneficiaire: isDepense ? beneficiaire.trim() || null : null,
           // Donateur fields (only for dons non-collecte)
           donateur_nom: !isCollecte && isDon && !isDepense ? donateurNom.trim() : null,
@@ -691,6 +697,20 @@ export function OperationFormModal({
                 className={errors.numeroReleveBancaire ? 'border-destructive' : ''}
               />
               {errors.numeroReleveBancaire && <p className="text-sm text-destructive">{errors.numeroReleveBancaire}</p>}
+            </div>
+          )}
+
+          {/* Numéro de chèque - uniquement si paiement par chèque */}
+          {!isDepenseDirecteParti && modePaiement === 'cheque' && (
+            <div className="space-y-2">
+              <Label>N° de chèque *</Label>
+              <Input
+                value={numeroCheque}
+                onChange={(e) => setNumeroCheque(e.target.value)}
+                placeholder="Ex: 1234567"
+                className={errors.numeroCheque ? 'border-destructive' : ''}
+              />
+              {errors.numeroCheque && <p className="text-sm text-destructive">{errors.numeroCheque}</p>}
             </div>
           )}
 
