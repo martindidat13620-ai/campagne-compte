@@ -136,7 +136,7 @@ export function OperationsTable({
     const headers = isComptable 
       ? [
           'Date', 'Type', 'Montant', 'Catégorie', 'Compte Comptable', 'Mode Paiement', 
-          'N° Relevé Bancaire', 'Bénéficiaire/Donateur', 'Prénom Donateur', 
+          'N° Relevé Bancaire', 'N° Chèque', 'Bénéficiaire/Donateur', 'Prénom Donateur', 
           'Adresse', 'Code Postal', 'Ville', 'Pays', 'Nationalité', 
           'N° Reçu', 'Collecte', 'Date Collecte', 'Organisation Collecte',
           'Parti Politique', 'Adresse Parti', 'CP Parti', 'Ville Parti', 'SIRET Parti', 'RNA Parti',
@@ -156,6 +156,7 @@ export function OperationsTable({
           opAny.compte_comptable || '',
           op.mode_paiement || '',
           opAny.numero_releve_bancaire || '',
+          opAny.numero_cheque || '',
           op.beneficiaire || op.donateur_nom || '',
           opAny.donateur_prenom || '',
           op.donateur_adresse || '',
@@ -499,6 +500,13 @@ export function OperationsTable({
                   <p className="text-sm text-muted-foreground">Statut</p>
                   {getStatusBadge(selectedOp.statut_validation)}
                 </div>
+                {/* N° de chèque */}
+                {(selectedOp as any).numero_cheque && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">N° de chèque</p>
+                    <p className="font-medium">{(selectedOp as any).numero_cheque}</p>
+                  </div>
+                )}
                 {/* N° relevé bancaire */}
                 {(selectedOp as any).numero_releve_bancaire && (
                   <div className="col-span-2">

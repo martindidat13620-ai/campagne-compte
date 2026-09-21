@@ -39,6 +39,7 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
     categorie: '',
     modePaiement: '',
     numeroReleveBancaire: '',
+    numeroCheque: '',
     // Champs donateur
     donateurNom: '',
     donateurPrenom: '',
@@ -148,6 +149,9 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
       if (!formData.modePaiement) newErrors.modePaiement = 'Le mode de paiement est obligatoire';
       if (!formData.numeroReleveBancaire.trim()) {
         newErrors.numeroReleveBancaire = 'Le numéro du relevé bancaire est obligatoire';
+      }
+      if (formData.modePaiement === 'cheque' && !formData.numeroCheque.trim()) {
+        newErrors.numeroCheque = 'Le numéro de chèque est obligatoire';
       }
     }
 
@@ -344,6 +348,7 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
             compte_comptable: compteComptable || null,
             mode_paiement: formData.modePaiement,
             numero_releve_bancaire: formData.numeroReleveBancaire.trim(),
+            numero_cheque: formData.modePaiement === 'cheque' ? formData.numeroCheque.trim() : null,
             // Champs donateur (uniquement pour les dons non-collecte)
             donateur_nom: !formData.isCollecte && isDon ? formData.donateurNom.trim() : null,
             donateur_prenom: !formData.isCollecte && isDon ? formData.donateurPrenom.trim() : null,
@@ -523,6 +528,24 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
               className={errors.numeroReleveBancaire ? 'border-destructive' : ''}
             />
             {errors.numeroReleveBancaire && <p className="text-sm text-destructive">{errors.numeroReleveBancaire}</p>}
+          </div>
+        )}
+
+        {/* Numéro de chèque - uniquement si paiement par chèque */}
+        {!isDepenseDirecteParti && formData.modePaiement === 'cheque' && (
+          <div className="space-y-2">
+            <Label htmlFor="numeroCheque" className="flex items-center gap-2">
+              <FileText size={16} className="text-muted-foreground" />
+              N° de chèque *
+            </Label>
+            <Input
+              id="numeroCheque"
+              placeholder="Ex: 1234567"
+              value={formData.numeroCheque}
+              onChange={(e) => setFormData({ ...formData, numeroCheque: e.target.value })}
+              className={errors.numeroCheque ? 'border-destructive' : ''}
+            />
+            {errors.numeroCheque && <p className="text-sm text-destructive">{errors.numeroCheque}</p>}
           </div>
         )}
       </div>

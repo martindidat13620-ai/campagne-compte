@@ -248,6 +248,7 @@ export type Database = {
           mandataire_id: string
           mode_paiement: string
           montant: number
+          numero_cheque: string | null
           numero_recu: string | null
           numero_releve_bancaire: string | null
           parti_adresse: string | null
@@ -285,6 +286,7 @@ export type Database = {
           mandataire_id: string
           mode_paiement: string
           montant: number
+          numero_cheque?: string | null
           numero_recu?: string | null
           numero_releve_bancaire?: string | null
           parti_adresse?: string | null
@@ -322,6 +324,7 @@ export type Database = {
           mandataire_id?: string
           mode_paiement?: string
           montant?: number
+          numero_cheque?: string | null
           numero_recu?: string | null
           numero_releve_bancaire?: string | null
           parti_adresse?: string | null

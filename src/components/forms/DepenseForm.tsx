@@ -31,6 +31,7 @@ export function DepenseForm({ onSuccess }: DepenseFormProps) {
     beneficiaire: '',
     categorie: '',
     modePaiement: '',
+    numeroCheque: '',
     commentaire: '',
   });
   const [justificatif, setJustificatif] = useState<File | null>(null);
@@ -81,6 +82,9 @@ export function DepenseForm({ onSuccess }: DepenseFormProps) {
     if (!formData.beneficiaire.trim()) newErrors.beneficiaire = 'Le bénéficiaire est obligatoire';
     if (!formData.categorie) newErrors.categorie = 'La catégorie est obligatoire';
     if (!formData.modePaiement) newErrors.modePaiement = 'Le mode de paiement est obligatoire';
+    if (formData.modePaiement === 'cheque' && !formData.numeroCheque.trim()) {
+      newErrors.numeroCheque = 'Le numéro de chèque est obligatoire';
+    }
     if (!justificatif) newErrors.justificatif = 'Le justificatif est obligatoire';
 
     setErrors(newErrors);
@@ -145,6 +149,7 @@ export function DepenseForm({ onSuccess }: DepenseFormProps) {
           categorie: formData.categorie,
           compte_comptable: compteComptable || null,
           mode_paiement: formData.modePaiement,
+          numero_cheque: formData.modePaiement === 'cheque' ? formData.numeroCheque.trim() : null,
           commentaire: formData.commentaire.trim() || null,
           justificatif_url: justificatifUrl,
           justificatif_nom: justificatif?.name || null,
@@ -274,6 +279,24 @@ export function DepenseForm({ onSuccess }: DepenseFormProps) {
           </Select>
           {errors.modePaiement && <p className="text-sm text-destructive">{errors.modePaiement}</p>}
         </div>
+
+        {/* Numéro de chèque - uniquement si paiement par chèque */}
+        {formData.modePaiement === 'cheque' && (
+          <div className="space-y-2">
+            <Label htmlFor="numeroCheque" className="flex items-center gap-2">
+              <FileText size={16} className="text-muted-foreground" />
+              N° de chèque *
+            </Label>
+            <Input
+              id="numeroCheque"
+              placeholder="Ex: 1234567"
+              value={formData.numeroCheque}
+              onChange={(e) => setFormData({ ...formData, numeroCheque: e.target.value })}
+              className={errors.numeroCheque ? 'border-destructive' : ''}
+            />
+            {errors.numeroCheque && <p className="text-sm text-destructive">{errors.numeroCheque}</p>}
+          </div>
+        )}
 
         {/* Commentaire */}
         <div className="space-y-2 md:col-span-2">
