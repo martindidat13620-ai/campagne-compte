@@ -12,7 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { CATEGORIES_DEPENSES, MODES_PAIEMENT, getCompteComptableDepense } from '@/types';
+import { CATEGORIES_DEPENSES, MODES_PAIEMENT, getCompteComptableDepense, getPiecesJustificativesDepense } from '@/types';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Info } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useMandataireData } from '@/hooks/useMandataireData';
