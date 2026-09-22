@@ -31,7 +31,8 @@ import {
   CATEGORIES_DEPENSES,
   MODES_PAIEMENT,
   getCompteComptable, 
-  getCompteComptableDepense 
+  getCompteComptableDepense,
+  getPiecesJustificativesDepense
 } from '@/types';
 
 interface Operation {
