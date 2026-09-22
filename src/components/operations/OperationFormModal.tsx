@@ -31,7 +31,8 @@ import {
   CATEGORIES_DEPENSES,
   MODES_PAIEMENT,
   getCompteComptable, 
-  getCompteComptableDepense 
+  getCompteComptableDepense,
+  getPiecesJustificativesDepense
 } from '@/types';
 
 interface Operation {
@@ -667,6 +668,17 @@ export function OperationFormModal({
             </Select>
             {errors.categorie && <p className="text-sm text-destructive">{errors.categorie}</p>}
           </div>
+
+          {/* Pièces justificatives attendues pour la dépense */}
+          {isDepense && categorie && getPiecesJustificativesDepense(categorie) && (
+            <Alert className="border-blue-500 bg-blue-50 dark:bg-blue-950/20">
+              <Info className="h-4 w-4 text-blue-600" />
+              <AlertTitle className="text-blue-800 dark:text-blue-200">Pièces justificatives attendues</AlertTitle>
+              <AlertDescription className="text-blue-700 dark:text-blue-300">
+                {getPiecesJustificativesDepense(categorie)}
+              </AlertDescription>
+            </Alert>
+          )}
 
           {/* Mode de paiement - masqué pour dépenses directes parti */}
           {!isDepenseDirecteParti && (

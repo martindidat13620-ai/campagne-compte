@@ -117,34 +117,42 @@ export interface CategorieDepense {
   label: string;
   compteComptable: string;
   parent?: string; // Pour les sous-catégories
+  piecesJustificatives?: string; // Pièces justificatives attendues
 }
 
 export const CATEGORIES_DEPENSES: CategorieDepense[] = [
-  { value: 'materiels', label: 'Matériels (valeur d\'utilisation)', compteComptable: '6051' },
-  { value: 'achats_fournitures', label: 'Achats de fournitures et de marchandises', compteComptable: '6060' },
+  { value: 'materiels', label: 'Matériels (valeur d\'utilisation)', compteComptable: '6051', piecesJustificatives: 'Facture, paiement, inventaire, méthode, comparables et revente éventuelle.' },
+  { value: 'achats_fournitures', label: 'Achats de fournitures et de marchandises', compteComptable: '6060', piecesJustificatives: 'Facture détaillée, paiement, livraison et preuve d\'utilisation.' },
   // Locations
-  { value: 'location_immobiliere', label: 'Location ou mise à disposition immobilière', compteComptable: '6132', parent: 'Location' },
-  { value: 'location_materiel', label: 'Location ou mise à disposition de matériel', compteComptable: '6135', parent: 'Location' },
+  { value: 'location_immobiliere', label: 'Location ou mise à disposition immobilière', compteComptable: '6132', parent: 'Location', piecesJustificatives: 'Bail, quittances, paiements, charges et calcul du prorata.' },
+  { value: 'location_materiel', label: 'Location ou mise à disposition de matériel', compteComptable: '6135', parent: 'Location', piecesJustificatives: 'Contrat, devis, facture, paiement, inventaire et dates de restitution.' },
   // Personnel
-  { value: 'personnel_salarie', label: 'Personnel salarié recruté spécifiquement pour la campagne, y compris charges sociales', compteComptable: '6040', parent: 'Personnel' },
-  { value: 'personnel_interimaire', label: 'Personnel intérimaire', compteComptable: '6210', parent: 'Personnel' },
-  { value: 'personnel_mis_disposition', label: 'Personnel mis à disposition', compteComptable: '6211', parent: 'Personnel' },
+  { value: 'personnel_salarie', label: 'Personnel recruté pour la campagne, y compris charges sociales', compteComptable: '6400', parent: 'Personnel', piecesJustificatives: 'Contrats, DPAE, postes, heures, paie, charges et paiements.' },
+  { value: 'personnel_interimaire', label: 'Personnel intérimaire', compteComptable: '6210', parent: 'Personnel', piecesJustificatives: 'Contrat de mise à disposition, heures, tâches, facture et paiement.' },
+  { value: 'personnel_mis_disposition', label: 'Personnel mis à disposition', compteComptable: '6211', parent: 'Personnel', piecesJustificatives: 'Convention de mise à disposition, heures, tâches, valorisation et justificatifs correspondants.' },
   // Honoraires
-  { value: 'honoraires_communication', label: 'Honoraires et conseils en communication', compteComptable: '6226', parent: 'Honoraires' },
-  { value: 'honoraires_expert_comptable', label: 'Honoraires d\'expert-comptable', compteComptable: '6229', parent: 'Honoraires' },
+  { value: 'honoraires_communication', label: 'Honoraires et conseils en communication', compteComptable: '6226', parent: 'Honoraires', piecesJustificatives: 'Contrat, devis, cahier des charges, intervenants, temps, livrables, facture et paiement.' },
+  { value: 'honoraires_expert_comptable', label: 'Honoraires d\'expert-comptable', compteComptable: '6229', parent: 'Honoraires', piecesJustificatives: 'Lettre de mission, diligences, facture ventilée, avenants et paiement.' },
   // Communication et production
-  { value: 'productions_audiovisuelles', label: 'Productions audiovisuelles (film, DVD), internet, services télématiques', compteComptable: '6230' },
-  { value: 'publications_impressions', label: 'Publications, impressions hors dépenses de la campagne officielle (art. R. 39)', compteComptable: '6237' },
-  { value: 'enquetes_sondages', label: 'Enquêtes et sondages', compteComptable: '6235' },
+  { value: 'productions_audiovisuelles', label: 'Production audiovisuel', compteComptable: '6230', piecesJustificatives: 'Contrats, factures, paiements, captures datées, URL, statistiques et livrables.' },
+  { value: 'publications_impressions', label: 'Publications et impressions hors campagne officielle', compteComptable: '6237', piecesJustificatives: 'Devis, BAT, facture avec format/quantité, paiement, exemplaire et bon de livraison.' },
+  { value: 'enquetes_sondages', label: 'Enquêtes et sondages', compteComptable: '6235', piecesJustificatives: 'Contrat, questionnaire, méthode, terrain, échantillon, résultats, facture et paiement.' },
   // Autres charges
-  { value: 'transports_deplacements', label: 'Transports et déplacements', compteComptable: '6240' },
-  { value: 'reunions_publiques', label: 'Réunions publiques', compteComptable: '6254' },
-  { value: 'reception_hebergement', label: 'Frais de réception et d\'hébergement', compteComptable: '6257' },
-  { value: 'frais_postaux', label: 'Frais postaux et de distribution', compteComptable: '6260' },
-  { value: 'telephone_telecommunications', label: 'Téléphone et télécommunications', compteComptable: '6262' },
-  { value: 'frais_divers', label: 'Frais divers', compteComptable: '6280' },
-  { value: 'frais_financiers', label: 'Frais financiers', compteComptable: '6600' },
+  { value: 'transports_deplacements', label: 'Transports et déplacements', compteComptable: '6240', piecesJustificatives: 'État daté (conducteur, véhicule, trajet, km, motif), carte grise, barème et factures.' },
+  { value: 'reunions_publiques', label: 'Manifestations, meetings et réunions publiques', compteComptable: '6254', piecesJustificatives: 'Dossier par événement : date, lieu, contrats, factures, paiements, programme et recettes.' },
+  { value: 'reception_hebergement', label: 'Réception et hébergement', compteComptable: '6257', piecesJustificatives: 'Facture, paiement, date, objet, participants, coût par personne et justificatif du déplacement.' },
+  { value: 'frais_postaux', label: 'Frais postaux et de distribution', compteComptable: '6260', piecesJustificatives: 'Factures, bordereaux, quantités, zones, dates, contrat et preuve du service.' },
+  { value: 'telephone_telecommunications', label: 'Téléphone et télécommunications', compteComptable: '6262', piecesJustificatives: 'Contrat, factures, paiement, consommation, période et méthode de prorata.' },
+  { value: 'frais_divers', label: 'Frais divers', compteComptable: '6280', piecesJustificatives: 'Facture, paiement, note de classement et preuve du service.' },
+  { value: 'frais_financiers', label: 'Frais financiers et intérêts d\'emprunt', compteComptable: '6600', piecesJustificatives: 'Contrat, échéancier, relevés, preuve de paiement et calcul du prorata.' },
+  { value: 'frais_financiers_candidat', label: 'Frais financiers payés directement par le candidat', compteComptable: '6613', piecesJustificatives: 'Contrat, échéancier, relevés personnels occultés et attestation bancaire.' },
+  { value: 'menues_depenses_candidat', label: 'Menues dépenses payées directement par le candidat', compteComptable: '6789', piecesJustificatives: 'Factures, paiements, relevés personnels occultés et état récapitulatif.' },
 ];
+
+// Fonction helper pour obtenir les pièces justificatives attendues d'une catégorie de dépense
+export function getPiecesJustificativesDepense(categorieValue: string): string | undefined {
+  return CATEGORIES_DEPENSES.find(cat => cat.value === categorieValue)?.piecesJustificatives;
+}
 
 // Fonction helper pour obtenir le compte comptable d'une catégorie de dépense
 export function getCompteComptableDepense(categorieValue: string): string | undefined {
