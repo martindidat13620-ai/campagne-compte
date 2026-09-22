@@ -315,6 +315,19 @@ export function DepenseForm({ onSuccess }: DepenseFormProps) {
           />
         </div>
 
+        {/* Pièces justificatives attendues */}
+        {formData.categorie && getPiecesJustificativesDepense(formData.categorie) && (
+          <div className="md:col-span-2">
+            <Alert className="border-blue-500 bg-blue-50 dark:bg-blue-950/20">
+              <Info className="h-4 w-4 text-blue-600" />
+              <AlertTitle className="text-blue-800 dark:text-blue-200">Pièces justificatives attendues</AlertTitle>
+              <AlertDescription className="text-blue-700 dark:text-blue-300">
+                {getPiecesJustificativesDepense(formData.categorie)}
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
+
         {/* Justificatif */}
         <div className="space-y-2 md:col-span-2">
           <Label className="flex items-center gap-2">
