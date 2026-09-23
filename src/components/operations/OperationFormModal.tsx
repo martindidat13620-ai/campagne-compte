@@ -1207,7 +1207,7 @@ export function OperationFormModal({
                 Enregistrement...
               </>
             ) : (
-              isEditing ? 'Modifier' : 'Créer'
+              isEditing ? 'Modifier' : isDuplicate ? 'Dupliquer' : 'Créer'
             )}
           </Button>
         </DialogFooter>
