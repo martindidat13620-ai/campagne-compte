@@ -522,6 +522,13 @@ export function OperationsTable({
                     <p className="font-medium">{(selectedOp as any).numero_cheque}</p>
                   </div>
                 )}
+                {/* Référence facture */}
+                {(selectedOp as any).reference_facture && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Réf. facture</p>
+                    <p className="font-medium">{(selectedOp as any).reference_facture}</p>
+                  </div>
+                )}
                 {/* N° relevé bancaire */}
                 {(selectedOp as any).numero_releve_bancaire && (
                   <div className="col-span-2">
