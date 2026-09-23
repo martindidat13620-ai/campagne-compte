@@ -523,6 +523,7 @@ export default function ComptableDossier() {
           candidatId={candidatId!}
           onSuccess={handleOperationSuccess}
           campaignDates={campaign ? { date_debut: campaign.date_debut, date_fin: campaign.date_fin } : undefined}
+          isDuplicate={isDuplicating}
         />
       </div>
     </AppLayout>
