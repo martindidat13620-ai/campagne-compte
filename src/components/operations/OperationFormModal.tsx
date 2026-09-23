@@ -315,6 +315,9 @@ export function OperationFormModal({
     if (isDepense) {
       if (!beneficiaire.trim()) newErrors.beneficiaire = 'Le bénéficiaire est obligatoire';
       if (!referenceFacture.trim()) newErrors.referenceFacture = 'La référence de la facture est obligatoire';
+      if (!isDepenseDirecteParti && !numeroReleveBancaire.trim()) {
+        newErrors.numeroReleveBancaire = 'Le numéro du relevé bancaire est obligatoire';
+      }
       // Justificatif obligatoire pour dépenses (sauf si modification avec justificatif existant)
       if (!justificatif && !operation?.justificatif_url) {
         newErrors.justificatif = 'Le justificatif est obligatoire';
