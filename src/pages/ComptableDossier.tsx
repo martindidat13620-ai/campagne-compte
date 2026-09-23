@@ -84,6 +84,7 @@ export default function ComptableDossier() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [operationModalOpen, setOperationModalOpen] = useState(false);
   const [selectedOperationForEdit, setSelectedOperationForEdit] = useState<Operation | null>(null);
+  const [isDuplicating, setIsDuplicating] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
