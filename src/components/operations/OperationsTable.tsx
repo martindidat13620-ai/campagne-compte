@@ -75,7 +75,8 @@ export function OperationsTable({
   onValidate,
   onReject,
   onDelete,
-  onEdit
+  onEdit,
+  onDuplicate
 }: OperationsTableProps) {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
