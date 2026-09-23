@@ -88,6 +88,9 @@ export function DepenseForm({ onSuccess }: DepenseFormProps) {
     if (formData.modePaiement === 'cheque' && !formData.numeroCheque.trim()) {
       newErrors.numeroCheque = 'Le numéro de chèque est obligatoire';
     }
+    if (!formData.referenceFacture.trim()) {
+      newErrors.referenceFacture = 'La référence de la facture est obligatoire';
+    }
     if (!justificatif) newErrors.justificatif = 'Le justificatif est obligatoire';
 
     setErrors(newErrors);
