@@ -220,6 +220,12 @@ export default function ComptableGestion() {
 
   const inviteUser = async () => {
     if (!inviteDialog.record) return;
+
+    if (inviteOptions.customPassword && inviteOptions.customPassword.length < 6) {
+      toast.error('Le mot de passe doit contenir au moins 6 caractères');
+      return;
+    }
+    
     
     setInviting(true);
     const { type, record } = inviteDialog;

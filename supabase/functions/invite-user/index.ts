@@ -190,6 +190,13 @@ serve(async (req) => {
 
     console.log(`Inviting user: ${email} as ${role}`);
 
+    if (custom_password && custom_password.length < 6) {
+      return new Response(
+        JSON.stringify({ error: "Le mot de passe doit contenir au moins 6 caractères" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     // Use custom password or generate temporary one
     const tempPassword = custom_password || generateTempPassword();
 
