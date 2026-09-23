@@ -489,6 +489,7 @@ export default function ComptableDossier() {
               showValidationActions={true}
               isComptable={true}
               onEdit={handleEditOperation}
+              onDuplicate={handleDuplicateOperation}
               onDelete={handleDelete}
             />
           </TabsContent>
