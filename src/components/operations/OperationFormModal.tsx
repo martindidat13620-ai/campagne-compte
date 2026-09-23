@@ -507,6 +507,7 @@ export function OperationFormModal({
           mode_paiement: modePaiement,
           numero_releve_bancaire: !isDepense ? numeroReleveBancaire.trim() || null : null,
           numero_cheque: modePaiement === 'cheque' ? numeroCheque.trim() || null : null,
+          reference_facture: isDepense ? referenceFacture.trim() || null : null,
           beneficiaire: isDepense ? beneficiaire.trim() || null : null,
           // Donateur fields (only for dons non-collecte)
           donateur_nom: !isCollecte && isDon && !isDepense ? donateurNom.trim() : null,
