@@ -633,10 +633,22 @@ export function OperationFormModal({
               <Input
                 type="date"
                 value={date}
+                min={campaignDates?.date_debut ?? undefined}
+                max={campaignDates?.date_fin ?? undefined}
                 onChange={(e) => setDate(e.target.value)}
                 className={errors.date ? 'border-destructive' : ''}
               />
               {errors.date && <p className="text-sm text-destructive">{errors.date}</p>}
+              {!errors.date && (campaignDates?.date_debut || campaignDates?.date_fin) && (
+                <p className="text-xs text-muted-foreground">
+                  Période de campagne : {campaignDates?.date_debut ? new Date(campaignDates.date_debut).toLocaleDateString('fr-FR') : '—'} au {campaignDates?.date_fin ? new Date(campaignDates.date_fin).toLocaleDateString('fr-FR') : '—'}
+                </p>
+              )}
+              {!campaignDates?.date_debut && !campaignDates?.date_fin && (
+                <p className="text-xs text-muted-foreground">
+                  Les dates de la campagne ne sont pas renseignées : aucun contrôle de période n'est possible.
+                </p>
+              )}
             </div>
           </div>
 

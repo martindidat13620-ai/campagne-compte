@@ -464,10 +464,22 @@ export function RecetteForm({ onSuccess }: RecetteFormProps) {
             id="date"
             type="date"
             value={formData.date}
+            min={candidat?.campaign?.date_debut ?? undefined}
+            max={candidat?.campaign?.date_fin ?? undefined}
             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
             className={errors.date ? 'border-destructive' : ''}
           />
           {errors.date && <p className="text-sm text-destructive">{errors.date}</p>}
+          {!errors.date && (candidat?.campaign?.date_debut || candidat?.campaign?.date_fin) && (
+            <p className="text-xs text-muted-foreground">
+              Période de campagne : {candidat?.campaign?.date_debut ? new Date(candidat.campaign.date_debut).toLocaleDateString('fr-FR') : '—'} au {candidat?.campaign?.date_fin ? new Date(candidat.campaign.date_fin).toLocaleDateString('fr-FR') : '—'}
+            </p>
+          )}
+          {!candidat?.campaign?.date_debut && !candidat?.campaign?.date_fin && (
+            <p className="text-xs text-muted-foreground">
+              Les dates de la campagne ne sont pas renseignées : aucun contrôle de période n'est possible.
+            </p>
+          )}
         </div>
 
         {/* Montant */}
