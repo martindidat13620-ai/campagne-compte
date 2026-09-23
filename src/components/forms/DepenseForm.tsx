@@ -33,6 +33,7 @@ export function DepenseForm({ onSuccess }: DepenseFormProps) {
     beneficiaire: '',
     categorie: '',
     modePaiement: '',
+    numeroReleveBancaire: '',
     numeroCheque: '',
     referenceFacture: '',
     commentaire: '',
@@ -90,6 +91,9 @@ export function DepenseForm({ onSuccess }: DepenseFormProps) {
     }
     if (!formData.referenceFacture.trim()) {
       newErrors.referenceFacture = 'La référence de la facture est obligatoire';
+    }
+    if (!formData.numeroReleveBancaire.trim()) {
+      newErrors.numeroReleveBancaire = 'Le numéro du relevé bancaire est obligatoire';
     }
     if (!justificatif) newErrors.justificatif = 'Le justificatif est obligatoire';
 
@@ -157,6 +161,7 @@ export function DepenseForm({ onSuccess }: DepenseFormProps) {
           mode_paiement: formData.modePaiement,
           numero_cheque: formData.modePaiement === 'cheque' ? formData.numeroCheque.trim() : null,
           reference_facture: formData.referenceFacture.trim(),
+          numero_releve_bancaire: formData.numeroReleveBancaire.trim(),
           commentaire: formData.commentaire.trim() || null,
           justificatif_url: justificatifUrl,
           justificatif_nom: justificatif?.name || null,
@@ -332,6 +337,23 @@ export function DepenseForm({ onSuccess }: DepenseFormProps) {
           />
           {errors.referenceFacture && <p className="text-sm text-destructive">{errors.referenceFacture}</p>}
         </div>
+
+        {/* Numéro de relevé bancaire */}
+        <div className="space-y-2">
+          <Label htmlFor="numeroReleveBancaire" className="flex items-center gap-2">
+            <FileText size={16} className="text-muted-foreground" />
+            N° relevé bancaire *
+          </Label>
+          <Input
+            id="numeroReleveBancaire"
+            placeholder="Ex: RB-2026-001"
+            value={formData.numeroReleveBancaire}
+            onChange={(e) => setFormData({ ...formData, numeroReleveBancaire: e.target.value })}
+            className={errors.numeroReleveBancaire ? 'border-destructive' : ''}
+          />
+          {errors.numeroReleveBancaire && <p className="text-sm text-destructive">{errors.numeroReleveBancaire}</p>}
+        </div>
+
 
         {/* Commentaire */}
         <div className="space-y-2 md:col-span-2">

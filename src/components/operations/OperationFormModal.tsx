@@ -315,6 +315,9 @@ export function OperationFormModal({
     if (isDepense) {
       if (!beneficiaire.trim()) newErrors.beneficiaire = 'Le bénéficiaire est obligatoire';
       if (!referenceFacture.trim()) newErrors.referenceFacture = 'La référence de la facture est obligatoire';
+      if (!isDepenseDirecteParti && !numeroReleveBancaire.trim()) {
+        newErrors.numeroReleveBancaire = 'Le numéro du relevé bancaire est obligatoire';
+      }
       // Justificatif obligatoire pour dépenses (sauf si modification avec justificatif existant)
       if (!justificatif && !operation?.justificatif_url) {
         newErrors.justificatif = 'Le justificatif est obligatoire';
@@ -506,7 +509,7 @@ export function OperationFormModal({
           date,
           categorie,
           mode_paiement: modePaiement,
-          numero_releve_bancaire: !isDepense ? numeroReleveBancaire.trim() || null : null,
+          numero_releve_bancaire: !isDepenseDirecteParti ? numeroReleveBancaire.trim() || null : null,
           numero_cheque: modePaiement === 'cheque' ? numeroCheque.trim() || null : null,
           reference_facture: isDepense ? referenceFacture.trim() || null : null,
           beneficiaire: isDepense ? beneficiaire.trim() || null : null,
@@ -717,8 +720,8 @@ export function OperationFormModal({
             </div>
           )}
 
-          {/* Numéro relevé bancaire (recettes only) - masqué pour dépenses directes parti */}
-          {!isDepense && !isDepenseDirecteParti && (
+          {/* Numéro relevé bancaire - masqué pour dépenses directes parti */}
+          {!isDepenseDirecteParti && (
             <div className="space-y-2">
               <Label>N° relevé bancaire *</Label>
               <Input
