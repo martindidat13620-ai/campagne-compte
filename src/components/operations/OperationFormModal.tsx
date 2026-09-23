@@ -746,6 +746,20 @@ export function OperationFormModal({
             </div>
           )}
 
+          {/* Référence de la facture - dépenses uniquement */}
+          {isDepense && (
+            <div className="space-y-2">
+              <Label>Référence de la facture *</Label>
+              <Input
+                value={referenceFacture}
+                onChange={(e) => setReferenceFacture(e.target.value)}
+                placeholder="Ex: FA-2026-0042"
+                className={errors.referenceFacture ? 'border-destructive' : ''}
+              />
+              {errors.referenceFacture && <p className="text-sm text-destructive">{errors.referenceFacture}</p>}
+            </div>
+          )}
+
           {/* Alerte don > 150€ en espèces */}
           {donEspecesSuperieur150 && (
             <Alert variant="destructive">
