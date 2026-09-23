@@ -504,6 +504,7 @@ export default function ComptableDossier() {
               onReject={handleReject}
               onDelete={handleDelete}
               onEdit={handleEditOperation}
+              onDuplicate={handleDuplicateOperation}
             />
             {pendingOperations.length === 0 && (
               <div className="text-center py-12">
