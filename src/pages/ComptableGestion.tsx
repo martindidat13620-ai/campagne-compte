@@ -994,7 +994,7 @@ export default function ComptableGestion() {
                   Ne pas envoyer d'email (mode test)
                 </Label>
               </div>
-              <Button onClick={inviteUser} className="w-full" disabled={inviting}>
+              <Button onClick={inviteUser} className="w-full" disabled={inviting || (!!inviteOptions.customPassword && inviteOptions.customPassword.length < 6)}>
                 {inviting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
                 Créer le compte
               </Button>
