@@ -156,6 +156,7 @@ export function DepenseForm({ onSuccess }: DepenseFormProps) {
           compte_comptable: compteComptable || null,
           mode_paiement: formData.modePaiement,
           numero_cheque: formData.modePaiement === 'cheque' ? formData.numeroCheque.trim() : null,
+          reference_facture: formData.referenceFacture.trim(),
           commentaire: formData.commentaire.trim() || null,
           justificatif_url: justificatifUrl,
           justificatif_nom: justificatif?.name || null,
