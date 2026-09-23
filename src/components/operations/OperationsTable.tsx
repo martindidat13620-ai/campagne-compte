@@ -160,6 +160,7 @@ export function OperationsTable({
           op.mode_paiement || '',
           opAny.numero_releve_bancaire || '',
           opAny.numero_cheque || '',
+          opAny.reference_facture || '',
           op.beneficiaire || op.donateur_nom || '',
           opAny.donateur_prenom || '',
           op.donateur_adresse || '',
