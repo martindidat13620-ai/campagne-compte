@@ -220,6 +220,12 @@ export default function ComptableGestion() {
 
   const inviteUser = async () => {
     if (!inviteDialog.record) return;
+
+    if (inviteOptions.customPassword && inviteOptions.customPassword.length < 6) {
+      toast.error('Le mot de passe doit contenir au moins 6 caractères');
+      return;
+    }
+    
     
     setInviting(true);
     const { type, record } = inviteDialog;
@@ -964,13 +970,19 @@ export default function ComptableGestion() {
                 <Label>Mot de passe personnalisé (optionnel)</Label>
                 <Input 
                   type="text" 
+                  minLength={6}
                   value={inviteOptions.customPassword} 
                   onChange={(e) => setInviteOptions({ ...inviteOptions, customPassword: e.target.value })}
                   placeholder="Laisser vide pour générer automatiquement"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Si vide, un mot de passe temporaire sera généré automatiquement
+                  Si vide, un mot de passe temporaire sera généré automatiquement. Sinon, 6 caractères minimum.
                 </p>
+                {inviteOptions.customPassword && inviteOptions.customPassword.length < 6 && (
+                  <p className="text-xs text-destructive mt-1">
+                    Le mot de passe doit contenir au moins 6 caractères
+                  </p>
+                )}
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox 
@@ -982,7 +994,7 @@ export default function ComptableGestion() {
                   Ne pas envoyer d'email (mode test)
                 </Label>
               </div>
-              <Button onClick={inviteUser} className="w-full" disabled={inviting}>
+              <Button onClick={inviteUser} className="w-full" disabled={inviting || (!!inviteOptions.customPassword && inviteOptions.customPassword.length < 6)}>
                 {inviting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
                 Créer le compte
               </Button>
