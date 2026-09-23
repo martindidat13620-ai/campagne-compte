@@ -108,6 +108,7 @@ export function OperationFormModal({
   const [modePaiement, setModePaiement] = useState('');
   const [numeroReleveBancaire, setNumeroReleveBancaire] = useState('');
   const [numeroCheque, setNumeroCheque] = useState('');
+  const [referenceFacture, setReferenceFacture] = useState('');
   const [beneficiaire, setBeneficiaire] = useState('');
   // Donateur fields
   const [donateurNom, setDonateurNom] = useState('');
