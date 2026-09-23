@@ -82,6 +82,7 @@ export interface Operation {
   numero_recu?: string | null;
   numero_releve_bancaire?: string | null;
   numero_cheque?: string | null;
+  reference_facture?: string | null;
   // Champs collecte
   is_collecte?: boolean;
   collecte_date?: string | null;

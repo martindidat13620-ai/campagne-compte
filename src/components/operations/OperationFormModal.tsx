@@ -108,6 +108,7 @@ export function OperationFormModal({
   const [modePaiement, setModePaiement] = useState('');
   const [numeroReleveBancaire, setNumeroReleveBancaire] = useState('');
   const [numeroCheque, setNumeroCheque] = useState('');
+  const [referenceFacture, setReferenceFacture] = useState('');
   const [beneficiaire, setBeneficiaire] = useState('');
   // Donateur fields
   const [donateurNom, setDonateurNom] = useState('');
@@ -200,6 +201,7 @@ export function OperationFormModal({
       setCategorie(operation.categorie);
       setModePaiement(operation.mode_paiement);
       setNumeroCheque((operation as any).numero_cheque || '');
+      setReferenceFacture((operation as any).reference_facture || '');
       setNumeroReleveBancaire(operation.numero_releve_bancaire || '');
       setBeneficiaire(operation.beneficiaire || '');
       setDonateurNom(operation.donateur_nom || '');
@@ -231,6 +233,7 @@ export function OperationFormModal({
       setCategorie('');
       setModePaiement('');
       setNumeroReleveBancaire('');
+      setReferenceFacture('');
       setBeneficiaire('');
       setDonateurNom('');
       setDonateurPrenom('');
@@ -311,6 +314,7 @@ export function OperationFormModal({
     // Dépense specific
     if (isDepense) {
       if (!beneficiaire.trim()) newErrors.beneficiaire = 'Le bénéficiaire est obligatoire';
+      if (!referenceFacture.trim()) newErrors.referenceFacture = 'La référence de la facture est obligatoire';
       // Justificatif obligatoire pour dépenses (sauf si modification avec justificatif existant)
       if (!justificatif && !operation?.justificatif_url) {
         newErrors.justificatif = 'Le justificatif est obligatoire';
@@ -504,6 +508,7 @@ export function OperationFormModal({
           mode_paiement: modePaiement,
           numero_releve_bancaire: !isDepense ? numeroReleveBancaire.trim() || null : null,
           numero_cheque: modePaiement === 'cheque' ? numeroCheque.trim() || null : null,
+          reference_facture: isDepense ? referenceFacture.trim() || null : null,
           beneficiaire: isDepense ? beneficiaire.trim() || null : null,
           // Donateur fields (only for dons non-collecte)
           donateur_nom: !isCollecte && isDon && !isDepense ? donateurNom.trim() : null,
@@ -739,6 +744,20 @@ export function OperationFormModal({
                 className={errors.beneficiaire ? 'border-destructive' : ''}
               />
               {errors.beneficiaire && <p className="text-sm text-destructive">{errors.beneficiaire}</p>}
+            </div>
+          )}
+
+          {/* Référence de la facture - dépenses uniquement */}
+          {isDepense && (
+            <div className="space-y-2">
+              <Label>Référence de la facture *</Label>
+              <Input
+                value={referenceFacture}
+                onChange={(e) => setReferenceFacture(e.target.value)}
+                placeholder="Ex: FA-2026-0042"
+                className={errors.referenceFacture ? 'border-destructive' : ''}
+              />
+              {errors.referenceFacture && <p className="text-sm text-destructive">{errors.referenceFacture}</p>}
             </div>
           )}
 

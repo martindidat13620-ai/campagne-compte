@@ -257,6 +257,7 @@ export type Database = {
           parti_rna: string | null
           parti_siret: string | null
           parti_ville: string | null
+          reference_facture: string | null
           statut_validation: string
           type_operation: string
           updated_at: string
@@ -295,6 +296,7 @@ export type Database = {
           parti_rna?: string | null
           parti_siret?: string | null
           parti_ville?: string | null
+          reference_facture?: string | null
           statut_validation?: string
           type_operation: string
           updated_at?: string
@@ -333,6 +335,7 @@ export type Database = {
           parti_rna?: string | null
           parti_siret?: string | null
           parti_ville?: string | null
+          reference_facture?: string | null
           statut_validation?: string
           type_operation?: string
           updated_at?: string

@@ -34,6 +34,7 @@ export function DepenseForm({ onSuccess }: DepenseFormProps) {
     categorie: '',
     modePaiement: '',
     numeroCheque: '',
+    referenceFacture: '',
     commentaire: '',
   });
   const [justificatif, setJustificatif] = useState<File | null>(null);
@@ -86,6 +87,9 @@ export function DepenseForm({ onSuccess }: DepenseFormProps) {
     if (!formData.modePaiement) newErrors.modePaiement = 'Le mode de paiement est obligatoire';
     if (formData.modePaiement === 'cheque' && !formData.numeroCheque.trim()) {
       newErrors.numeroCheque = 'Le numéro de chèque est obligatoire';
+    }
+    if (!formData.referenceFacture.trim()) {
+      newErrors.referenceFacture = 'La référence de la facture est obligatoire';
     }
     if (!justificatif) newErrors.justificatif = 'Le justificatif est obligatoire';
 
@@ -152,6 +156,7 @@ export function DepenseForm({ onSuccess }: DepenseFormProps) {
           compte_comptable: compteComptable || null,
           mode_paiement: formData.modePaiement,
           numero_cheque: formData.modePaiement === 'cheque' ? formData.numeroCheque.trim() : null,
+          reference_facture: formData.referenceFacture.trim(),
           commentaire: formData.commentaire.trim() || null,
           justificatif_url: justificatifUrl,
           justificatif_nom: justificatif?.name || null,
@@ -299,6 +304,22 @@ export function DepenseForm({ onSuccess }: DepenseFormProps) {
             {errors.numeroCheque && <p className="text-sm text-destructive">{errors.numeroCheque}</p>}
           </div>
         )}
+
+        {/* Référence de la facture */}
+        <div className="space-y-2">
+          <Label htmlFor="referenceFacture" className="flex items-center gap-2">
+            <FileText size={16} className="text-muted-foreground" />
+            Référence de la facture *
+          </Label>
+          <Input
+            id="referenceFacture"
+            placeholder="Ex: FA-2026-0042"
+            value={formData.referenceFacture}
+            onChange={(e) => setFormData({ ...formData, referenceFacture: e.target.value })}
+            className={errors.referenceFacture ? 'border-destructive' : ''}
+          />
+          {errors.referenceFacture && <p className="text-sm text-destructive">{errors.referenceFacture}</p>}
+        </div>
 
         {/* Commentaire */}
         <div className="space-y-2 md:col-span-2">

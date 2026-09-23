@@ -139,7 +139,7 @@ export function OperationsTable({
     const headers = isComptable 
       ? [
           'Date', 'Type', 'Montant', 'Catégorie', 'Compte Comptable', 'Mode Paiement', 
-          'N° Relevé Bancaire', 'N° Chèque', 'Bénéficiaire/Donateur', 'Prénom Donateur', 
+          'N° Relevé Bancaire', 'N° Chèque', 'Réf. Facture', 'Bénéficiaire/Donateur', 'Prénom Donateur', 
           'Adresse', 'Code Postal', 'Ville', 'Pays', 'Nationalité', 
           'N° Reçu', 'Collecte', 'Date Collecte', 'Organisation Collecte',
           'Parti Politique', 'Adresse Parti', 'CP Parti', 'Ville Parti', 'SIRET Parti', 'RNA Parti',
@@ -160,6 +160,7 @@ export function OperationsTable({
           op.mode_paiement || '',
           opAny.numero_releve_bancaire || '',
           opAny.numero_cheque || '',
+          opAny.reference_facture || '',
           op.beneficiaire || op.donateur_nom || '',
           opAny.donateur_prenom || '',
           op.donateur_adresse || '',
@@ -519,6 +520,13 @@ export function OperationsTable({
                   <div>
                     <p className="text-sm text-muted-foreground">N° de chèque</p>
                     <p className="font-medium">{(selectedOp as any).numero_cheque}</p>
+                  </div>
+                )}
+                {/* Référence facture */}
+                {(selectedOp as any).reference_facture && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Réf. facture</p>
+                    <p className="font-medium">{(selectedOp as any).reference_facture}</p>
                   </div>
                 )}
                 {/* N° relevé bancaire */}
