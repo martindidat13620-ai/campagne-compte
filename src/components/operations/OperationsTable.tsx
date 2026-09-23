@@ -13,7 +13,8 @@ import {
   Trash2,
   Loader2,
   ExternalLink,
-  Pencil
+  Pencil,
+  Copy
 } from 'lucide-react';
 import { Operation, ValidationStatus, getCategorieLabel, getCategorieDepenseLabel } from '@/types';
 import { cn } from '@/lib/utils';
