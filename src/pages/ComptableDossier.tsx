@@ -194,12 +194,23 @@ export default function ComptableDossier() {
   const handleEditOperation = (operation: OperationType) => {
     const op = operations.find(o => o.id === operation.id);
     if (op) {
+      setIsDuplicating(false);
+      setSelectedOperationForEdit(op);
+      setOperationModalOpen(true);
+    }
+  };
+
+  const handleDuplicateOperation = (operation: OperationType) => {
+    const op = operations.find(o => o.id === operation.id);
+    if (op) {
+      setIsDuplicating(true);
       setSelectedOperationForEdit(op);
       setOperationModalOpen(true);
     }
   };
 
   const handleNewOperation = () => {
+    setIsDuplicating(false);
     setSelectedOperationForEdit(null);
     setOperationModalOpen(true);
   };
