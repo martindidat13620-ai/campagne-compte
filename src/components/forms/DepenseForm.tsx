@@ -34,6 +34,7 @@ export function DepenseForm({ onSuccess }: DepenseFormProps) {
     categorie: '',
     modePaiement: '',
     numeroCheque: '',
+    referenceFacture: '',
     commentaire: '',
   });
   const [justificatif, setJustificatif] = useState<File | null>(null);
