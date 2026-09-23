@@ -64,6 +64,7 @@ interface OperationsTableProps {
   onReject?: (id: string, comment: string) => void;
   onDelete?: (id: string) => Promise<void>;
   onEdit?: (operation: Operation) => void;
+  onDuplicate?: (operation: Operation) => void;
 }
 
 export function OperationsTable({ 
