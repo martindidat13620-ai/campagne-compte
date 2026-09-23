@@ -84,6 +84,7 @@ export default function ComptableDossier() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [operationModalOpen, setOperationModalOpen] = useState(false);
   const [selectedOperationForEdit, setSelectedOperationForEdit] = useState<Operation | null>(null);
+  const [isDuplicating, setIsDuplicating] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -193,12 +194,23 @@ export default function ComptableDossier() {
   const handleEditOperation = (operation: OperationType) => {
     const op = operations.find(o => o.id === operation.id);
     if (op) {
+      setIsDuplicating(false);
+      setSelectedOperationForEdit(op);
+      setOperationModalOpen(true);
+    }
+  };
+
+  const handleDuplicateOperation = (operation: OperationType) => {
+    const op = operations.find(o => o.id === operation.id);
+    if (op) {
+      setIsDuplicating(true);
       setSelectedOperationForEdit(op);
       setOperationModalOpen(true);
     }
   };
 
   const handleNewOperation = () => {
+    setIsDuplicating(false);
     setSelectedOperationForEdit(null);
     setOperationModalOpen(true);
   };
@@ -477,6 +489,7 @@ export default function ComptableDossier() {
               showValidationActions={true}
               isComptable={true}
               onEdit={handleEditOperation}
+              onDuplicate={handleDuplicateOperation}
               onDelete={handleDelete}
             />
           </TabsContent>
@@ -491,6 +504,7 @@ export default function ComptableDossier() {
               onReject={handleReject}
               onDelete={handleDelete}
               onEdit={handleEditOperation}
+              onDuplicate={handleDuplicateOperation}
             />
             {pendingOperations.length === 0 && (
               <div className="text-center py-12">
@@ -509,6 +523,7 @@ export default function ComptableDossier() {
           candidatId={candidatId!}
           onSuccess={handleOperationSuccess}
           campaignDates={campaign ? { date_debut: campaign.date_debut, date_fin: campaign.date_fin } : undefined}
+          isDuplicate={isDuplicating}
         />
       </div>
     </AppLayout>

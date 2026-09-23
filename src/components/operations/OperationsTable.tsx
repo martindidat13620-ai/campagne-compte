@@ -13,7 +13,8 @@ import {
   Trash2,
   Loader2,
   ExternalLink,
-  Pencil
+  Pencil,
+  Copy
 } from 'lucide-react';
 import { Operation, ValidationStatus, getCategorieLabel, getCategorieDepenseLabel } from '@/types';
 import { cn } from '@/lib/utils';
@@ -63,6 +64,7 @@ interface OperationsTableProps {
   onReject?: (id: string, comment: string) => void;
   onDelete?: (id: string) => Promise<void>;
   onEdit?: (operation: Operation) => void;
+  onDuplicate?: (operation: Operation) => void;
 }
 
 export function OperationsTable({ 
@@ -73,7 +75,8 @@ export function OperationsTable({
   onValidate,
   onReject,
   onDelete,
-  onEdit
+  onEdit,
+  onDuplicate
 }: OperationsTableProps) {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
@@ -359,6 +362,17 @@ export function OperationsTable({
                             onClick={() => onEdit(op)}
                           >
                             <Pencil size={16} />
+                          </Button>
+                        )}
+                        {onDuplicate && (
+                          <Button 
+                            size="icon" 
+                            variant="ghost" 
+                            className="h-8 w-8 text-muted-foreground hover:bg-muted"
+                            title="Dupliquer"
+                            onClick={() => onDuplicate(op)}
+                          >
+                            <Copy size={16} />
                           </Button>
                         )}
                         {onDelete && (

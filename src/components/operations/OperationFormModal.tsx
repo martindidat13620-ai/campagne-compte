@@ -82,6 +82,7 @@ interface OperationFormModalProps {
     date_debut: string | null;
     date_fin: string | null;
   };
+  isDuplicate?: boolean;
 }
 
 export function OperationFormModal({
@@ -91,6 +92,7 @@ export function OperationFormModal({
   candidatId,
   onSuccess,
   campaignDates,
+  isDuplicate = false,
 }: OperationFormModalProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -134,7 +136,7 @@ export function OperationFormModal({
   // Catégorie de dépense associée (pour depenses_directes_formations)
   const [categorieDepenseAssociee, setCategorieDepenseAssociee] = useState('');
 
-  const isEditing = !!operation;
+  const isEditing = !!operation && !isDuplicate;
   
   // Computed values for conditional rendering
   const isDon = categorie === 'dons';
@@ -566,7 +568,7 @@ export function OperationFormModal({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {isEditing ? "Modifier l'opération" : 'Nouvelle opération'}
+            {isEditing ? "Modifier l'opération" : isDuplicate ? "Dupliquer l'opération" : 'Nouvelle opération'}
           </DialogTitle>
         </DialogHeader>
 
@@ -1205,7 +1207,7 @@ export function OperationFormModal({
                 Enregistrement...
               </>
             ) : (
-              isEditing ? 'Modifier' : 'Créer'
+              isEditing ? 'Modifier' : isDuplicate ? 'Dupliquer' : 'Créer'
             )}
           </Button>
         </DialogFooter>
