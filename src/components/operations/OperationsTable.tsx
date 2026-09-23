@@ -364,6 +364,17 @@ export function OperationsTable({
                             <Pencil size={16} />
                           </Button>
                         )}
+                        {onDuplicate && (
+                          <Button 
+                            size="icon" 
+                            variant="ghost" 
+                            className="h-8 w-8 text-muted-foreground hover:bg-muted"
+                            title="Dupliquer"
+                            onClick={() => onDuplicate(op)}
+                          >
+                            <Copy size={16} />
+                          </Button>
+                        )}
                         {onDelete && (
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
