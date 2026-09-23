@@ -305,6 +305,22 @@ export function DepenseForm({ onSuccess }: DepenseFormProps) {
           </div>
         )}
 
+        {/* Référence de la facture */}
+        <div className="space-y-2">
+          <Label htmlFor="referenceFacture" className="flex items-center gap-2">
+            <FileText size={16} className="text-muted-foreground" />
+            Référence de la facture *
+          </Label>
+          <Input
+            id="referenceFacture"
+            placeholder="Ex: FA-2026-0042"
+            value={formData.referenceFacture}
+            onChange={(e) => setFormData({ ...formData, referenceFacture: e.target.value })}
+            className={errors.referenceFacture ? 'border-destructive' : ''}
+          />
+          {errors.referenceFacture && <p className="text-sm text-destructive">{errors.referenceFacture}</p>}
+        </div>
+
         {/* Commentaire */}
         <div className="space-y-2 md:col-span-2">
           <Label htmlFor="commentaire" className="flex items-center gap-2">
