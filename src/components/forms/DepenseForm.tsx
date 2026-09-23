@@ -338,6 +338,23 @@ export function DepenseForm({ onSuccess }: DepenseFormProps) {
           {errors.referenceFacture && <p className="text-sm text-destructive">{errors.referenceFacture}</p>}
         </div>
 
+        {/* Numéro de relevé bancaire */}
+        <div className="space-y-2">
+          <Label htmlFor="numeroReleveBancaire" className="flex items-center gap-2">
+            <FileText size={16} className="text-muted-foreground" />
+            N° relevé bancaire *
+          </Label>
+          <Input
+            id="numeroReleveBancaire"
+            placeholder="Ex: RB-2026-001"
+            value={formData.numeroReleveBancaire}
+            onChange={(e) => setFormData({ ...formData, numeroReleveBancaire: e.target.value })}
+            className={errors.numeroReleveBancaire ? 'border-destructive' : ''}
+          />
+          {errors.numeroReleveBancaire && <p className="text-sm text-destructive">{errors.numeroReleveBancaire}</p>}
+        </div>
+
+
         {/* Commentaire */}
         <div className="space-y-2 md:col-span-2">
           <Label htmlFor="commentaire" className="flex items-center gap-2">
