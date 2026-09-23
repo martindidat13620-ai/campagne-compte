@@ -233,6 +233,7 @@ export function OperationFormModal({
       setCategorie('');
       setModePaiement('');
       setNumeroReleveBancaire('');
+      setReferenceFacture('');
       setBeneficiaire('');
       setDonateurNom('');
       setDonateurPrenom('');
