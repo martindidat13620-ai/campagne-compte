@@ -201,6 +201,7 @@ export function OperationFormModal({
       setCategorie(operation.categorie);
       setModePaiement(operation.mode_paiement);
       setNumeroCheque((operation as any).numero_cheque || '');
+      setReferenceFacture((operation as any).reference_facture || '');
       setNumeroReleveBancaire(operation.numero_releve_bancaire || '');
       setBeneficiaire(operation.beneficiaire || '');
       setDonateurNom(operation.donateur_nom || '');
