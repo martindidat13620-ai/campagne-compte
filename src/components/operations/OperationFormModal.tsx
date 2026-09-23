@@ -568,7 +568,7 @@ export function OperationFormModal({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {isEditing ? "Modifier l'opération" : 'Nouvelle opération'}
+            {isEditing ? "Modifier l'opération" : isDuplicate ? "Dupliquer l'opération" : 'Nouvelle opération'}
           </DialogTitle>
         </DialogHeader>
 
