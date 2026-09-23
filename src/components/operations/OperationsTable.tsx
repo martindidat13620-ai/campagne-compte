@@ -139,7 +139,7 @@ export function OperationsTable({
     const headers = isComptable 
       ? [
           'Date', 'Type', 'Montant', 'Catégorie', 'Compte Comptable', 'Mode Paiement', 
-          'N° Relevé Bancaire', 'N° Chèque', 'Bénéficiaire/Donateur', 'Prénom Donateur', 
+          'N° Relevé Bancaire', 'N° Chèque', 'Réf. Facture', 'Bénéficiaire/Donateur', 'Prénom Donateur', 
           'Adresse', 'Code Postal', 'Ville', 'Pays', 'Nationalité', 
           'N° Reçu', 'Collecte', 'Date Collecte', 'Organisation Collecte',
           'Parti Politique', 'Adresse Parti', 'CP Parti', 'Ville Parti', 'SIRET Parti', 'RNA Parti',
