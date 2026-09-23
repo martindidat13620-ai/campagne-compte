@@ -82,6 +82,7 @@ interface OperationFormModalProps {
     date_debut: string | null;
     date_fin: string | null;
   };
+  isDuplicate?: boolean;
 }
 
 export function OperationFormModal({
@@ -91,6 +92,7 @@ export function OperationFormModal({
   candidatId,
   onSuccess,
   campaignDates,
+  isDuplicate = false,
 }: OperationFormModalProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
