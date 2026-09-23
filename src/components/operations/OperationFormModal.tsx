@@ -136,7 +136,7 @@ export function OperationFormModal({
   // Catégorie de dépense associée (pour depenses_directes_formations)
   const [categorieDepenseAssociee, setCategorieDepenseAssociee] = useState('');
 
-  const isEditing = !!operation;
+  const isEditing = !!operation && !isDuplicate;
   
   // Computed values for conditional rendering
   const isDon = categorie === 'dons';
