@@ -8,6 +8,7 @@ import guideEntretien from '@/assets/guide_entretien.xlsx.asset.json';
 import scoringRisque from '@/assets/scoring_risque.xlsm.asset.json';
 import questionnaireIndependance from '@/assets/questionnaire_independance_v2.xlsx.asset.json';
 import questionnaireLab from '@/assets/questionnaire_lab.xlsx.asset.json';
+import grilleHonoraires from '@/assets/grille_honoraires.xlsx.asset.json';
 
 interface Dossier {
   id: string;
@@ -45,6 +46,12 @@ const DOSSIERS: Dossier[] = [
         description: 'Fichier Excel à télécharger',
         fichier: questionnaireLab.url,
         nomFichier: "Outil_4_Questionnaire_LAB.xlsx",
+      },
+      {
+        titre: "5 : Grille d'honoraires interactive",
+        description: 'Fichier Excel à télécharger',
+        fichier: grilleHonoraires.url,
+        nomFichier: "Outil_5_Grille_honoraires.xlsx",
       },
     ],
   },
