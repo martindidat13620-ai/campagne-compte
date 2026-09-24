@@ -387,6 +387,47 @@ export type Database = {
         }
         Relationships: []
       }
+      rapprochements_bancaires: {
+        Row: {
+          candidat_id: string
+          created_at: string
+          id: string
+          mois: string
+          operations_pointees: string[]
+          solde_debut: number
+          solde_fin: number
+          updated_at: string
+        }
+        Insert: {
+          candidat_id: string
+          created_at?: string
+          id?: string
+          mois: string
+          operations_pointees?: string[]
+          solde_debut?: number
+          solde_fin?: number
+          updated_at?: string
+        }
+        Update: {
+          candidat_id?: string
+          created_at?: string
+          id?: string
+          mois?: string
+          operations_pointees?: string[]
+          solde_debut?: number
+          solde_fin?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rapprochements_bancaires_candidat_id_fkey"
+            columns: ["candidat_id"]
+            isOneToOne: false
+            referencedRelation: "candidats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string | null

@@ -1,11 +1,12 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowUpRight, ArrowDownLeft, TrendingUp, Users, Loader2, LayoutDashboard, FileText, FileCheck, Plus } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, ArrowDownLeft, TrendingUp, Users, Loader2, LayoutDashboard, FileText, FileCheck, Plus, Landmark } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { PlafondCard } from '@/components/dashboard/PlafondCard';
 import { ExpenseChart } from '@/components/dashboard/ExpenseChart';
 import { OperationsTable } from '@/components/operations/OperationsTable';
 import { OperationFormModal } from '@/components/operations/OperationFormModal';
+import { RapprochementBancaire } from '@/components/operations/RapprochementBancaire';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -323,7 +324,7 @@ export default function ComptableDossier() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3 max-w-md">
+          <TabsList className="grid w-full grid-cols-4 max-w-2xl">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <LayoutDashboard size={16} />
               <span className="hidden sm:inline">Tableau de bord</span>
@@ -341,6 +342,11 @@ export default function ComptableDossier() {
                   {pendingOperations.length}
                 </Badge>
               )}
+            </TabsTrigger>
+            <TabsTrigger value="rapprochement" className="flex items-center gap-2">
+              <Landmark size={16} />
+              <span className="hidden sm:inline">Rapprochement bancaire</span>
+              <span className="sm:hidden">Banque</span>
             </TabsTrigger>
           </TabsList>
 
@@ -512,6 +518,11 @@ export default function ComptableDossier() {
                 <p className="text-muted-foreground">Toutes les opérations ont été traitées</p>
               </div>
             )}
+          </TabsContent>
+
+          {/* Rapprochement Tab */}
+          <TabsContent value="rapprochement" className="mt-6">
+            <RapprochementBancaire candidatId={candidatId!} operations={operations as any} />
           </TabsContent>
         </Tabs>
 
