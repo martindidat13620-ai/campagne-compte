@@ -70,7 +70,7 @@ const DOSSIERS: Dossier[] = [
       {
         titre: '7 : E-learning à destination des collaborateurs pour les comptes de campagne',
         description: 'Lien vers le dossier Google Drive',
-        fichier: 'https://drive.google.com/drive/folders/1n1Cz3QmeEAyJdA0AlPYN448s6WpVUdSG?usp=drive_link',
+        fichier: 'https://drive.google.com/drive/folders/1n1Cz3QmeEAyJdA0AlPYN448s6WpVUdSG?usp=sharing',
         lien: true,
       },
     ],
