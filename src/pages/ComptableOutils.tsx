@@ -130,6 +130,11 @@ export default function ComptableOutils() {
                             <div className="flex-1">
                             <div className="font-medium">{o.titre}</div>
                             <div className="text-sm text-muted-foreground">{o.description}</div>
+                            {o.lien && (
+                              <div className="text-xs text-muted-foreground italic mt-1">
+                                Si le lien ne s'ouvre pas : clic droit sur cette carte puis « Ouvrir le lien dans un nouvel onglet ».
+                              </div>
+                            )}
                             </div>
                             {o.lien ? <ExternalLink className="w-4 h-4 text-muted-foreground" /> : <Download className="w-4 h-4 text-muted-foreground" />}
                           </a>
