@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import guideEntretien from '@/assets/guide_entretien.xlsx.asset.json';
 import scoringRisque from '@/assets/scoring_risque.xlsm.asset.json';
 import questionnaireIndependance from '@/assets/questionnaire_independance_v2.xlsx.asset.json';
+import questionnaireLab from '@/assets/questionnaire_lab.xlsx.asset.json';
 
 interface Dossier {
   id: string;
@@ -38,6 +39,12 @@ const DOSSIERS: Dossier[] = [
         description: 'Fichier Excel à télécharger',
         fichier: questionnaireIndependance.url,
         nomFichier: "Outil_3_Questionnaire_independance.xlsx",
+      },
+      {
+        titre: "4 : Questionnaire LAB comptes de campagne",
+        description: 'Fichier Excel à télécharger',
+        fichier: questionnaireLab.url,
+        nomFichier: "Outil_4_Questionnaire_LAB.xlsx",
       },
     ],
   },
