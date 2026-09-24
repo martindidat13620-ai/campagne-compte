@@ -33,6 +33,7 @@ export function RapprochementBancaire({ candidatId, operations }: { candidatId: 
   const [pointees, setPointees] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [dejaPointees, setDejaPointees] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     let cancelled = false;
@@ -43,11 +44,14 @@ export function RapprochementBancaire({ candidatId, operations }: { candidatId: 
         .select('*')
         .eq('candidat_id', candidatId)
         .lte('mois', mois)
-        .order('mois', { ascending: false })
-        .limit(2);
+        .order('mois', { ascending: false });
       if (cancelled) return;
       const current = data?.find((r: any) => r.mois === mois);
       const previous = data?.find((r: any) => r.mois < mois);
+      const prevPointed = new Set<string>();
+      (data || []).filter((r: any) => r.mois < mois)
+        .forEach((r: any) => (r.operations_pointees || []).forEach((id: string) => prevPointed.add(id)));
+      setDejaPointees(prevPointed);
       if (current) {
         setSoldeDebut(String(current.solde_debut));
         setSoldeFin(String(current.solde_fin));
@@ -62,11 +66,12 @@ export function RapprochementBancaire({ candidatId, operations }: { candidatId: 
     return () => { cancelled = true; };
   }, [candidatId, mois]);
 
+  // Opérations validées jusqu'à la fin du mois, non rapprochées sur un mois précédent
   const opsMois = useMemo(
     () => operations
-      .filter(op => op.statut_validation === 'validee' && op.date?.slice(0, 7) === mois)
+      .filter(op => op.statut_validation === 'validee' && op.date && op.date.slice(0, 7) <= mois && !dejaPointees.has(op.id))
       .sort((a, b) => a.date.localeCompare(b.date)),
-    [operations, mois]
+    [operations, mois, dejaPointees]
   );
 
   const debut = parseFloat(soldeDebut.replace(',', '.')) || 0;
