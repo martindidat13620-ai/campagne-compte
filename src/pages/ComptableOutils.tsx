@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Folder, FolderOpen, ChevronRight, Wrench, FileSpreadsheet, Download } from 'lucide-react';
+import { ArrowLeft, Folder, FolderOpen, ChevronRight, Wrench, FileSpreadsheet, Download, ExternalLink, GraduationCap } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -15,7 +15,7 @@ interface Dossier {
   id: string;
   titre: string;
   description: string;
-  outils: { titre: string; description: string; fichier: string; nomFichier: string }[];
+  outils: { titre: string; description: string; fichier: string; nomFichier?: string; lien?: boolean }[];
 }
 
 const DOSSIERS: Dossier[] = [
@@ -66,7 +66,14 @@ const DOSSIERS: Dossier[] = [
     id: 'pendant-mission',
     titre: 'Pendant la mission',
     description: 'Outils à utiliser au cours de la mission',
-    outils: [],
+    outils: [
+      {
+        titre: '7 : E-learning à destination des collaborateurs pour les comptes de campagne',
+        description: 'Lien vers le dossier Google Drive',
+        fichier: 'https://drive.google.com/drive/folders/1n1Cz3QmeEAyJdA0AlPYN448s6WpVUdSG?usp=drive_link',
+        lien: true,
+      },
+    ],
   },
 ];
 
@@ -118,13 +125,13 @@ export default function ComptableOutils() {
                     ) : (
                       <div className="grid sm:grid-cols-2 gap-3">
                         {d.outils.map(o => (
-                          <a key={o.titre} href={o.fichier} download={o.nomFichier} className="flex items-center gap-3 border border-border rounded-lg p-3 hover:bg-muted/50">
-                            <FileSpreadsheet className="w-6 h-6 text-success shrink-0" />
+                          <a key={o.titre} href={o.fichier} {...(o.lien ? { target: '_blank', rel: 'noopener noreferrer' } : { download: o.nomFichier })} className="flex items-center gap-3 border border-border rounded-lg p-3 hover:bg-muted/50">
+                            {o.lien ? <GraduationCap className="w-6 h-6 text-accent shrink-0" /> : <FileSpreadsheet className="w-6 h-6 text-success shrink-0" />}
                             <div className="flex-1">
                             <div className="font-medium">{o.titre}</div>
                             <div className="text-sm text-muted-foreground">{o.description}</div>
                             </div>
-                            <Download className="w-4 h-4 text-muted-foreground" />
+                            {o.lien ? <ExternalLink className="w-4 h-4 text-muted-foreground" /> : <Download className="w-4 h-4 text-muted-foreground" />}
                           </a>
                         ))}
                       </div>
