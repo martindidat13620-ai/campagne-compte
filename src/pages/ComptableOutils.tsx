@@ -62,6 +62,12 @@ const DOSSIERS: Dossier[] = [
       },
     ],
   },
+  {
+    id: 'pendant-mission',
+    titre: 'Pendant la mission',
+    description: 'Outils à utiliser au cours de la mission',
+    outils: [],
+  },
 ];
 
 export default function ComptableOutils() {
