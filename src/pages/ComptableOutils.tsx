@@ -1,15 +1,34 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Wrench, Clock, Sparkles } from 'lucide-react';
+import { ArrowLeft, Folder, FolderOpen, ChevronRight, Wrench } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+
+interface Dossier {
+  id: string;
+  titre: string;
+  description: string;
+  outils: { titre: string; description: string; href?: string }[];
+}
+
+const DOSSIERS: Dossier[] = [
+  {
+    id: 'avant-mission',
+    titre: "Avant l'entrée en mission",
+    description: 'Outils à utiliser avant d’accepter et de démarrer une mission',
+    outils: [],
+  },
+];
 
 export default function ComptableOutils() {
+  const [ouvert, setOuvert] = useState<string | null>(null);
+
   return (
     <AppLayout>
       <div className="space-y-6 animate-fade-in">
-        {/* Header */}
         <div>
-          <Link 
+          <Link
             to="/comptable"
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4 transition-colors"
           >
@@ -17,36 +36,52 @@ export default function ComptableOutils() {
             Retour à l'accueil
           </Link>
           <h1 className="text-2xl font-bold text-foreground">Ma Boîte à Outils</h1>
-          <p className="text-muted-foreground">
-            Outils et ressources pour faciliter votre gestion
-          </p>
+          <p className="text-muted-foreground">Outils et ressources pour faciliter votre gestion</p>
         </div>
 
-        {/* Coming Soon */}
-        <Card className="border-dashed">
-          <CardContent className="py-16 text-center">
-            <div className="w-20 h-20 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-6">
-              <Wrench className="w-10 h-10 text-accent" />
-            </div>
-            <h2 className="text-xl font-semibold text-foreground mb-2">
-              Bientôt disponible
-            </h2>
-            <p className="text-muted-foreground max-w-md mx-auto mb-6">
-              Nous travaillons sur de nouveaux outils pour vous aider dans votre gestion quotidienne. 
-              Revenez bientôt pour découvrir les nouveautés !
-            </p>
-            <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                En développement
-              </div>
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4" />
-                Nouvelles fonctionnalités à venir
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="space-y-3">
+          {DOSSIERS.map(d => {
+            const isOpen = ouvert === d.id;
+            return (
+              <Card key={d.id}>
+                <button
+                  className="w-full flex items-center gap-4 p-4 text-left hover:bg-muted/50 transition-colors rounded-lg"
+                  onClick={() => setOuvert(isOpen ? null : d.id)}
+                >
+                  <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
+                    {isOpen ? <FolderOpen className="w-6 h-6 text-accent" /> : <Folder className="w-6 h-6 text-accent" />}
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-semibold text-foreground">{d.titre}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {d.description} · {d.outils.length} outil(s)
+                    </div>
+                  </div>
+                  <ChevronRight className={cn('text-muted-foreground transition-transform', isOpen && 'rotate-90')} />
+                </button>
+                {isOpen && (
+                  <CardContent className="pt-0">
+                    {d.outils.length === 0 ? (
+                      <div className="border border-dashed border-border rounded-lg py-10 text-center text-muted-foreground">
+                        <Wrench className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                        Aucun outil pour le moment
+                      </div>
+                    ) : (
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        {d.outils.map(o => (
+                          <Link key={o.titre} to={o.href || '#'} className="border border-border rounded-lg p-3 hover:bg-muted/50">
+                            <div className="font-medium">{o.titre}</div>
+                            <div className="text-sm text-muted-foreground">{o.description}</div>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                )}
+              </Card>
+            );
+          })}
+        </div>
       </div>
     </AppLayout>
   );
