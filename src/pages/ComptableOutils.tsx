@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Folder, FolderOpen, ChevronRight, Wrench } from 'lucide-react';
+import { ArrowLeft, Folder, FolderOpen, ChevronRight, Wrench, FileSpreadsheet, Download } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import guideEntretien from '@/assets/guide_entretien.xlsx.asset.json';
 
 interface Dossier {
   id: string;
   titre: string;
   description: string;
-  outils: { titre: string; description: string; href?: string }[];
+  outils: { titre: string; description: string; fichier: string; nomFichier: string }[];
 }
 
 const DOSSIERS: Dossier[] = [
@@ -17,7 +18,14 @@ const DOSSIERS: Dossier[] = [
     id: 'avant-mission',
     titre: "Avant l'entrée en mission",
     description: 'Outils à utiliser avant d’accepter et de démarrer une mission',
-    outils: [],
+    outils: [
+      {
+        titre: "1 : Le guide d'entretien et prise de connaissance",
+        description: 'Fichier Excel à télécharger',
+        fichier: guideEntretien.url,
+        nomFichier: "Outil_1_Guide_entretien.xlsx",
+      },
+    ],
   },
 ];
 
@@ -69,10 +77,14 @@ export default function ComptableOutils() {
                     ) : (
                       <div className="grid sm:grid-cols-2 gap-3">
                         {d.outils.map(o => (
-                          <Link key={o.titre} to={o.href || '#'} className="border border-border rounded-lg p-3 hover:bg-muted/50">
+                          <a key={o.titre} href={o.fichier} download={o.nomFichier} className="flex items-center gap-3 border border-border rounded-lg p-3 hover:bg-muted/50">
+                            <FileSpreadsheet className="w-6 h-6 text-success shrink-0" />
+                            <div className="flex-1">
                             <div className="font-medium">{o.titre}</div>
                             <div className="text-sm text-muted-foreground">{o.description}</div>
-                          </Link>
+                            </div>
+                            <Download className="w-4 h-4 text-muted-foreground" />
+                          </a>
                         ))}
                       </div>
                     )}
