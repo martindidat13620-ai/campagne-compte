@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import guideEntretien from '@/assets/guide_entretien.xlsx.asset.json';
 import scoringRisque from '@/assets/scoring_risque.xlsm.asset.json';
-import questionnaireIndependance from '@/assets/questionnaire_independance.xlsx.asset.json';
+import questionnaireIndependance from '@/assets/questionnaire_independance_v2.xlsx.asset.json';
 
 interface Dossier {
   id: string;
