@@ -391,8 +391,11 @@ export type Database = {
         Row: {
           candidat_id: string
           created_at: string
+          date_debut: string | null
+          date_fin: string | null
           id: string
-          mois: string
+          mois: string | null
+          numero_releve: string | null
           operations_pointees: string[]
           solde_debut: number
           solde_fin: number
@@ -401,8 +404,11 @@ export type Database = {
         Insert: {
           candidat_id: string
           created_at?: string
+          date_debut?: string | null
+          date_fin?: string | null
           id?: string
-          mois: string
+          mois?: string | null
+          numero_releve?: string | null
           operations_pointees?: string[]
           solde_debut?: number
           solde_fin?: number
@@ -411,8 +417,11 @@ export type Database = {
         Update: {
           candidat_id?: string
           created_at?: string
+          date_debut?: string | null
+          date_fin?: string | null
           id?: string
-          mois?: string
+          mois?: string | null
+          numero_releve?: string | null
           operations_pointees?: string[]
           solde_debut?: number
           solde_fin?: number
