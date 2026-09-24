@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import guideEntretien from '@/assets/guide_entretien.xlsx.asset.json';
 import scoringRisque from '@/assets/scoring_risque.xlsm.asset.json';
+import questionnaireIndependance from '@/assets/questionnaire_independance.xlsx.asset.json';
 
 interface Dossier {
   id: string;
@@ -31,6 +32,12 @@ const DOSSIERS: Dossier[] = [
         description: 'Fichier Excel avec macros à télécharger',
         fichier: scoringRisque.url,
         nomFichier: "Outil_2_Scoring_du_risque.xlsm",
+      },
+      {
+        titre: "3 : Questionnaire d'indépendance",
+        description: 'Fichier Excel à télécharger',
+        fichier: questionnaireIndependance.url,
+        nomFichier: "Outil_3_Questionnaire_independance.xlsx",
       },
     ],
   },
