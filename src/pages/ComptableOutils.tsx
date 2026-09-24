@@ -5,6 +5,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import guideEntretien from '@/assets/guide_entretien.xlsx.asset.json';
+import scoringRisque from '@/assets/scoring_risque.xlsm.asset.json';
 
 interface Dossier {
   id: string;
@@ -24,6 +25,12 @@ const DOSSIERS: Dossier[] = [
         description: 'Fichier Excel à télécharger',
         fichier: guideEntretien.url,
         nomFichier: "Outil_1_Guide_entretien.xlsx",
+      },
+      {
+        titre: "2 : Scoring du risque et aide à la décision",
+        description: 'Fichier Excel avec macros à télécharger',
+        fichier: scoringRisque.url,
+        nomFichier: "Outil_2_Scoring_du_risque.xlsm",
       },
     ],
   },
