@@ -132,7 +132,7 @@ export function RapprochementBancaire({ candidatId, operations }: { candidatId: 
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-base">Opérations validées du mois ({opsMois.length})</CardTitle>
+          <CardTitle className="text-base">Opérations à rapprocher ({opsMois.length})</CardTitle>
           {opsMois.length > 0 && (
             <Button variant="outline" size="sm" onClick={toggleAll}>
               {pointees.size === opsMois.length ? 'Tout décocher' : 'Tout cocher'}
@@ -154,6 +154,7 @@ export function RapprochementBancaire({ candidatId, operations }: { candidatId: 
                     {libelle(o)}
                     {o.numero_releve_bancaire && <span className="text-muted-foreground"> · Relevé {o.numero_releve_bancaire}</span>}
                     {o.numero_cheque && <span className="text-muted-foreground"> · Chèque {o.numero_cheque}</span>}
+                    {o.date.slice(0, 7) < mois && <span className="ml-2 text-xs text-warning">(reporté)</span>}
                   </span>
                   <span className={cn('text-sm font-medium', o.type_operation === 'recette' ? 'text-success' : 'text-destructive')}>
                     {o.type_operation === 'recette' ? '+' : '−'}{fmt(Number(o.montant))}
