@@ -9,6 +9,7 @@ import scoringRisque from '@/assets/scoring_risque.xlsm.asset.json';
 import questionnaireIndependance from '@/assets/questionnaire_independance_v2.xlsx.asset.json';
 import questionnaireLab from '@/assets/questionnaire_lab.xlsx.asset.json';
 import grilleHonoraires from '@/assets/grille_honoraires.xlsx.asset.json';
+import lettreMission from '@/assets/lettre_mission.docx.asset.json';
 
 interface Dossier {
   id: string;
@@ -52,6 +53,12 @@ const DOSSIERS: Dossier[] = [
         description: 'Fichier Excel à télécharger',
         fichier: grilleHonoraires.url,
         nomFichier: "Outil_5_Grille_honoraires.xlsx",
+      },
+      {
+        titre: "6 : Modèle de lettre de mission",
+        description: 'Fichier Word à télécharger',
+        fichier: lettreMission.url,
+        nomFichier: "Outil_6_Lettre_de_mission.docx",
       },
     ],
   },
