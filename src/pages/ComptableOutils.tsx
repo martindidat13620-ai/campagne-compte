@@ -13,6 +13,7 @@ import lettreMission from '@/assets/lettre_mission.docx.asset.json';
 import fichesMemo from '@/assets/fiches_memo_depenses.pdf.asset.json';
 import fichesMemoRecettes from '@/assets/fiches_memo_recettes.pdf.asset.json';
 import fichesMemoEnveloppe from '@/assets/fiches_memo_enveloppe.pdf.asset.json';
+import manuelProcedures from '@/assets/manuel_procedures_internes.pdf.asset.json';
 
 interface Dossier {
   id: string;
@@ -71,28 +72,34 @@ const DOSSIERS: Dossier[] = [
     description: 'Outils à utiliser au cours de la mission',
     outils: [
       {
-        titre: '7 : E-learning à destination des collaborateurs pour les comptes de campagne',
+        titre: '7 : Manuel des procédures internes « spécial comptes de campagne »',
+        description: 'Fichier PDF à télécharger',
+        fichier: manuelProcedures.url,
+        nomFichier: 'Outil_7_Manuel_procedures_internes.pdf',
+      },
+      {
+        titre: '8 : E-learning à destination des collaborateurs pour les comptes de campagne',
         description: 'Lien vers le dossier Google Drive',
         fichier: 'https://drive.google.com/drive/folders/1n1Cz3QmeEAyJdA0AlPYN448s6WpVUdSG?usp=sharing',
         lien: true,
       },
       {
-        titre: '8 : Fiches mémo « dépenses »',
+        titre: '9 : Fiches mémo « dépenses »',
         description: 'Fichier PDF à télécharger',
         fichier: fichesMemo.url,
-        nomFichier: 'Outil_8_Fiches_memo_depenses.pdf',
+        nomFichier: 'Outil_9_Fiches_memo_depenses.pdf',
       },
       {
-        titre: '8 : Fiches mémo « recettes »',
+        titre: '9 : Fiches mémo « recettes »',
         description: 'Fichier PDF à télécharger',
         fichier: fichesMemoRecettes.url,
-        nomFichier: 'Outil_8_Fiches_memo_recettes.pdf',
+        nomFichier: 'Outil_9_Fiches_memo_recettes.pdf',
       },
       {
-        titre: '8 : Fiches mémo « enveloppe »',
+        titre: '9 : Fiches mémo « enveloppe »',
         description: 'Fichier PDF à télécharger',
         fichier: fichesMemoEnveloppe.url,
-        nomFichier: 'Outil_8_Fiches_memo_enveloppe.pdf',
+        nomFichier: 'Outil_9_Fiches_memo_enveloppe.pdf',
       },
     ],
   },
