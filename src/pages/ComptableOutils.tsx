@@ -15,6 +15,7 @@ import fichesMemo from '@/assets/fiches_memo_depenses.pdf.asset.json';
 import fichesMemoRecettes from '@/assets/fiches_memo_recettes.pdf.asset.json';
 import fichesMemoEnveloppe from '@/assets/fiches_memo_enveloppe.pdf.asset.json';
 import manuelProcedures from '@/assets/manuel_procedures_internes.pdf.asset.json';
+import tableauBordSuivi from '@/assets/outil_12_tableau_bord_suivi_commercial.xlsx.asset.json';
 
 interface Dossier {
   id: string;
@@ -113,6 +114,12 @@ const DOSSIERS: Dossier[] = [
         description: 'Fichier Excel à télécharger',
         fichier: workflowJalonnement.url,
         nomFichier: 'Outil_11_Workflow_de_jalonnement_et_de_vigilance_de_la_mission.xlsx',
+      },
+      {
+        titre: '12 : Tableau de bord de suivi commercial',
+        description: 'Fichier Excel à télécharger',
+        fichier: tableauBordSuivi.url,
+        nomFichier: 'Outil_12_Tableau_de_bord_de_suivi_commercial.xlsx',
       },
     ],
   },
