@@ -16,6 +16,7 @@ import fichesMemoRecettes from '@/assets/fiches_memo_recettes.pdf.asset.json';
 import fichesMemoEnveloppe from '@/assets/fiches_memo_enveloppe.pdf.asset.json';
 import manuelProcedures from '@/assets/manuel_procedures_internes.pdf.asset.json';
 import tableauBordSuivi from '@/assets/outil_12_tableau_bord_suivi_commercial.xlsx.asset.json';
+import checklistFinMission from '@/assets/outil_13_checklist_fin_mission.xlsx.asset.json';
 
 interface Dossier {
   id: string;
@@ -120,6 +121,12 @@ const DOSSIERS: Dossier[] = [
         description: 'Fichier Excel à télécharger',
         fichier: tableauBordSuivi.url,
         nomFichier: 'Outil_12_Tableau_de_bord_de_suivi_commercial.xlsx',
+      },
+      {
+        titre: '13 : Checklist de fin de mission interactive',
+        description: 'Fichier Excel à télécharger',
+        fichier: checklistFinMission.url,
+        nomFichier: 'Outil_13_Checklist_de_fin_de_mission_interactive.xlsx',
       },
     ],
   },
