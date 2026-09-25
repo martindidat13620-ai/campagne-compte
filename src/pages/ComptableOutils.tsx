@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, FileText, Folder, FolderOpen, ChevronRight, Wrench, FileSpreadsheet, Download, ExternalLink, GraduationCap } from 'lucide-react';
+import { ArrowLeft, FileText, FileType, Folder, FolderOpen, ChevronRight, Wrench, FileSpreadsheet, Download, ExternalLink, GraduationCap } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -147,7 +147,7 @@ export default function ComptableOutils() {
                       <div className="grid sm:grid-cols-2 gap-3">
                         {d.outils.map(o => (
                           <a key={o.titre} href={o.fichier} {...(o.lien ? { target: '_blank', rel: 'noopener noreferrer' } : { download: o.nomFichier })} className="flex items-center gap-3 border border-border rounded-lg p-3 hover:bg-muted/50">
-                            {o.lien ? <GraduationCap className="w-6 h-6 text-accent shrink-0" /> : o.nomFichier?.endsWith('.pdf') ? <FileText className="w-6 h-6 text-destructive shrink-0" /> : <FileSpreadsheet className="w-6 h-6 text-success shrink-0" />}
+                            {o.lien ? <GraduationCap className="w-6 h-6 text-accent shrink-0" /> : o.nomFichier?.endsWith('.docx') ? <FileType className="w-6 h-6 text-primary shrink-0" /> : o.nomFichier?.endsWith('.pdf') ? <FileText className="w-6 h-6 text-destructive shrink-0" /> : <FileSpreadsheet className="w-6 h-6 text-success shrink-0" />}
                             <div className="flex-1">
                             <div className="font-medium">{o.titre}</div>
                             <div className="text-sm text-muted-foreground">{o.description}</div>
