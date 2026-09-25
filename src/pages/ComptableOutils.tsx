@@ -10,6 +10,7 @@ import questionnaireIndependance from '@/assets/questionnaire_independance_v2.xl
 import questionnaireLab from '@/assets/questionnaire_lab.xlsx.asset.json';
 import grilleHonoraires from '@/assets/grille_honoraires.xlsx.asset.json';
 import lettreMission from '@/assets/lettre_mission.docx.asset.json';
+import fichesMemo from '@/assets/fiches_memo_depenses.pdf.asset.json';
 
 interface Dossier {
   id: string;
@@ -72,6 +73,12 @@ const DOSSIERS: Dossier[] = [
         description: 'Lien vers le dossier Google Drive',
         fichier: 'https://drive.google.com/drive/folders/1n1Cz3QmeEAyJdA0AlPYN448s6WpVUdSG?usp=sharing',
         lien: true,
+      },
+      {
+        titre: '8 : Fiches mémo « dépenses »',
+        description: 'Fichier PDF à télécharger',
+        fichier: fichesMemo.url,
+        nomFichier: 'Outil_8_Fiches_memo_depenses.pdf',
       },
     ],
   },
