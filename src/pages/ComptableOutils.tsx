@@ -16,6 +16,7 @@ import fichesMemoRecettes from '@/assets/fiches_memo_recettes.pdf.asset.json';
 import fichesMemoEnveloppe from '@/assets/fiches_memo_enveloppe.pdf.asset.json';
 import manuelProcedures from '@/assets/manuel_procedures_internes.pdf.asset.json';
 import tableauBordSuivi from '@/assets/outil_12_tableau_bord_suivi_commercial.xlsx.asset.json';
+import checklistFinMission from '@/assets/outil_13_checklist_fin_mission.xlsx.asset.json';
 
 interface Dossier {
   id: string;
