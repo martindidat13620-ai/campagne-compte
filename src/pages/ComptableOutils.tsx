@@ -10,6 +10,7 @@ import questionnaireIndependance from '@/assets/questionnaire_independance_v2.xl
 import questionnaireLab from '@/assets/questionnaire_lab.xlsx.asset.json';
 import grilleHonoraires from '@/assets/grille_honoraires.xlsx.asset.json';
 import lettreMission from '@/assets/lettre_mission.docx.asset.json';
+import workflowJalonnement from '@/assets/outil_11_workflow_jalonnement.xlsx.asset.json';
 import fichesMemo from '@/assets/fiches_memo_depenses.pdf.asset.json';
 import fichesMemoRecettes from '@/assets/fiches_memo_recettes.pdf.asset.json';
 import fichesMemoEnveloppe from '@/assets/fiches_memo_enveloppe.pdf.asset.json';
@@ -106,6 +107,12 @@ const DOSSIERS: Dossier[] = [
         description: 'Lien vers l\'assistant IA (Gemini)',
         fichier: 'https://gemini.google.com/gem/a5d80097a6e8',
         lien: true,
+      },
+      {
+        titre: '11 : Workflow de jalonnement et de vigilance de la mission',
+        description: 'Fichier Excel à télécharger',
+        fichier: workflowJalonnement.url,
+        nomFichier: 'Outil_11_Workflow_de_jalonnement_et_de_vigilance_de_la_mission.xlsx',
       },
     ],
   },
