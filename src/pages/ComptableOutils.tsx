@@ -108,6 +108,12 @@ const DOSSIERS: Dossier[] = [
         fichier: 'https://gemini.google.com/gem/a5d80097a6e8',
         lien: true,
       },
+      {
+        titre: '11 : Workflow de jalonnement et de vigilance de la mission',
+        description: 'Fichier Excel à télécharger',
+        fichier: workflowJalonnement.url,
+        nomFichier: 'Outil_11_Workflow_de_jalonnement_et_de_vigilance_de_la_mission.xlsx',
+      },
     ],
   },
 ];
