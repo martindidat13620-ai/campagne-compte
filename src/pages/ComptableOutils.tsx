@@ -101,6 +101,12 @@ const DOSSIERS: Dossier[] = [
         fichier: fichesMemoEnveloppe.url,
         nomFichier: 'Outil_9_Fiches_memo_enveloppe.pdf',
       },
+      {
+        titre: '10 : Assistant IA conversationnel spécial compte de campagne',
+        description: 'Lien vers l\'assistant IA (Gemini)',
+        fichier: 'https://gemini.google.com/gem/a5d80097a6e8',
+        lien: true,
+      },
     ],
   },
 ];
