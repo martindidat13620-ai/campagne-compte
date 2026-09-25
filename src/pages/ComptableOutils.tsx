@@ -12,6 +12,7 @@ import grilleHonoraires from '@/assets/grille_honoraires.xlsx.asset.json';
 import lettreMission from '@/assets/lettre_mission.docx.asset.json';
 import fichesMemo from '@/assets/fiches_memo_depenses.pdf.asset.json';
 import fichesMemoRecettes from '@/assets/fiches_memo_recettes.pdf.asset.json';
+import fichesMemoEnveloppe from '@/assets/fiches_memo_enveloppe.pdf.asset.json';
 
 interface Dossier {
   id: string;
@@ -86,6 +87,12 @@ const DOSSIERS: Dossier[] = [
         description: 'Fichier PDF à télécharger',
         fichier: fichesMemoRecettes.url,
         nomFichier: 'Outil_8_Fiches_memo_recettes.pdf',
+      },
+      {
+        titre: '8 : Fiches mémo « enveloppe »',
+        description: 'Fichier PDF à télécharger',
+        fichier: fichesMemoEnveloppe.url,
+        nomFichier: 'Outil_8_Fiches_memo_enveloppe.pdf',
       },
     ],
   },
