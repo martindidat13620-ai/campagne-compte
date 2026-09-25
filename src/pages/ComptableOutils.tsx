@@ -122,6 +122,12 @@ const DOSSIERS: Dossier[] = [
         fichier: tableauBordSuivi.url,
         nomFichier: 'Outil_12_Tableau_de_bord_de_suivi_commercial.xlsx',
       },
+      {
+        titre: '13 : Checklist de fin de mission interactive',
+        description: 'Fichier Excel à télécharger',
+        fichier: checklistFinMission.url,
+        nomFichier: 'Outil_13_Checklist_de_fin_de_mission_interactive.xlsx',
+      },
     ],
   },
 ];
