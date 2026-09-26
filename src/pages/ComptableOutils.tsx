@@ -128,6 +128,12 @@ const DOSSIERS: Dossier[] = [
         fichier: checklistFinMission.url,
         nomFichier: 'Outil_13_Checklist_de_fin_de_mission_interactive.xlsx',
       },
+      {
+        titre: "14 : Campagn'juris : assistant jurisprudentiel",
+        description: "Lien vers l'assistant IA (Gemini)",
+        fichier: 'https://gemini.google.com/gem/1Xa5kPkk95GDv-tUcKwVcPdnYwgv3VpDl?usp=sharing',
+        lien: true,
+      },
     ],
   },
 ];
