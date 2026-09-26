@@ -109,6 +109,28 @@ export default function MandataireConnaissances() {
             );
           })}
         </div>
+
+        {LIENS.map(l => (
+          <a
+            key={l.titre}
+            href={l.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-4 p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
+          >
+            <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+              <Bot className="w-6 h-6 text-accent" />
+            </div>
+            <div className="flex-1">
+              <div className="font-semibold text-foreground">{l.titre}</div>
+              <div className="text-sm text-muted-foreground">{l.description}</div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Si le lien ne s'ouvre pas : clic droit sur cette carte puis « Ouvrir le lien dans un nouvel onglet »
+              </div>
+            </div>
+            <ExternalLink className="w-4 h-4 text-muted-foreground shrink-0" />
+          </a>
+        ))}
       </div>
     </AppLayout>
   );
