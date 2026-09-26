@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Folder, FolderOpen, ChevronRight, FileText, Download } from 'lucide-react';
+import { Folder, FolderOpen, ChevronRight, FileText, Download, Bot, ExternalLink } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -39,6 +39,15 @@ const DOSSIERS: Dossier[] = [
         nomFichier: 'Fiches_memo_enveloppe.pdf',
       },
     ],
+  },
+];
+
+const LIENS: { titre: string; description: string; url: string }[] = [
+  {
+    titre: 'Mon assistant comptes de campagne',
+    description:
+      "Assistant jurisprudentiel IA. Important : pensez à anonymiser toutes vos requêtes — ne saisissez jamais de noms, prénoms ou données personnelles identifiables.",
+    url: 'https://gemini.google.com/gem/1Xa5kPkk95GDv-tUcKwVcPdnYwgv3VpDl?usp=sharing',
   },
 ];
 
