@@ -97,7 +97,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 key={item.href}
                 to={item.href}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                  "relative flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
                   location.pathname === item.href
                     ? "bg-primary-foreground/20"
                     : "hover:bg-primary-foreground/10"
@@ -105,6 +105,11 @@ export function AppLayout({ children }: AppLayoutProps) {
               >
                 <item.icon size={18} />
                 {item.label}
+                {'badge' in item && (item.badge ?? 0) > 0 && (
+                  <span className="bg-destructive text-destructive-foreground text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5">
+                    {item.badge}
+                  </span>
+                )}
               </Link>
             ))}
           </nav>
@@ -155,6 +160,11 @@ export function AppLayout({ children }: AppLayoutProps) {
               >
                 <item.icon size={20} />
                 {item.label}
+                {'badge' in item && (item.badge ?? 0) > 0 && (
+                  <span className="bg-destructive text-destructive-foreground text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5">
+                    {item.badge}
+                  </span>
+                )}
               </Link>
             ))}
           </nav>
