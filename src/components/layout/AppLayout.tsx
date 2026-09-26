@@ -8,9 +8,11 @@ import {
   X,
   Building2,
   FileCheck,
-  ChevronDown
+  ChevronDown,
+  MessageCircle
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnreadCount } from '@/hooks/useChat';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -31,20 +33,30 @@ export function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const unreadCount = useUnreadCount();
 
-  const mandataireNavItems = [
+  interface NavItem {
+    href: string;
+    label: string;
+    icon: typeof LayoutDashboard;
+    badge?: number;
+  }
+
+  const mandataireNavItems: NavItem[] = [
     { href: '/mandataire', label: 'Accueil', icon: LayoutDashboard },
     { href: '/mandataire/campagne', label: 'Ma Campagne', icon: Building2 },
     { href: '/mandataire/operations', label: 'Mes opérations', icon: FileCheck },
+    { href: '/mandataire/messages', label: 'Messages', icon: MessageCircle, badge: unreadCount },
   ];
 
-  const comptableNavItems = [
+  const comptableNavItems: NavItem[] = [
     { href: '/comptable', label: 'Accueil', icon: LayoutDashboard },
     { href: '/comptable/campagnes', label: 'Campagnes', icon: Building2 },
     { href: '/comptable/gestion', label: 'Gestion', icon: FileCheck },
+    { href: '/comptable/messages', label: 'Messages', icon: MessageCircle, badge: unreadCount },
   ];
 
-  const candidatNavItems = [
+  const candidatNavItems: NavItem[] = [
     { href: '/candidat', label: 'Tableau de bord', icon: LayoutDashboard },
   ];
 
@@ -92,7 +104,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 key={item.href}
                 to={item.href}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                  "relative flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
                   location.pathname === item.href
                     ? "bg-primary-foreground/20"
                     : "hover:bg-primary-foreground/10"
@@ -100,6 +112,11 @@ export function AppLayout({ children }: AppLayoutProps) {
               >
                 <item.icon size={18} />
                 {item.label}
+                {(item.badge ?? 0) > 0 && (
+                  <span className="bg-destructive text-destructive-foreground text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5">
+                    {item.badge}
+                  </span>
+                )}
               </Link>
             ))}
           </nav>
@@ -150,6 +167,11 @@ export function AppLayout({ children }: AppLayoutProps) {
               >
                 <item.icon size={20} />
                 {item.label}
+                {(item.badge ?? 0) > 0 && (
+                  <span className="bg-destructive text-destructive-foreground text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5">
+                    {item.badge}
+                  </span>
+                )}
               </Link>
             ))}
           </nav>
