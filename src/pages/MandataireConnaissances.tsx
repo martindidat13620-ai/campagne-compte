@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import fichesMemoDepenses from '@/assets/fiches_memo_depenses.pdf.asset.json';
 import fichesMemoRecettes from '@/assets/fiches_memo_recettes.pdf.asset.json';
 import fichesMemoEnveloppe from '@/assets/fiches_memo_enveloppe.pdf.asset.json';
+import manuelMandataireFinancier from '@/assets/manuel_mandataire_financier.pdf.asset.json';
 
 interface Dossier {
   id: string;
@@ -37,6 +38,21 @@ const DOSSIERS: Dossier[] = [
         description: 'Fichier PDF à télécharger',
         fichier: fichesMemoEnveloppe.url,
         nomFichier: 'Fiches_memo_enveloppe.pdf',
+      },
+    ],
+  },
+];
+
+  {
+    id: 'mon-cabinet',
+    titre: 'Mon cabinet d’expertise comptable',
+    description: 'Documents fournis par votre cabinet',
+    fichiers: [
+      {
+        titre: 'Guide du mandataire financier par mon cabinet',
+        description: 'Fichier PDF à télécharger',
+        fichier: manuelMandataireFinancier.url,
+        nomFichier: 'Manuel_du_mandataire_financier.pdf',
       },
     ],
   },
