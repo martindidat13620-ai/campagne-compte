@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Folder, FolderOpen, ChevronRight, FileText, Download, Bot, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Folder, FolderOpen, ChevronRight, FileText, Download, Bot, ExternalLink, MessageCircle, ArrowRight } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -12,7 +13,7 @@ interface Dossier {
   id: string;
   titre: string;
   description: string;
-  fichiers: { titre: string; description: string; fichier: string; nomFichier: string }[];
+  fichiers: { titre: string; description: string; fichier?: string; nomFichier?: string; lien?: string }[];
 }
 
 const DOSSIERS: Dossier[] = [
@@ -50,8 +51,13 @@ const DOSSIERS: Dossier[] = [
         titre: 'Guide du mandataire financier par mon cabinet',
         description: 'Fichier PDF à télécharger',
         fichier: manuelMandataireFinancier.url,
-        nomFichier: 'Manuel_du_mandataire_financier.pdf',
-      },
+          nomFichier: 'Manuel_du_mandataire_financier.pdf',
+        },
+        {
+          titre: 'Messagerie : échanger avec votre interlocuteur comptable',
+          description: 'Un espace de discussion direct avec votre expert-comptable',
+          lien: '/mandataire/messages',
+        },
     ],
   },
 ];
@@ -101,21 +107,36 @@ export default function MandataireConnaissances() {
                 {isOpen && (
                   <CardContent className="pt-0">
                     <div className="grid sm:grid-cols-2 gap-3">
-                      {d.fichiers.map(f => (
-                        <a
-                          key={f.titre}
-                          href={f.fichier}
-                          download={f.nomFichier}
-                          className="flex items-center gap-3 border border-border rounded-lg p-3 hover:bg-muted/50"
-                        >
-                          <FileText className="w-6 h-6 text-destructive shrink-0" />
-                          <div className="flex-1">
-                            <div className="font-medium">{f.titre}</div>
-                            <div className="text-sm text-muted-foreground">{f.description}</div>
-                          </div>
-                          <Download className="w-4 h-4 text-muted-foreground" />
-                        </a>
-                      ))}
+                      {d.fichiers.map(f =>
+                        f.lien ? (
+                          <Link
+                            key={f.titre}
+                            to={f.lien}
+                            className="flex items-center gap-3 border border-border rounded-lg p-3 hover:bg-muted/50"
+                          >
+                            <MessageCircle className="w-6 h-6 text-accent shrink-0" />
+                            <div className="flex-1">
+                              <div className="font-medium">{f.titre}</div>
+                              <div className="text-sm text-muted-foreground">{f.description}</div>
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                          </Link>
+                        ) : (
+                          <a
+                            key={f.titre}
+                            href={f.fichier}
+                            download={f.nomFichier}
+                            className="flex items-center gap-3 border border-border rounded-lg p-3 hover:bg-muted/50"
+                          >
+                            <FileText className="w-6 h-6 text-destructive shrink-0" />
+                            <div className="flex-1">
+                              <div className="font-medium">{f.titre}</div>
+                              <div className="text-sm text-muted-foreground">{f.description}</div>
+                            </div>
+                            <Download className="w-4 h-4 text-muted-foreground" />
+                          </a>
+                        )
+                      )}
                     </div>
                   </CardContent>
                 )}
