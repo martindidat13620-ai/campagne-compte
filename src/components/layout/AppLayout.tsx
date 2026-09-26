@@ -35,14 +35,21 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const unreadCount = useUnreadCount();
 
-  const mandataireNavItems = [
+  interface NavItem {
+    href: string;
+    label: string;
+    icon: typeof LayoutDashboard;
+    badge?: number;
+  }
+
+  const mandataireNavItems: NavItem[] = [
     { href: '/mandataire', label: 'Accueil', icon: LayoutDashboard },
     { href: '/mandataire/campagne', label: 'Ma Campagne', icon: Building2 },
     { href: '/mandataire/operations', label: 'Mes opérations', icon: FileCheck },
     { href: '/mandataire/messages', label: 'Messages', icon: MessageCircle, badge: unreadCount },
   ];
 
-  const comptableNavItems = [
+  const comptableNavItems: NavItem[] = [
     { href: '/comptable', label: 'Accueil', icon: LayoutDashboard },
     { href: '/comptable/campagnes', label: 'Campagnes', icon: Building2 },
     { href: '/comptable/gestion', label: 'Gestion', icon: FileCheck },
@@ -105,7 +112,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               >
                 <item.icon size={18} />
                 {item.label}
-                {'badge' in item && (item.badge ?? 0) > 0 && (
+                {(item.badge ?? 0) > 0 && (
                   <span className="bg-destructive text-destructive-foreground text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5">
                     {item.badge}
                   </span>
@@ -160,7 +167,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               >
                 <item.icon size={20} />
                 {item.label}
-                {'badge' in item && (item.badge ?? 0) > 0 && (
+                {(item.badge ?? 0) > 0 && (
                   <span className="bg-destructive text-destructive-foreground text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5">
                     {item.badge}
                   </span>
