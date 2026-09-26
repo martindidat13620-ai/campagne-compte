@@ -107,21 +107,36 @@ export default function MandataireConnaissances() {
                 {isOpen && (
                   <CardContent className="pt-0">
                     <div className="grid sm:grid-cols-2 gap-3">
-                      {d.fichiers.map(f => (
-                        <a
-                          key={f.titre}
-                          href={f.fichier}
-                          download={f.nomFichier}
-                          className="flex items-center gap-3 border border-border rounded-lg p-3 hover:bg-muted/50"
-                        >
-                          <FileText className="w-6 h-6 text-destructive shrink-0" />
-                          <div className="flex-1">
-                            <div className="font-medium">{f.titre}</div>
-                            <div className="text-sm text-muted-foreground">{f.description}</div>
-                          </div>
-                          <Download className="w-4 h-4 text-muted-foreground" />
-                        </a>
-                      ))}
+                      {d.fichiers.map(f =>
+                        f.lien ? (
+                          <Link
+                            key={f.titre}
+                            to={f.lien}
+                            className="flex items-center gap-3 border border-border rounded-lg p-3 hover:bg-muted/50"
+                          >
+                            <MessageCircle className="w-6 h-6 text-accent shrink-0" />
+                            <div className="flex-1">
+                              <div className="font-medium">{f.titre}</div>
+                              <div className="text-sm text-muted-foreground">{f.description}</div>
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                          </Link>
+                        ) : (
+                          <a
+                            key={f.titre}
+                            href={f.fichier}
+                            download={f.nomFichier}
+                            className="flex items-center gap-3 border border-border rounded-lg p-3 hover:bg-muted/50"
+                          >
+                            <FileText className="w-6 h-6 text-destructive shrink-0" />
+                            <div className="flex-1">
+                              <div className="font-medium">{f.titre}</div>
+                              <div className="text-sm text-muted-foreground">{f.description}</div>
+                            </div>
+                            <Download className="w-4 h-4 text-muted-foreground" />
+                          </a>
+                        )
+                      )}
                     </div>
                   </CardContent>
                 )}
