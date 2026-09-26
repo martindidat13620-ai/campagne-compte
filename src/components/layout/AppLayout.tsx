@@ -56,7 +56,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     { href: '/comptable/messages', label: 'Messages', icon: MessageCircle, badge: unreadCount },
   ];
 
-  const candidatNavItems = [
+  const candidatNavItems: NavItem[] = [
     { href: '/candidat', label: 'Tableau de bord', icon: LayoutDashboard },
   ];
 
