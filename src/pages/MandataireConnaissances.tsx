@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Folder, FolderOpen, ChevronRight, FileText, Download } from 'lucide-react';
+import { Folder, FolderOpen, ChevronRight, FileText, Download, Bot, ExternalLink } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -39,6 +39,15 @@ const DOSSIERS: Dossier[] = [
         nomFichier: 'Fiches_memo_enveloppe.pdf',
       },
     ],
+  },
+];
+
+const LIENS: { titre: string; description: string; url: string }[] = [
+  {
+    titre: 'Mon assistant comptes de campagne',
+    description:
+      "Assistant jurisprudentiel IA. Important : pensez à anonymiser toutes vos requêtes — ne saisissez jamais de noms, prénoms ou données personnelles identifiables.",
+    url: 'https://gemini.google.com/gem/1Xa5kPkk95GDv-tUcKwVcPdnYwgv3VpDl?usp=sharing',
   },
 ];
 
@@ -100,6 +109,28 @@ export default function MandataireConnaissances() {
             );
           })}
         </div>
+
+        {LIENS.map(l => (
+          <a
+            key={l.titre}
+            href={l.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-4 p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
+          >
+            <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+              <Bot className="w-6 h-6 text-accent" />
+            </div>
+            <div className="flex-1">
+              <div className="font-semibold text-foreground">{l.titre}</div>
+              <div className="text-sm text-muted-foreground">{l.description}</div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Si le lien ne s'ouvre pas : clic droit sur cette carte puis « Ouvrir le lien dans un nouvel onglet »
+              </div>
+            </div>
+            <ExternalLink className="w-4 h-4 text-muted-foreground shrink-0" />
+          </a>
+        ))}
       </div>
     </AppLayout>
   );
