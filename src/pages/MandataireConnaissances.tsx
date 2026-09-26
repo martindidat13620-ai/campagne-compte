@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Folder, FolderOpen, ChevronRight, FileText, Download, Bot, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Folder, FolderOpen, ChevronRight, FileText, Download, Bot, ExternalLink, MessageCircle, ArrowRight } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -12,7 +13,7 @@ interface Dossier {
   id: string;
   titre: string;
   description: string;
-  fichiers: { titre: string; description: string; fichier: string; nomFichier: string }[];
+  fichiers: { titre: string; description: string; fichier?: string; nomFichier?: string; lien?: string }[];
 }
 
 const DOSSIERS: Dossier[] = [
