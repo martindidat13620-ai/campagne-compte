@@ -42,8 +42,8 @@ const DOSSIERS: Dossier[] = [
     ],
   },
 ];
+const DOSSIERS: Dossier[] = [
 
-  {
     id: 'mon-cabinet',
     titre: 'Mon cabinet d’expertise comptable',
     description: 'Documents fournis par votre cabinet',
