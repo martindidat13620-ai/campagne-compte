@@ -21,6 +21,7 @@ import ComptableOutils from "./pages/ComptableOutils";
 import ComptableValidation from "./pages/ComptableValidation";
 import ComptableGestion from "./pages/ComptableGestion";
 import CandidatDashboard from "./pages/CandidatDashboard";
+import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,6 +42,8 @@ const App = () => (
             <Route path="/mandataire/connaissances" element={<MandataireConnaissances />} />
             <Route path="/mandataire/operations" element={<MesOperations />} />
             <Route path="/depense/nouvelle" element={<NouvelleDepense />} />
+            <Route path="/mandataire/messages" element={<Messages />} />
+            <Route path="/comptable/messages" element={<Messages />} />
             <Route path="/recette/nouvelle" element={<NouvelleRecette />} />
             <Route path="/historique" element={<Historique />} />
             <Route path="/comptable" element={<ComptableHome />} />

@@ -8,9 +8,11 @@ import {
   X,
   Building2,
   FileCheck,
-  ChevronDown
+  ChevronDown,
+  MessageCircle
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnreadCount } from '@/hooks/useChat';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -31,17 +33,20 @@ export function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const unreadCount = useUnreadCount();
 
   const mandataireNavItems = [
     { href: '/mandataire', label: 'Accueil', icon: LayoutDashboard },
     { href: '/mandataire/campagne', label: 'Ma Campagne', icon: Building2 },
     { href: '/mandataire/operations', label: 'Mes opérations', icon: FileCheck },
+    { href: '/mandataire/messages', label: 'Messages', icon: MessageCircle, badge: unreadCount },
   ];
 
   const comptableNavItems = [
     { href: '/comptable', label: 'Accueil', icon: LayoutDashboard },
     { href: '/comptable/campagnes', label: 'Campagnes', icon: Building2 },
     { href: '/comptable/gestion', label: 'Gestion', icon: FileCheck },
+    { href: '/comptable/messages', label: 'Messages', icon: MessageCircle, badge: unreadCount },
   ];
 
   const candidatNavItems = [
