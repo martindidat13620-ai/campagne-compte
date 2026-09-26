@@ -51,8 +51,13 @@ const DOSSIERS: Dossier[] = [
         titre: 'Guide du mandataire financier par mon cabinet',
         description: 'Fichier PDF à télécharger',
         fichier: manuelMandataireFinancier.url,
-        nomFichier: 'Manuel_du_mandataire_financier.pdf',
-      },
+          nomFichier: 'Manuel_du_mandataire_financier.pdf',
+        },
+        {
+          titre: 'Messagerie : échanger avec votre interlocuteur comptable',
+          description: 'Un espace de discussion direct avec votre expert-comptable',
+          lien: '/mandataire/messages',
+        },
     ],
   },
 ];
